@@ -61,8 +61,8 @@
 
 // my classes
 #include "JPsieeAnalyzerSignal.h"
-#include "TrackerIsolation.h"		
-#include "CalotowerIsolation.h"
+#include "../interface/TrackerIsolation.h"		
+#include "../interface/CalotowerIsolation.h"
 
 using namespace reco;
 using namespace std;

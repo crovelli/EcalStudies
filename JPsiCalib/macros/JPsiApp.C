@@ -10,6 +10,7 @@
 #include <TTree.h>
 #include <TChain.h>
 #include "finalJPsiAnalysis.cc"
+#include "finalJPsiAnalysisEle.cc"
 #include "invMassStudy.cc"
 
 int main(int argc, char* argv[]) {
@@ -48,6 +49,11 @@ int main(int argc, char* argv[]) {
   }  
 
   if (applic==1) {
+    finalJPsiAnalysisEle jpsiStudy(theChain);
+    jpsiStudy.Loop();
+  }  
+
+  if (applic==2) {
     invMassStudy jpsiStudy(theChain);
     jpsiStudy.Loop();
   }  

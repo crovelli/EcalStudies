@@ -3,7 +3,7 @@
 #include "FWCore/Framework/interface/ModuleFactory.h"
 #include "FWCore/Framework/interface/eventsetupdata_registration_macro.h"
 
-#include "JPsieeAnalyzerSignal.h"
+#include "EcalStudies/JPsiCalib/plugins/JPsieeAnalyzerSignal.h"
 
 DEFINE_SEAL_MODULE();
 
