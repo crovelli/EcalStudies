@@ -1,0 +1,70 @@
+SEGNALI:
+--------
+
+1) segnale j/psi prompt:
+raw+reco         -> /castor/cern.ch/user/c/crovelli/CrabMio/JPsi/FULL_PROMPT
+reco + hlt + raw -> /castor/cern.ch/user/c/crovelli/CrabMio/JPsi/HLTFromReco/signalPrompt_notHLTskimmed
+tree             -> /castor/cern.ch/user/c/crovelli/CrabMio/JPsi/Analisi_Feb09/signalPrompt_notHLTskimmed
+* non skimmato HLT
+
+1bis) segnale j/psi prompt starup conditions
+raw+reco         -> /castor/cern.ch/user/c/crovelli/CrabMio/JPsi/FULL_PROMPT_STARTUP
+reco + hlt + raw -> /castor/cern.ch/user/c/crovelli/CrabMio/JPsi/HLTFromReco/signalPrompt_notHLTskimmed_startup
+tree             -> /castor/cern.ch/user/c/crovelli/CrabMio/JPsi/Analisi_Feb09/signalPrompt_notHLTskimmed_startup/
+* non skimmato HLT
+* usato STARTUP_V7::All
+
+2) segnale j/psi non prompt:
+reco + hlt + raw -> /castor/cern.ch/user/c/crovelli/CrabMio/JPsi/HLTFromReco/signalNonPrompt_notHLTskimmed
+tree             -> /castor/cern.ch/user/c/crovelli/CrabMio/JPsi/Analisi_Feb09/signalNonPrompt_notHLTskimmed
+* non skimmato HLT
+
+3) segnale Upsilon 1s prompt (produzione fatta in casa partendo dai cfg dalla summer production):
+* reco        -> /castor/cern.ch/user/r/ric/Upsilon/UpsilonToEE_n.root
+  (dove n va da 1 a 500 (con dei buchi). Sono ~660k eventi non skimmati HLT)
+* reco + hlt  -> /castor/cern.ch/user/r/ric/Upsilon/UpsilonToEEwithHLT_n.root
+  (dove n va da 1 a 81 (senza buchi). Sono ~660k eventi non skimmati HLT)
+* efficienze di HLT:
+HLT_DoubleEM8e29_Ups1s -> 35410/661338 = 5.35%
+HLT_DoubleEM1e31_Ups1s ->  23563/661338 = 3.56%
+
+
+
+FONDI:
+------
+/QCD_BCtoE_Pt20to30/Summer08_IDEAL_V9_v1/GEN-SIM-RAW:
+raw + hlt        -> /castor/cern.ch/user/c/crovelli/CrabMio/JPsi/HLTFromRaw/enriched2030_BCe_skimHLT
+reco + hlt + raw -> /castor/cern.ch/user/c/crovelli/CrabMio/JPsi/RecoFromHLT/bcToe2030_skimHLT
+trees            -> /castor/cern.ch/user/c/crovelli/CrabMio/JPsi/Analisi_Feb09/bcToe2030_skimHLT
+* skimmato HLT
+* efficienze di HLT: 
+  HLT_DoubleEM8e29_Jpsi:  71568/2074605
+  HLT_DoubleEM8e29_Ups1s:  4908/2074605
+
+
+/QCD_BCtoE_Pt30to80/Summer08_IDEAL_V9_v1/GEN-SIM-RAW:
+raw + hlt        -> /castor/cern.ch/user/a/arcidiac/JPSI/QCD_BCtoE_Pt30to80/jPsiHLTFromRaw_N.root
+reco + raw + hlt -> /castor/cern.ch/user/a/arcidiac/JPSI/RecoFromHLT/QCD_bcToe3080_skimHLT/qcd3080_BCe_HLTskimmed_HLTandReco_N.root 
+trees            -> /castor/cern.ch/user/a/arcidiac/JPSI/Analisi/qcd3080BCe_HLTskim_Merge.root
+494 jobs
+* efficienze di HLT:
+jpsi_8e29 _ 182336/1628434  =  11.20 %
+upsilon_8e29 16273/1628434  =  0.99 % 
+(si riferiscono solo a 396 jobs (si sono persi degli output files), mentre abbiamo i dati relativi a 494 jobs)
+
+
+/QCD_BCtoE_Pt80to170/Summer08_IDEAL_V9_v1/GEN-SIM-RAW 
+raw + hlt -> /castor/cern.ch/user/r/ric/Upsilon/HLTFromRaw/enriched80170_BCe_skimHLT/enriched80170_BCe_skimHLT_n.root
+* (~2 MB ad evento !!); dove n va da 1 a 813. skimmato HLT
+reco      -> /castor/cern.ch/user/r/ric/Upsilon/RecoFromHLT/enriched80170_BCe_skimHLT/enriched80170_BCe_reco_skimHLT_n.root
+trees     -> /castor/cern.ch/user/c/crovelli/CrabMio/JPsi/Analisi_Feb09/bcToe80170_skimHLT
+* dove n va da 1 a 250; skimmato HLT; sono in tutto 223156 eventi nei reco, 219923 nei tree.
+* efficienze di HLT:
+jpsi_8e29     -> 219448/1069789 = 20.51%
+jpsi_1e31     -> 40264/1069789  = 3.76%
+upsilon_8e29  -> 43848/1069789  = 4.09%
+upsilon_1e31  -> 6349/1069789   = 0.59%
+
+
+
+
