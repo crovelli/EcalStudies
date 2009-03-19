@@ -37,7 +37,7 @@ void OptimizeSingleCut(char basename[100]="hnuMsqr2",char file[100]="NuMass", bo
   SNPfile.cd();
   
   TH1F *hSNP =((TH1F*)gDirectory->Get(basename))->Clone();
-  hSNP->SetName("hSP");
+  hSNP->SetName("hSNP");
   hSNP->Scale(10./lumi[1]);
 
   ///////////// bkg ////////////////
