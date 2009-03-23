@@ -206,21 +206,21 @@ void finalJPsiAnalysisEle::Loop() {
 		if(fabs(this3P.Eta())>1.479) isBarrel = false;
 		
 		if (isBarrel){		
-		  if( fabs(dEtaWithTrackerRecoEle[theEle]) > 0.006 )  isGood = false;
-		  if( fabs(dPhiWithTrackerRecoEle[theEle]) > 0.048 )  isGood = false;
-		  if( HoverERecoEle[theEle]>0.041 )                   isGood = false;
-		  if( sigmaEtaEtaRecoEle[theEle]>0.0115 )             isGood = false;
-		  if( emIsolRecoEle_03[theEle]*this4P.E()*sin(this4P.Theta() )>17. ) isGood = false;
-		  if( hadIsolRecoEle_03[theEle]*this4P.E()*sin(this4P.Theta() )>1.5) isGood = false;
+		  if( fabs(dEtaWithTrackerRecoEle[theEle]) > 0.0066 ) isGood = false;
+		  if( fabs(dPhiWithTrackerRecoEle[theEle]) > 0.07 )   isGood = false;
+		  if( HoverERecoEle[theEle]>0.05 )                    isGood = false;
+		  if( sigmaEtaEtaRecoEle[theEle]>0.0124 )             isGood = false;
+		  if( emIsolRecoEle_03[theEle]*this4P.E()*sin(this4P.Theta() )> 30. ) isGood = false;
+		  // if( hadIsolRecoEle_03[theEle]*this4P.E()*sin(this4P.Theta() )>1.5)  isGood = false;
 		}
 		
 		if (!isBarrel){
-		  if( fabs(dEtaWithTrackerRecoEle[theEle])>0.0075 ) isGood = false;
-		  if( fabs(dPhiWithTrackerRecoEle[theEle])>0.048 )  isGood = false;
-		  if( HoverERecoEle[theEle]>0.041 )                 isGood = false;
-		  if( sigmaEtaEtaRecoEle[theEle]>0.03 )             isGood = false;
-		  if( emIsolRecoEle_03[theEle]*this4P.E()*sin(this4P.Theta())>17.  ) isGood = false;
-		  if( hadIsolRecoEle_03[theEle]*this4P.E()*sin(this4P.Theta())>1.5 ) isGood = false; 
+		  if( fabs(dEtaWithTrackerRecoEle[theEle])>0.0080 ) isGood = false;
+		  if( fabs(dPhiWithTrackerRecoEle[theEle])>0.07 )   isGood = false;
+		  if( HoverERecoEle[theEle]>0.05 )                  isGood = false;
+		  if( sigmaEtaEtaRecoEle[theEle]>0.033 )            isGood = false;
+		  if( emIsolRecoEle_03[theEle]*this4P.E()*sin(this4P.Theta())> 30. ) isGood = false;
+		  // if( hadIsolRecoEle_03[theEle]*this4P.E()*sin(this4P.Theta())>1.5 ) isGood = false; 
 		}
 		
 		if (!isGood) continue;
@@ -405,35 +405,8 @@ void finalJPsiAnalysisEle::Loop() {
 	    }
 	  }  // ok matched   
 	} // signal
+
 	
-      
-	// plots with all combinatorics
-	if ( (totEleGt4plus+totEleGt4minus)>1 ){ 
-	  for(int theEle1=0; theEle1<numberOfElectrons; theEle1++) { 
-	    if (xRecoEle[theEle1]<-700) continue;
-	    if (etRecoEle[theEle1]<4)     continue;
-
-	    for(int theEle2=(theEle1+1); theEle2<numberOfElectrons; theEle2++) { 
-	      if (xRecoEle[theEle2]<-700) continue;
-	      if (etRecoEle[theEle2]<4)     continue;
-
-		TLorentzVector tlvTheEle1, tlvTheEle2;
-		TVector3 tv3TheEle1, tv3TheEle2;
-		tlvTheEle1.SetPxPyPzE(xRecoEle[theEle1], yRecoEle[theEle1], zRecoEle[theEle1], eneRecoEle[theEle1]);
-		tlvTheEle2.SetPxPyPzE(xRecoEle[theEle2], yRecoEle[theEle2], zRecoEle[theEle2], eneRecoEle[theEle2]);
-		tv3TheEle1.SetXYZ (xRecoEle[theEle1], yRecoEle[theEle1], zRecoEle[theEle1]);
-		tv3TheEle2.SetXYZ (xRecoEle[theEle2], yRecoEle[theEle2], zRecoEle[theEle2]);
-		
-		float deltaR = tv3TheEle1.DeltaR(tv3TheEle2);
-		float mee    = (tlvTheEle1 + tlvTheEle2).M();
-		ScHisto_deltaRComb->Fill(deltaR);
-		ScHisto_invMassComb->Fill(mee);
-		ScHisto_deltaRVsInvMassComb->Fill(mee,deltaR);
-	    }}
-	}
-	
-
-
 	// to compare the distributions: use the two highest Et electrons
         if (numberOfEleOkPlus>=1 && numberOfEleOkMinus>=1) {  
 
@@ -447,7 +420,7 @@ void finalJPsiAnalysisEle::Loop() {
 	  }
 	  
           // BEST PAIR CUTS
-          if (highestEt_TIso03p*highestEt_4p.Et() < 2.1 && highestEt_TIso03e*highestEt_4e.Et() < 2.1) numberOfPairsOk++;
+          if (highestEt_TIso03p*highestEt_4p.Et() < 2.8 && highestEt_TIso03e*highestEt_4e.Et() < 2.8) numberOfPairsOk++;
 	  
 	  if (numberOfPairsOk) {
 	    ScHisto_etaHighestEt->Fill(highestEt_3p.Eta());
@@ -494,6 +467,32 @@ void finalJPsiAnalysisEle::Loop() {
 	    
 	  } // ok best pair
 	} // ok matched
+
+	// plots with all combinatorics
+	if ( numberOfEleOkPlus>=1 && numberOfEleOkMinus>=1 && numberOfPairsOk>=1 ){ 
+	  for(int theEle1=0; theEle1<numberOfElectrons; theEle1++) { 
+	    if (xRecoEle[theEle1]<-700) continue;
+	    if (etRecoEle[theEle1]<4)     continue;
+
+	    for(int theEle2=(theEle1+1); theEle2<numberOfElectrons; theEle2++) { 
+	      if (xRecoEle[theEle2]<-700) continue;
+	      if (etRecoEle[theEle2]<4)     continue;
+
+		TLorentzVector tlvTheEle1, tlvTheEle2;
+		TVector3 tv3TheEle1, tv3TheEle2;
+		tlvTheEle1.SetPxPyPzE(xRecoEle[theEle1], yRecoEle[theEle1], zRecoEle[theEle1], eneRecoEle[theEle1]);
+		tlvTheEle2.SetPxPyPzE(xRecoEle[theEle2], yRecoEle[theEle2], zRecoEle[theEle2], eneRecoEle[theEle2]);
+		tv3TheEle1.SetXYZ (xRecoEle[theEle1], yRecoEle[theEle1], zRecoEle[theEle1]);
+		tv3TheEle2.SetXYZ (xRecoEle[theEle2], yRecoEle[theEle2], zRecoEle[theEle2]);
+		
+		float deltaR = tv3TheEle1.DeltaR(tv3TheEle2);
+		float mee    = (tlvTheEle1 + tlvTheEle2).M();
+		ScHisto_deltaRComb->Fill(deltaR);
+		ScHisto_invMassComb->Fill(mee);
+		ScHisto_deltaRVsInvMassComb->Fill(mee,deltaR);
+	    }}
+	}
+
       } // ok HLT
       
     } // ok generated
