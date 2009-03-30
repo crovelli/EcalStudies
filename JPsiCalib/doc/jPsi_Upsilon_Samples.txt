@@ -61,10 +61,17 @@ trees     -> /castor/cern.ch/user/c/crovelli/CrabMio/JPsi/Analisi_Feb09/bcToe801
 * dove n va da 1 a 250; skimmato HLT; sono in tutto 223156 eventi nei reco, 219923 nei tree.
 * efficienze di HLT:
 jpsi_8e29     -> 219448/1069789 = 20.51%
-jpsi_1e31     -> 40264/1069789  = 3.76%
 upsilon_8e29  -> 43848/1069789  = 4.09%
-upsilon_1e31  -> 6349/1069789   = 0.59%
 
 
-
+/QCD_EMenriched_Pt80to170/Summer08_IDEAL_V9_v1/GEN-SIM-RAW
+raw + hlt -> /castor/cern.ch/user/r/ric/Upsilon/HLTFromRaw/QCDenriched80170_skimHLT/QCDenriched80170_skimHLT_n.root
+* dove n va da 1 a 2025. skimmato HLT
+reco      -> /castor/cern.ch/user/r/ric/Upsilon/RecoFromHLT/enriched80170_skimHLT/QCDenriched80170_n.root
+* dove n va da 1 a 667; skimmato HLT.
+tree     -> /castor/cern.ch/user/r/ric/Upsilon/tree/QCD_enriched_Pt80to170_merged.root
+Total number of events: 810278 (730M)
+* efficienze di HLT:
+jpsi_8e29     -> 751426/5903529 = 12.73%
+upsilon_8e29  -> 172151/5903529 = 2.92% 
 
