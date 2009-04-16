@@ -36,17 +36,18 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
   std::cout << "Number of entries = " << nentries << std::endl;
 
   // counters
-  float totalEvents      = 0.;
-  float totalReco        = 0.;
-  float totalRecoGt4     = 0.;
-  float totalTrigger     = 0.;
-  float totalIdentified  = 0.;
-  float numberOfPairsOk  = 0.;
+  float totalEvents         = 0.;
+  float totalReco           = 0.;
+  float totalRecoGt4        = 0.;
+  float totalRecoGt4Charge  = 0.;
+  float totalTrigger        = 0.;
+  float totalIdentified     = 0.;
+  float numberOfPairsOk     = 0.;
   float numbersOfInvMassOk  = 0.;
   float totalIdentifiedMore = 0.;
-  float goodGene         = 0.;
-  float okEvent_McTruth  = 0.;
-  float okEvent_Highest  = 0.;
+  float goodGene            = 0.;
+  float okEvent_McTruth     = 0.;
+  float okEvent_Highest     = 0.;
 
   // to choose the best pair
   int okHighest_many      = 0;
@@ -124,7 +125,7 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
       
       // HLT
       if (hlt29) {
-	// if (hlt29jpsi) {
+	//if (hlt29jpsi) {
 	totalTrigger++;
 	
 	// few numbers: all electrons
@@ -138,10 +139,10 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
 	  if (etRecoEle[theEle]>4 && chargeEle[theEle]<0) totEleGt4minus++;
 	}
 	ScHistoGt4_size -> Fill(totEleGt4);
-	if(totEleGt4plus>1)  ScHistoGt4plus_size  -> Fill(totEleGt4plus);
-	if(totEleGt4minus>1) ScHistoGt4minus_size -> Fill(totEleGt4minus);
-	if (totEleGt4>1) totalRecoGt4++;
-	
+	if(totEleGt4plus>=1)  ScHistoGt4plus_size  -> Fill(totEleGt4plus);
+	if(totEleGt4minus>=1) ScHistoGt4minus_size -> Fill(totEleGt4minus);
+	if(totEleGt4>1) totalRecoGt4++;
+	if(totEleGt4plus>=1 && totEleGt4minus>=1) totalRecoGt4Charge++;
 	
 	// --------------------------------------------------------------------------------
 	// 2) loop to decide which criteria to apply to select the electron if more than 1 is reconstructed	
@@ -547,6 +548,7 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
   cout << "total number of events passing HLT = "  << totalTrigger    << endl;
   cout << "total number of reco = "                << totalReco       << endl;
   cout << "total number of reco & Et>4= "          << totalRecoGt4    << endl;
+  cout << "total number of reco & Et>4 & charge requirement = " << totalRecoGt4Charge << endl;
   cout << "total number of reco & Et>4 & id & isol = " << totalIdentified << endl;
   cout << "total number of reco & ET>4 & id & full isol (tracker also) = " << numberOfPairsOk << endl;
   cout << "total number of reco & ET>4 & id & full isol (tracker also) + invMass in 2.5 - 4 = " << numbersOfInvMassOk << endl;
@@ -558,32 +560,45 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
 
   
   // normalizing to cross sections
-  float kineEff_reco    = totalRecoGt4/goodGene;
-  float kineEff_id      = totalIdentified/goodGene;
-  float kineEff_isol    = numberOfPairsOk/goodGene;
-  float kineEff_invMass = numbersOfInvMassOk/goodGene;
   float hltEff_prod; 
   float filterEff_prod;
   float crossSection;
-  if (theSample==1) { hltEff_prod=1.;       filterEff_prod = 1.;      crossSection = 17000.;     } 
+  if (theSample==1) { hltEff_prod=1.;       filterEff_prod = 1.;      crossSection = 17000.;     }    // hltEff_prod = j/psi only
   if (theSample==2) { hltEff_prod=1.;       filterEff_prod = 1.;      crossSection = 2500;       }
-  if (theSample==3) { hltEff_prod=0.0369;   filterEff_prod = 0.00048; crossSection = 400000000.; } 
-  if (theSample==4) { hltEff_prod=0.1220;   filterEff_prod = 0.0024;  crossSection = 100000000.; } 
-  if (theSample==5) { hltEff_prod=0.2461;   filterEff_prod = 0.012;   crossSection = 1900000.;   } 
+  if (theSample==3) { hltEff_prod=0.0345;   filterEff_prod = 0.00048; crossSection = 400000000.; } 
+  if (theSample==4) { hltEff_prod=0.1119;   filterEff_prod = 0.0024;  crossSection = 100000000.; } 
+  if (theSample==5) { hltEff_prod=0.2051;   filterEff_prod = 0.012;   crossSection = 1900000.;   } 
   if (theSample==6) { hltEff_prod=1.;       filterEff_prod = 0.0080;  crossSection = 400000000.; }
-  if (theSample==7) { hltEff_prod=0.07437;  filterEff_prod = 0.047;   crossSection = 100000000.; }  
-  if (theSample==8) { hltEff_prod=0.15644;  filterEff_prod = 0.15;    crossSection = 1900000.;   }
+  if (theSample==7) { hltEff_prod=0.0684;   filterEff_prod = 0.047;   crossSection = 100000000.; }  
+  if (theSample==8) { hltEff_prod=0.12728;  filterEff_prod = 0.15;    crossSection = 1900000.;   }
 
-  float exp_reco   = kineEff_reco   *hltEff_prod*filterEff_prod*crossSection;
-  float exp_id     = kineEff_id     *hltEff_prod*filterEff_prod*crossSection;
-  float exp_isol   = kineEff_isol   *hltEff_prod*filterEff_prod*crossSection;
-  float exp_okMass = kineEff_invMass*hltEff_prod*filterEff_prod*crossSection;
+  float numEvents;
+  if(theSample > 2) numEvents = totalTrigger/hltEff_prod; 
+  if(theSample <=2) numEvents = goodGene;
+  float kineEff_hlt           = totalTrigger/numEvents;
+  float kineEff_reco          = totalReco/numEvents;
+  float kineEff_recoGt4       = totalRecoGt4/numEvents;
+  float kineEff_recoGt4charge = totalRecoGt4Charge/numEvents;
+  float kineEff_id            = totalIdentified/numEvents;
+  float kineEff_isol          = numberOfPairsOk/numEvents;
+  float kineEff_invMass       = numbersOfInvMassOk/numEvents;
+
+  float exp_hlt            = kineEff_hlt           * filterEff_prod*crossSection;
+  float exp_reco           = kineEff_reco          * filterEff_prod*crossSection;
+  float exp_recoGt4        = kineEff_recoGt4       * filterEff_prod*crossSection;
+  float exp_recoGt4charge  = kineEff_recoGt4charge * filterEff_prod*crossSection;
+  float exp_id             = kineEff_id            * filterEff_prod*crossSection;
+  float exp_isol           = kineEff_isol          * filterEff_prod*crossSection;
+  float exp_okMass         = kineEff_invMass       * filterEff_prod * crossSection;
   
-  cout << "number of expected events in 1 pb-1: "    << endl;
-  cout << "after reco + Et>4       : " << exp_reco   << endl; 
-  cout << "after id                : " << exp_id     << endl; 
-  cout << "after isolation         : " << exp_isol   << endl; 
-  cout << "in the inv mass region  : " << exp_okMass << endl; 
+  cout << "number of expected events in 10 pb-1: "            << endl;
+  cout << "after HLT                  : " << 10.*exp_hlt      << endl; 
+  cout << "after reco                 : " << 10.*exp_reco     << endl; 
+  cout << "after reco + Et>4          : " << 10.*exp_recoGt4  << endl; 
+  cout << "after reco + Et>4 + charge : " << 10.*exp_recoGt4charge << endl; 
+  cout << "after id                   : " << 10.*exp_id       << endl; 
+  cout << "after isolation            : " << 10.*exp_isol     << endl; 
+  cout << "in the inv mass region     : " << 10.*exp_okMass   << endl; 
     
 
 
