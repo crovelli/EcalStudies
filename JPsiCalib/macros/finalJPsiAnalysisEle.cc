@@ -24,7 +24,7 @@ finalJPsiAnalysisEle::finalJPsiAnalysisEle(TTree *tree)
 
 finalJPsiAnalysisEle::~finalJPsiAnalysisEle(){ } 
 
-void finalJPsiAnalysisEle::Loop() {
+void finalJPsiAnalysisEle::Loop(int theSample) {
 
   if (fChain == 0) return;  
   int nentries = (int)fChain->GetEntries();
@@ -36,16 +36,17 @@ void finalJPsiAnalysisEle::Loop() {
   std::cout << "Number of entries = " << nentries << std::endl;
 
   // counters
-  int totalEvents      = 0;
-  int totalReco        = 0;
-  int totalRecoGt4     = 0;
-  int totalTrigger     = 0;
-  int totalIdentified  = 0;
-  int numberOfPairsOk  = 0;
-  int totalIdentifiedMore  = 0;
-  int goodGene         = 0;
-  int okEvent_McTruth  = 0;
-  int okEvent_Highest  = 0;
+  float totalEvents      = 0.;
+  float totalReco        = 0.;
+  float totalRecoGt4     = 0.;
+  float totalTrigger     = 0.;
+  float totalIdentified  = 0.;
+  float numberOfPairsOk  = 0.;
+  float numbersOfInvMassOk  = 0.;
+  float totalIdentifiedMore = 0.;
+  float goodGene         = 0.;
+  float okEvent_McTruth  = 0.;
+  float okEvent_Highest  = 0.;
 
   // to choose the best pair
   int okHighest_many      = 0;
@@ -64,6 +65,7 @@ void finalJPsiAnalysisEle::Loop() {
     fChain->GetEntry(jentry);
     if (jentry%1000 == 0) std::cout << ">>> Processing event # " << jentry << std::endl;
     
+    if (theSample==2) signal = 0;
     totalEvents++;
 
     // counters for this entry
@@ -122,6 +124,7 @@ void finalJPsiAnalysisEle::Loop() {
       
       // HLT
       if (hlt29) {
+	// if (hlt29jpsi) {
 	totalTrigger++;
 	
 	// few numbers: all electrons
@@ -418,11 +421,11 @@ void finalJPsiAnalysisEle::Loop() {
 	    highestEt_TIso03e -= (highestEt_4p.Et()/highestEt_4e.Et());
 	    if (highestEt_TIso03e < 0.) highestEt_TIso03e = 0.;
 	  }
-	  
+	
           // BEST PAIR CUTS
           if (highestEt_TIso03p*highestEt_4p.Et() < 2.8 && highestEt_TIso03e*highestEt_4e.Et() < 2.8) numberOfPairsOk++;
 	  
-	  if (numberOfPairsOk) {
+	  if (highestEt_TIso03p*highestEt_4p.Et() < 2.8 && highestEt_TIso03e*highestEt_4e.Et() < 2.8) {
 	    ScHisto_etaHighestEt->Fill(highestEt_3p.Eta());
 	    ScHisto_etaHighestEt->Fill(highestEt_3e.Eta());
 	    ScHisto_phiHighestEt->Fill(highestEt_3p.Phi());
@@ -446,6 +449,7 @@ void finalJPsiAnalysisEle::Loop() {
 	    
 	    float mee_highestEt = (highestEt_4p + highestEt_4e).M();
 	    ScHisto_invMassHighestEt->Fill(mee_highestEt);
+	    if (mee_highestEt<4. && mee_highestEt>2.5) numbersOfInvMassOk++;
 	    
 	    // to study EB/ EE depencency: both in barrel only
 	    if ( fabs(highestEt_3p.Eta())<1.479 && fabs(highestEt_3e.Eta())<1.479 ){
@@ -464,6 +468,27 @@ void finalJPsiAnalysisEle::Loop() {
 	      ScHisto_deltaRHighestEt_EBEE       -> Fill(deltaR_highestEt);	
 	      ScHisto_invMassHighestEt_EBEE      -> Fill(mee_highestEt);
 	    }
+
+	    // study of possible biases for signal
+	    if (signal) {    
+	      float jpsi_ene = (highestEt_4p + highestEt_4e).E();	  
+	      float jpsi_et  = (highestEt_4p + highestEt_4e).Et();	  
+	      float jpsi_eta = (highestEt_4p + highestEt_4e).Eta();	  
+	      float jpsi_phi = (highestEt_4p + highestEt_4e).Phi();	  
+	      float deltaR   =  highestEt_4p.DeltaR(highestEt_4e);
+
+	      ScHisto_JeneVsJeta_highestEt      -> Fill(jpsi_eta, jpsi_ene);
+	      ScHisto_JetVsJeta_highestEt       -> Fill(jpsi_eta, jpsi_et);
+	      ScHisto_InvMassVsJeta_highestEt   -> Fill(jpsi_eta, mee_highestEt);                
+	      ScHisto_InvMassVsJphi_highestEt   -> Fill(jpsi_phi, mee_highestEt);                
+	      ScHisto_InvMassVsJene_highestEt   -> Fill(jpsi_ene, mee_highestEt);        
+	      ScHisto_InvMassVsJet_highestEt    -> Fill(jpsi_et,  mee_highestEt);        
+	      ScHisto_InvMassVsDeltaR_highestEt -> Fill(deltaR,   mee_highestEt);        
+	      if (fabs(jpsi_eta)<1.5) ScHisto_InvMassVsJeneEB_highestEt -> Fill(jpsi_ene, mee_highestEt);        
+	      if (fabs(jpsi_eta)>1.5) ScHisto_InvMassVsJeneEE_highestEt -> Fill(jpsi_ene, mee_highestEt);        
+	      if (fabs(jpsi_eta)<1.5) ScHisto_InvMassVsJetEB_highestEt  -> Fill(jpsi_et,  mee_highestEt);        
+	      if (fabs(jpsi_eta)>1.5) ScHisto_InvMassVsJetEE_highestEt  -> Fill(jpsi_et,  mee_highestEt);        
+	      }
 	    
 	  } // ok best pair
 	} // ok matched
@@ -524,11 +549,43 @@ void finalJPsiAnalysisEle::Loop() {
   cout << "total number of reco & Et>4= "          << totalRecoGt4    << endl;
   cout << "total number of reco & Et>4 & id & isol = " << totalIdentified << endl;
   cout << "total number of reco & ET>4 & id & full isol (tracker also) = " << numberOfPairsOk << endl;
+  cout << "total number of reco & ET>4 & id & full isol (tracker also) + invMass in 2.5 - 4 = " << numbersOfInvMassOk << endl;
   cout << endl;
   cout << "total number of reco & matched & id, more than 2 = " << totalIdentifiedMore << endl;
   cout << endl;
   cout << "total number of events with closer to MC match MC within dR=0.5 = " << okEvent_McTruth << endl; 
   cout << "total number of events with highest Et match MC within dR=0.5 = "   << okEvent_Highest << endl; 
+
+  
+  // normalizing to cross sections
+  float kineEff_reco    = totalRecoGt4/goodGene;
+  float kineEff_id      = totalIdentified/goodGene;
+  float kineEff_isol    = numberOfPairsOk/goodGene;
+  float kineEff_invMass = numbersOfInvMassOk/goodGene;
+  float hltEff_prod; 
+  float filterEff_prod;
+  float crossSection;
+  if (theSample==1) { hltEff_prod=1.;       filterEff_prod = 1.;      crossSection = 17000.;     } 
+  if (theSample==2) { hltEff_prod=1.;       filterEff_prod = 1.;      crossSection = 2500;       }
+  if (theSample==3) { hltEff_prod=0.0369;   filterEff_prod = 0.00048; crossSection = 400000000.; } 
+  if (theSample==4) { hltEff_prod=0.1220;   filterEff_prod = 0.0024;  crossSection = 100000000.; } 
+  if (theSample==5) { hltEff_prod=0.2461;   filterEff_prod = 0.012;   crossSection = 1900000.;   } 
+  if (theSample==6) { hltEff_prod=1.;       filterEff_prod = 0.0080;  crossSection = 400000000.; }
+  if (theSample==7) { hltEff_prod=0.07437;  filterEff_prod = 0.047;   crossSection = 100000000.; }  
+  if (theSample==8) { hltEff_prod=0.15644;  filterEff_prod = 0.15;    crossSection = 1900000.;   }
+
+  float exp_reco   = kineEff_reco   *hltEff_prod*filterEff_prod*crossSection;
+  float exp_id     = kineEff_id     *hltEff_prod*filterEff_prod*crossSection;
+  float exp_isol   = kineEff_isol   *hltEff_prod*filterEff_prod*crossSection;
+  float exp_okMass = kineEff_invMass*hltEff_prod*filterEff_prod*crossSection;
+  
+  cout << "number of expected events in 1 pb-1: "    << endl;
+  cout << "after reco + Et>4       : " << exp_reco   << endl; 
+  cout << "after id                : " << exp_id     << endl; 
+  cout << "after isolation         : " << exp_isol   << endl; 
+  cout << "in the inv mass region  : " << exp_okMass << endl; 
+    
+
 
 } // end of program
 
@@ -576,7 +633,20 @@ void finalJPsiAnalysisEle::bookHistos() {
   ScHisto_invMassHighestEt_EE   = new TH1F("ScHisto_invMassHighestEt_EE",      "Sc invariant mass",  150, 0.,6.);
   ScHisto_deltaRHighestEt_EBEE  = new TH1F("ScHisto_deltaRHighestEt_EBEE",       "Sc deltaR",          100, 0.,5.);
   ScHisto_invMassHighestEt_EBEE = new TH1F("ScHisto_invMassHighestEt_EBEE",      "Sc invariant mass",  150, 0.,6.);
+
+  ScHisto_JeneVsJeta_highestEt       = new TH2F("ScHisto_JeneVsJeta_highestEt",      "ScHisto_JeneVsJeta_highestEt",      100,  0., 2.5,    50, 5., 100.);
+  ScHisto_JetVsJeta_highestEt        = new TH2F("ScHisto_JetVsJeta_highestEt",       "ScHisto_JetVsJeta_highestEt",       100,  0., 2.5,    50, 5., 30.);
+  ScHisto_InvMassVsJene_highestEt    = new TH2F("ScHisto_InvMassVsJene_highestEt",   "ScHisto_InvMassVsJene_highestEt",    50,  5., 100.,   75, 0., 6.);
+  ScHisto_InvMassVsJet_highestEt     = new TH2F("ScHisto_InvMassVsJet_highestEt",    "ScHisto_InvMassVsJet_highestEt",     50,  5.,  30.,   75, 0., 6.);
+  ScHisto_InvMassVsJeneEB_highestEt  = new TH2F("ScHisto_InvMassVsJeneEB_highestEt", "ScHisto_InvMassVsJeneEB_highestEt",  50,  5., 100.,   75, 0., 6.);
+  ScHisto_InvMassVsJeneEE_highestEt  = new TH2F("ScHisto_InvMassVsJeneEE_highestEt", "ScHisto_InvMassVsJeneEE_highestEt",  50,  5., 100.,   75, 0., 6.);
+  ScHisto_InvMassVsJetEB_highestEt   = new TH2F("ScHisto_InvMassVsJetEB_highestEt",  "ScHisto_InvMassVsJetEB_highestEt",   50,  5.,  30.,   75, 0., 6.);
+  ScHisto_InvMassVsJetEE_highestEt   = new TH2F("ScHisto_InvMassVsJetEE_highestEt",  "ScHisto_InvMassVsJetEE_highestEt",   50,  5.,  30.,   75, 0., 6.);
+  ScHisto_InvMassVsJeta_highestEt    = new TH2F("ScHisto_InvMassVsJeta_highestEt",   "ScHisto_InvMassVsJeta_highestEt",    50, -2.5,  2.5,  75, 0., 6.);
+  ScHisto_InvMassVsJphi_highestEt    = new TH2F("ScHisto_InvMassVsJphi_highestEt",   "ScHisto_InvMassVsJphi_highestEt",    50, -3.14, 3.14, 75, 0., 6.);
+  ScHisto_InvMassVsDeltaR_highestEt  = new TH2F("ScHisto_InvMassVsDeltaR_highestEt", "ScHisto_InvMassVsDeltaR_highestEt",  50,  0.,   1.,   75, 0., 6.);
 }
+
 
 void finalJPsiAnalysisEle::drawPlots() {
 
@@ -647,6 +717,49 @@ void finalJPsiAnalysisEle::drawPlots() {
   c.SetLogy(0);
   ScHisto_deltaRHighestEt_EBEE   -> Draw();  c.Print("scDeltaR_EBEE.eps");
   ScHisto_invMassHighestEt_EBEE  -> Draw();  c.Print("scInvMass_EBEE.eps");
+
+
+  // to study the invariant mass
+  if (signal) {
+    c.SetLogy(0);
+    ScHisto_InvMassVsJene_highestEt   -> FitSlicesY();
+    ScHisto_InvMassVsJet_highestEt    -> FitSlicesY();
+    ScHisto_InvMassVsJeneEB_highestEt -> FitSlicesY();
+    ScHisto_InvMassVsJeneEE_highestEt -> FitSlicesY();
+    ScHisto_InvMassVsJetEB_highestEt  -> FitSlicesY();
+    ScHisto_InvMassVsJetEE_highestEt  -> FitSlicesY();
+    ScHisto_InvMassVsJeta_highestEt   -> FitSlicesY();
+    ScHisto_InvMassVsJphi_highestEt   -> FitSlicesY();
+    ScHisto_InvMassVsDeltaR_highestEt -> FitSlicesY();
+
+    TH1F* GHisto_InvMassVsJene_highestEt   = (TH1F*)gDirectory->Get("ScHisto_InvMassVsJene_highestEt_1");
+    TH1F* GHisto_InvMassVsJet_highestEt    = (TH1F*)gDirectory->Get("ScHisto_InvMassVsJet_highestEt_1");
+    TH1F* GHisto_InvMassVsJeneEB_highestEt = (TH1F*)gDirectory->Get("ScHisto_InvMassVsJeneEB_highestEt_1");
+    TH1F* GHisto_InvMassVsJeneEE_highestEt = (TH1F*)gDirectory->Get("ScHisto_InvMassVsJeneEE_highestEt_1");
+    TH1F* GHisto_InvMassVsJetEB_highestEt  = (TH1F*)gDirectory->Get("ScHisto_InvMassVsJetEB_highestEt_1");
+    TH1F* GHisto_InvMassVsJetEE_highestEt  = (TH1F*)gDirectory->Get("ScHisto_InvMassVsJetEE_highestEt_1");
+    TH1F* GHisto_InvMassVsJeta_highestEt   = (TH1F*)gDirectory->Get("ScHisto_InvMassVsJeta_highestEt_1");
+    TH1F* GHisto_InvMassVsJphi_highestEt   = (TH1F*)gDirectory->Get("ScHisto_InvMassVsJphi_highestEt_1");
+    TH1F* GHisto_InvMassVsDeltaR_highestEt = (TH1F*)gDirectory->Get("ScHisto_InvMassVsDeltaR_highestEt_1");
+
+    GHisto_InvMassVsJene_highestEt   -> Draw();  c.Print("GHisto_InvMassVsJene_highestEt.eps");   c.Print("GHisto_InvMassVsJene_highestEt.root");
+    GHisto_InvMassVsJet_highestEt    -> Draw();  c.Print("GHisto_InvMassVsJet_highestEt.eps");    c.Print("GHisto_InvMassVsJet_highestEt.root");
+    GHisto_InvMassVsJeneEB_highestEt -> Draw();  c.Print("GHisto_InvMassVsJeneEB_highestEt.eps"); c.Print("GHisto_InvMassVsJeneEB_highestEt.root");
+    GHisto_InvMassVsJeneEE_highestEt -> Draw();  c.Print("GHisto_InvMassVsJeneEE_highestEt.eps"); c.Print("GHisto_InvMassVsJeneEE_highestEt.root");
+    GHisto_InvMassVsJetEB_highestEt  -> Draw();  c.Print("GHisto_InvMassVsJetEB_highestEt.eps");  c.Print("GHisto_InvMassVsJetEB_highestEt.root");
+    GHisto_InvMassVsJetEE_highestEt  -> Draw();  c.Print("GHisto_InvMassVsJetEE_highestEt.eps");  c.Print("GHisto_InvMassVsJetEE_highestEt.root");
+    GHisto_InvMassVsJeta_highestEt   -> Draw();  c.Print("GHisto_InvMassVsJeta_highestEt.eps");   c.Print("GHisto_InvMassVsJeta_highestEt.root");
+    GHisto_InvMassVsJphi_highestEt   -> Draw();  c.Print("GHisto_InvMassVsJphi_highestEt.eps");   c.Print("GHisto_InvMassVsJphi_highestEt.root");
+    GHisto_InvMassVsDeltaR_highestEt -> Draw();  c.Print("GHisto_InvMassVsDeltaR_highestEt.eps"); c.Print("GHisto_InvMassVsDeltaR_highestEt.root");
+
+    // 
+    ScHisto_JeneVsJeta_highestEt -> FitSlicesY();
+    ScHisto_JetVsJeta_highestEt  -> FitSlicesY();
+    TH1F* GScHisto_JeneVsJeta_highestEt = (TH1F*)gDirectory->Get("ScHisto_JeneVsJeta_highestEt_1");
+    TH1F* GScHisto_JetVsJeta_highestEt  = (TH1F*)gDirectory->Get("ScHisto_JetVsJeta_highestEt_1");
+    GScHisto_JeneVsJeta_highestEt -> Draw();   c.Print("GHisto_JeneVsJeta_highestEt.eps");   c.Print("GHisto_JeneVsJeta_highestEt.root");
+    GScHisto_JetVsJeta_highestEt  -> Draw();   c.Print("GHisto_JetVsJeta_highestEt.eps");    c.Print("GHisto_JetVsJeta_highestEt.root");    
+    }
 }
 
 void finalJPsiAnalysisEle::saveHistos() {
@@ -657,6 +770,11 @@ void finalJPsiAnalysisEle::saveHistos() {
   ScHistoEle_size       -> Write();
   ScHistoGt4plus_size   -> Write();
   ScHistoGt4minus_size  -> Write();
+
+  ScHisto_invMassHighestEt      -> Write();
+  ScHisto_invMassHighestEt_EB   -> Write();
+  ScHisto_invMassHighestEt_EE   -> Write();
+  ScHisto_invMassHighestEt_EBEE -> Write();
 
 
   if (signal) {

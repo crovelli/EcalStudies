@@ -15,7 +15,7 @@ public:
   
   finalJPsiAnalysisEle(TTree *tree=0);
   virtual ~finalJPsiAnalysisEle();
-  void Loop();
+  void Loop(int theSample);
 
 private:
 
@@ -95,6 +95,18 @@ private:
   TH1F *ScHisto_hoeHighestEt_EBEE;
   TH1F *ScHisto_dEtaTrHighestEt_EBEE;
   TH1F *ScHisto_dPhiTrHighestEt_EBEE;
+
+  TH2F *ScHisto_InvMassVsJene_highestEt;         
+  TH2F *ScHisto_InvMassVsJet_highestEt;          
+  TH2F *ScHisto_InvMassVsJeneEB_highestEt;         
+  TH2F *ScHisto_InvMassVsJeneEE_highestEt;         
+  TH2F *ScHisto_InvMassVsJetEB_highestEt;          
+  TH2F *ScHisto_InvMassVsJetEE_highestEt;          
+  TH2F *ScHisto_InvMassVsJeta_highestEt;         
+  TH2F *ScHisto_InvMassVsJphi_highestEt;         
+  TH2F *ScHisto_JeneVsJeta_highestEt;
+  TH2F *ScHisto_JetVsJeta_highestEt;
+  TH2F *ScHisto_InvMassVsDeltaR_highestEt;
 };
 #endif
 
