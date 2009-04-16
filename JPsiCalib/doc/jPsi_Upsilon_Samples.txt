@@ -64,6 +64,16 @@ jpsi_8e29     -> 219448/1069789 = 20.51%
 upsilon_8e29  -> 43848/1069789  = 4.09%
 
 
+/QCD_EMenriched_Pt30to80/Summer08_IDEAL_V9_v1/GEN-SIM-RAW 
+raw + hlt -> /castor/cern.ch/user/c/covarell/QCD_EMenriched/QCD_EMenr_3080_HLTFromRaw_n.root
+dove n va da 1 a 445. skimmato HLT
+reco      ->  /castor/cern.ch/user/c/covarell/QCD_EMenriched/QCD_EMenr_3080_HLTskimmed_HLTandReco_n.root
+trees     -> /castor/cern.ch/user/a/arcidiac/JPSI/Analisi/QCD3080/qcd3080_EMenr_HLTskimmed_tree_n.root
+* efficienze di HLT:
+jpsi_8e29     -> 301118/4405460 = 6.83%
+upsilon_8e29  -> 26532/4405460  = 0.60%
+
+
 /QCD_EMenriched_Pt80to170/Summer08_IDEAL_V9_v1/GEN-SIM-RAW
 raw + hlt -> /castor/cern.ch/user/r/ric/Upsilon/HLTFromRaw/QCDenriched80170_skimHLT/QCDenriched80170_skimHLT_n.root
 * dove n va da 1 a 2025. skimmato HLT
