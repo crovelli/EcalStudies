@@ -85,3 +85,13 @@ Total number of events: 810278 (730M)
 jpsi_8e29     -> 751426/5903529 = 12.73%
 upsilon_8e29  -> 172151/5903529 = 2.92% 
 
+
+/MinBias/Summer08_IDEAL_V9_v1/GEN-SIM-RAW
+* fatto con CMSSW_2_1_8
+raw + hlt -> /castor/cern.ch/user/c/crovelli/CrabMio/JPsi/HLTFromRaw/minBias_218/jPsiHLTFromRaw_n.root
+reco      -> /castor/cern.ch/user/c/crovelli/CrabMio/JPsi/RecoFromHLT/minBias_218_skimHLT/minBias_HLTskimmed_HLTandReco_n.root
+* dove n va da 1 a 213. skimmato HLT
+tree      -> /castor/cern.ch/user/c/crovelli/CrabMio/JPsi/Analisi_Feb09/minBias_218_skimHLT/
+* efficienze di HLT
+jpsi_8e29     -> 3213/40795440 = 0.0079%
+upsilon_8e29  -> 430/40795440  = 0.0011%
