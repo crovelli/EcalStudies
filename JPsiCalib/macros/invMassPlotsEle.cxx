@@ -16,22 +16,22 @@
 #include "myFunctions.cc"
 
 // vectors to be used in the following
-TFile *file[7];
-float expected[7];
+TFile *file[8];
+float expected[8];
 
 // histos declaration
-TH1F *ScHisto_invMassHighestEt[7];
-TH1F *ScHisto_invMassHighestEt_EB[7];
-TH1F *ScHisto_invMassHighestEt_EE[7];
-TH1F *ScHisto_invMassHighestEt_EBEE[7];
-TH1F *ScHisto_invMassHighestEt_norm1[7];
-TH1F *ScHisto_invMassHighestEt_EB_norm1[7];
-TH1F *ScHisto_invMassHighestEt_EE_norm1[7];
-TH1F *ScHisto_invMassHighestEt_EBEE_norm1[7];
-TH1F *ScHisto_invMassHighestEt_normL[7];
-TH1F *ScHisto_invMassHighestEt_EB_normL[7];
-TH1F *ScHisto_invMassHighestEt_EE_normL[7];
-TH1F *ScHisto_invMassHighestEt_EBEE_normL[7];
+TH1F *ScHisto_invMassHighestEt[8];
+TH1F *ScHisto_invMassHighestEt_EB[8];
+TH1F *ScHisto_invMassHighestEt_EE[8];
+TH1F *ScHisto_invMassHighestEt_EBEE[8];
+TH1F *ScHisto_invMassHighestEt_norm1[8];
+TH1F *ScHisto_invMassHighestEt_EB_norm1[8];
+TH1F *ScHisto_invMassHighestEt_EE_norm1[8];
+TH1F *ScHisto_invMassHighestEt_EBEE_norm1[8];
+TH1F *ScHisto_invMassHighestEt_normL[8];
+TH1F *ScHisto_invMassHighestEt_EB_normL[8];
+TH1F *ScHisto_invMassHighestEt_EE_normL[8];
+TH1F *ScHisto_invMassHighestEt_EBEE_normL[8];
 TH1F *ScHisto_invMassHighestEt_normL_all;
 
 void chargeFiles() {
@@ -42,6 +42,7 @@ void chargeFiles() {
   file[4] = new TFile("bce80170.root");
   file[5] = new TFile("emEnrich3080.root");
   file[6] = new TFile("emEnrich80170.root");
+  file[7] = new TFile("minBias.root");
 }
 
 void setExpected(int theStep) {
@@ -49,53 +50,58 @@ void setExpected(int theStep) {
   float lumi = 100.;   // pb-1
 
   if (theStep==1) {     // after HLT only
-    expected[0] =   1644.*lumi;
-    expected[1] =    286.*lumi;
-    expected[2] =   6624.*lumi;
-    expected[3] =  26856.*lumi;
-    expected[4] =   4676.*lumi;
-    expected[5] = 321480.*lumi;
-    expected[6] =  36275.*lumi;
+    expected[0] =    1644.*lumi;
+    expected[1] =     286.*lumi;
+    expected[2] =    6624.*lumi;
+    expected[3] =   26856.*lumi;
+    expected[4] =    4676.*lumi;
+    expected[5] =  321480.*lumi;
+    expected[6] =   36275.*lumi;
+    expected[7] = 5947120.*lumi;
   }
 
   if (theStep==2) {     // after HLT + reco
-    expected[0] =  1168.*lumi;
-    expected[1] =   168.*lumi;
-    expected[2] =  1259.*lumi;
-    expected[3] =  7174.*lumi;
-    expected[4] =  1750.*lumi;
-    expected[5] = 32066.*lumi;
-    expected[6] =  8430.*lumi;
+    expected[0] =   1168.*lumi;
+    expected[1] =    168.*lumi;
+    expected[2] =   1259.*lumi;
+    expected[3] =   7174.*lumi;
+    expected[4] =   1750.*lumi;
+    expected[5] =  32066.*lumi;
+    expected[6] =   8430.*lumi;
+    expected[7] = 471329.*lumi;
   }
 
   if (theStep==3) {     // after HLT + reco + Et>4 
-    expected[0] =  1167.*lumi;
-    expected[1] =   167.*lumi;
-    expected[2] =  1245.*lumi;
-    expected[3] =  7105.*lumi;
-    expected[4] =  1738.*lumi;
-    expected[5] = 31518.*lumi;
-    expected[6] =  8287.*lumi;
+    expected[0] =   1167.*lumi;
+    expected[1] =    167.*lumi;
+    expected[2] =   1245.*lumi;
+    expected[3] =   7105.*lumi;
+    expected[4] =   1738.*lumi;
+    expected[5] =  31518.*lumi;
+    expected[6] =   8287.*lumi;
+    expected[7] = 460410.*lumi;
   }
 
   if (theStep==4) {     // after HLT + reco + Et>4 + charge 
-    expected[0] =  1142.*lumi;
-    expected[1] =   158.*lumi;
-    expected[2] =   819.*lumi;
-    expected[3] =  4389.*lumi;
-    expected[4] =  1069.*lumi;
-    expected[5] = 18197.*lumi; 
-    expected[6] =  4782.*lumi; 
+    expected[0] =   1142.*lumi;
+    expected[1] =    158.*lumi;
+    expected[2] =    819.*lumi;
+    expected[3] =   4389.*lumi;
+    expected[4] =   1069.*lumi;
+    expected[5] =   8197.*lumi; 
+    expected[6] =   4782.*lumi; 
+    expected[7] = 298448.*lumi;
   }
 
   if (theStep==5) {     // after HLT + reco + Et>4 + charge + eleID 
-    expected[0] = 803.*lumi;
-    expected[1] =  94.*lumi;
-    expected[2] = 222.*lumi;
-    expected[3] = 740.*lumi;
-    expected[4] =  86.*lumi;
-    expected[5] = 659.*lumi;
-    expected[6] = 115.*lumi;
+    expected[0] =   803.*lumi;
+    expected[1] =    94.*lumi;
+    expected[2] =   222.*lumi;
+    expected[3] =   740.*lumi;
+    expected[4] =    86.*lumi;
+    expected[5] =   659.*lumi;
+    expected[6] =   115.*lumi;
+    expected[7] = 10919.*lumi;
   }
 
   if (theStep==6) {     // after HLT + reco + Et>4 + charge + eleID + isol 
@@ -106,11 +112,12 @@ void setExpected(int theStep) {
     expected[4] =   5.*lumi;
     expected[5] =  76.*lumi;
     expected[6] =   9.*lumi;
+    expected[7] =   0.*lumi;
   }
 }
 
 void readHistos() {
-  for(int ifile=0; ifile<7; ifile++){
+  for(int ifile=0; ifile<8; ifile++){
     ScHisto_invMassHighestEt[ifile]      = (TH1F*)file[ifile]->Get("ScHisto_invMassHighestEt");
     ScHisto_invMassHighestEt_EB[ifile]   = (TH1F*)file[ifile]->Get("ScHisto_invMassHighestEt_EB");
     ScHisto_invMassHighestEt_EE[ifile]   = (TH1F*)file[ifile]->Get("ScHisto_invMassHighestEt_EE");
@@ -121,22 +128,27 @@ void readHistos() {
 void normalizeTo1() { 
 
   char title[700];
-  for(int ifile=0; ifile<7; ifile++){
+
+  for(int ifile=0; ifile<8; ifile++){
     sprintf(title,"ScHisto_invMassHighestEt_norm1[%d]", ifile);
-    ScHisto_invMassHighestEt_norm1[ifile] = (TH1F*)ScHisto_invMassHighestEt[ifile]->Clone(title);
+    ScHisto_invMassHighestEt_norm1[ifile]      = (TH1F*)ScHisto_invMassHighestEt[ifile]->Clone(title);
     sprintf(title,"ScHisto_invMassHighestEt_EB_norm1[%d]", ifile);
-    ScHisto_invMassHighestEt_EB_norm1[ifile] = (TH1F*)ScHisto_invMassHighestEt_EB[ifile] -> Clone(title);  
+    ScHisto_invMassHighestEt_EB_norm1[ifile]   = (TH1F*)ScHisto_invMassHighestEt_EB[ifile] -> Clone(title);  
     sprintf(title,"ScHisto_invMassHighestEt_EE_norm1[%d]", ifile);
-    ScHisto_invMassHighestEt_EE_norm1[ifile] = (TH1F*)ScHisto_invMassHighestEt_EE[ifile] -> Clone(title);
+    ScHisto_invMassHighestEt_EE_norm1[ifile]   = (TH1F*)ScHisto_invMassHighestEt_EE[ifile] -> Clone(title);
     sprintf(title,"ScHisto_invMassHighestEt_EBEE_norm1[%d]", ifile);
     ScHisto_invMassHighestEt_EBEE_norm1[ifile] = (TH1F*)ScHisto_invMassHighestEt_EBEE[ifile] -> Clone(title);
   }
-  for(int ifile=0; ifile<7; ifile++){
-    //cout << ScHisto_invMassHighestEt_norm1[ifile]->Integral() << " " << ScHisto_invMassHighestEt_norm1[ifile]->GetEntries() << endl;
-    ScHisto_invMassHighestEt_norm1[ifile]      -> Scale(1./(ScHisto_invMassHighestEt_norm1[ifile]      -> Integral()));
-    ScHisto_invMassHighestEt_EB_norm1[ifile]   -> Scale(1./(ScHisto_invMassHighestEt_EB_norm1[ifile]   -> Integral()));
-    ScHisto_invMassHighestEt_EE_norm1[ifile]   -> Scale(1./(ScHisto_invMassHighestEt_EE_norm1[ifile]   -> Integral()));
-    ScHisto_invMassHighestEt_EBEE_norm1[ifile] -> Scale(1./(ScHisto_invMassHighestEt_EBEE_norm1[ifile] -> Integral()));
+
+  for(int ifile=0; ifile<8; ifile++){
+    if (ScHisto_invMassHighestEt_norm1[ifile]    -> Integral()>0) 
+      ScHisto_invMassHighestEt_norm1[ifile]      -> Scale(1./(ScHisto_invMassHighestEt_norm1[ifile]     -> Integral()));
+    if (ScHisto_invMassHighestEt_EB_norm1[ifile] -> Integral()>0) 
+      ScHisto_invMassHighestEt_EB_norm1[ifile]   -> Scale(1./(ScHisto_invMassHighestEt_EB_norm1[ifile]  -> Integral()));
+    if (ScHisto_invMassHighestEt_EE_norm1[ifile] -> Integral()>0) 
+      ScHisto_invMassHighestEt_EE_norm1[ifile]   -> Scale(1./(ScHisto_invMassHighestEt_EE_norm1[ifile]  -> Integral()));
+    if (ScHisto_invMassHighestEt_EBEE_norm1[ifile] -> Integral()>0) 
+      ScHisto_invMassHighestEt_EBEE_norm1[ifile] -> Scale(1./(ScHisto_invMassHighestEt_EBEE_norm1[ifile]-> Integral()));
   }
 }
 
@@ -144,7 +156,7 @@ void normalizeTo1() {
 void normalizeToL() { 
 
   char title[500];
-  for(int ifile=0; ifile<7; ifile++){
+  for(int ifile=0; ifile<8; ifile++){
     sprintf(title,"ScHisto_invMassHighestEt_normL[%d]", ifile);
     ScHisto_invMassHighestEt_normL[ifile] = (TH1F*)ScHisto_invMassHighestEt[ifile] -> Clone(title);
     sprintf(title,"ScHisto_invMassHighestEt_EB_normL[%d]", ifile);
@@ -154,11 +166,16 @@ void normalizeToL() {
     sprintf(title,"ScHisto_invMassHighestEt_EBEE_normL[%d]", ifile);
     ScHisto_invMassHighestEt_EBEE_normL[ifile] = (TH1F*)ScHisto_invMassHighestEt_EBEE[ifile] -> Clone(title);
   }
-  for(int ifile=0; ifile<7; ifile++){
-    ScHisto_invMassHighestEt_normL[ifile]      -> Scale(expected[ifile]/(ScHisto_invMassHighestEt_normL[ifile]      -> GetEntries()));
-    ScHisto_invMassHighestEt_EB_normL[ifile]   -> Scale(expected[ifile]/(ScHisto_invMassHighestEt_EB_normL[ifile]   -> GetEntries()));
-    ScHisto_invMassHighestEt_EE_normL[ifile]   -> Scale(expected[ifile]/(ScHisto_invMassHighestEt_EE_normL[ifile]   -> GetEntries()));
-    ScHisto_invMassHighestEt_EBEE_normL[ifile] -> Scale(expected[ifile]/(ScHisto_invMassHighestEt_EBEE_normL[ifile] -> GetEntries()));
+
+  for(int ifile=0; ifile<8; ifile++){
+    if (ScHisto_invMassHighestEt_normL[ifile]   -> GetEntries()>0) 
+      ScHisto_invMassHighestEt_normL[ifile]     -> Scale(expected[ifile]/(ScHisto_invMassHighestEt_normL[ifile] -> GetEntries()));
+    if (ScHisto_invMassHighestEt_EB_normL[ifile]-> GetEntries()>0) 
+      ScHisto_invMassHighestEt_EB_normL[ifile]  -> Scale(expected[ifile]/(ScHisto_invMassHighestEt_EB_normL[ifile] -> GetEntries()));
+    if (ScHisto_invMassHighestEt_EE_normL[ifile]-> GetEntries()>0) 
+      ScHisto_invMassHighestEt_EE_normL[ifile]  -> Scale(expected[ifile]/(ScHisto_invMassHighestEt_EE_normL[ifile] -> GetEntries()));
+    if (ScHisto_invMassHighestEt_EBEE_normL[ifile]-> GetEntries()>0) 
+      ScHisto_invMassHighestEt_EBEE_normL[ifile]  -> Scale(expected[ifile]/(ScHisto_invMassHighestEt_EBEE_normL[ifile] -> GetEntries()));
   }
 }
 
@@ -171,11 +188,12 @@ void addStoB() {
   ScHisto_invMassHighestEt_normL_all -> Add(ScHisto_invMassHighestEt_normL[4]);
   ScHisto_invMassHighestEt_normL_all -> Add(ScHisto_invMassHighestEt_normL[5]);
   ScHisto_invMassHighestEt_normL_all -> Add(ScHisto_invMassHighestEt_normL[6]);
+  ScHisto_invMassHighestEt_normL_all -> Add(ScHisto_invMassHighestEt_normL[7]);
 }
 
 void cosmeticsSvsB() {
   int color;
-  for(int ifile=0; ifile<7; ifile++){
+  for(int ifile=0; ifile<8; ifile++){
     color = ifile+2;
     
     ScHisto_invMassHighestEt_normL[ifile]      -> SetFillColor(color);
@@ -203,7 +221,7 @@ void cosmeticsSvsB() {
 
 // analysis: S vs B
 void drawSvsB(int theStep) {
-  
+
   chargeFiles();
   setExpected(theStep);
   readHistos();
@@ -232,19 +250,20 @@ void drawSvsB(int theStep) {
   leg.AddEntry(ScHisto_invMassHighestEt_normL[4], "bc->e, 80-170",      "f");
   leg.AddEntry(ScHisto_invMassHighestEt_normL[5], "em.enriched, 30-80", "f");
   leg.AddEntry(ScHisto_invMassHighestEt_normL[6], "em.enriched, 80-170","f");
+  leg.AddEntry(ScHisto_invMassHighestEt_normL[7], "minimum bias","f");
   leg.SetFillColor(0);
   leg.SetBorderSize(0.4);
 
   TCanvas c1("c1","all",1);  
   ScHisto_invMassHighestEt_normL[0]->Draw();
-  for(int ifile=0; ifile<7; ifile++) ScHisto_invMassHighestEt_normL[ifile] -> Draw("same");
+  for(int ifile=0; ifile<8; ifile++) ScHisto_invMassHighestEt_normL[ifile] -> Draw("same");
   leg.Draw();
   c1.SaveAs("normL.eps");
   c1.SaveAs("normL.root");
 
   TCanvas c11("c11","all",1);  
   ScHisto_invMassHighestEt_norm1[0]->Draw();
-  for(int ifile=0; ifile<7; ifile++) ScHisto_invMassHighestEt_norm1[ifile] -> Draw("same");
+  for(int ifile=0; ifile<8; ifile++) ScHisto_invMassHighestEt_norm1[ifile] -> Draw("same");
   leg.Draw();
   c11.SaveAs("norm1.eps");
   c11.SaveAs("norm1.root");
@@ -256,6 +275,7 @@ void drawSvsB(int theStep) {
 
   // summing up backgrounds and signals
   THStack staB_invMassHighestEt("staB_invMassHighestEt","staB_invMassHighestEt");
+  staB_invMassHighestEt.Add(ScHisto_invMassHighestEt_normL[7]);
   for (int ii=2; ii<7; ii++) {
     staB_invMassHighestEt.Add(ScHisto_invMassHighestEt_normL[ii]);
   }
