@@ -88,7 +88,7 @@ void setExpected(int theStep) {
     expected[2] =    819.*lumi;
     expected[3] =   4389.*lumi;
     expected[4] =   1069.*lumi;
-    expected[5] =   8197.*lumi; 
+    expected[5] =  18197.*lumi; 
     expected[6] =   4782.*lumi; 
     expected[7] = 298448.*lumi;
   }
