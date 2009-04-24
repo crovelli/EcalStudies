@@ -563,14 +563,15 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
   float hltEff_prod; 
   float filterEff_prod;
   float crossSection;
-  if (theSample==1) { hltEff_prod=1.;       filterEff_prod = 1.;      crossSection = 17000.;     }    // hltEff_prod = j/psi only
-  if (theSample==2) { hltEff_prod=1.;       filterEff_prod = 1.;      crossSection = 2500;       }
-  if (theSample==3) { hltEff_prod=0.0345;   filterEff_prod = 0.00048; crossSection = 400000000.; } 
-  if (theSample==4) { hltEff_prod=0.1119;   filterEff_prod = 0.0024;  crossSection = 100000000.; } 
-  if (theSample==5) { hltEff_prod=0.2051;   filterEff_prod = 0.012;   crossSection = 1900000.;   } 
-  if (theSample==6) { hltEff_prod=1.;       filterEff_prod = 0.0080;  crossSection = 400000000.; }
-  if (theSample==7) { hltEff_prod=0.0684;   filterEff_prod = 0.047;   crossSection = 100000000.; }  
-  if (theSample==8) { hltEff_prod=0.12728;  filterEff_prod = 0.15;    crossSection = 1900000.;   }
+  if (theSample==1) { hltEff_prod=1.;       filterEff_prod = 1.;      crossSection = 17000.;       }    // hltEff_prod = j/psi only 
+  if (theSample==2) { hltEff_prod=1.;       filterEff_prod = 1.;      crossSection = 2500;         }
+  if (theSample==3) { hltEff_prod=0.0345;   filterEff_prod = 0.00048; crossSection = 400000000.;   } 
+  if (theSample==4) { hltEff_prod=0.1119;   filterEff_prod = 0.0024;  crossSection = 100000000.;   } 
+  if (theSample==5) { hltEff_prod=0.2051;   filterEff_prod = 0.012;   crossSection = 1900000.;     } 
+  if (theSample==6) { hltEff_prod=1.;       filterEff_prod = 0.0080;  crossSection = 400000000.;   }
+  if (theSample==7) { hltEff_prod=0.0684;   filterEff_prod = 0.047;   crossSection = 100000000.;   }  
+  if (theSample==8) { hltEff_prod=0.12728;  filterEff_prod = 0.15;    crossSection = 1900000.;     }
+  if (theSample==9) { hltEff_prod=0.000079; filterEff_prod = 1.;      crossSection = 75280000000.; }
 
   float numEvents;
   if(theSample > 2) numEvents = totalTrigger/hltEff_prod; 

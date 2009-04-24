@@ -30,6 +30,7 @@ int main(int argc, char* argv[]) {
     std::cout << "6) QCD em. enriched, 20-30"  << std::endl;
     std::cout << "7) QCD em. enriched, 30-80"  << std::endl;
     std::cout << "8) QCD em. enriched, 80-170" << std::endl;
+    std::cout << "9) minimum bias"             << std::endl;
     return 1;
   }
   strcpy(inputFileName,argv[1]);
