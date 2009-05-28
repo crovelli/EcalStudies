@@ -4,6 +4,7 @@
 #include "FWCore/Framework/interface/eventsetupdata_registration_macro.h"
 
 #include "EcalStudies/JPsiCalib/plugins/JPsieeAnalyzerSignal.h"
+#include "EcalStudies/JPsiCalib/plugins/JPsiFiltering.h"
 
 DEFINE_SEAL_MODULE();
 
@@ -11,3 +12,4 @@ DEFINE_SEAL_MODULE();
 #include "DataFormats/EgammaReco/interface/SuperCluster.h"
 #include "DataFormats/EgammaReco/interface/SuperClusterFwd.h"
 DEFINE_FWK_MODULE(JPsieeAnalyzerSignal);
+DEFINE_FWK_MODULE(JPsiFiltering);
