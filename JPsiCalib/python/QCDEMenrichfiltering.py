@@ -19,10 +19,10 @@ process.load("Configuration.StandardSequences.MagneticField_cff")
 process.load("Geometry.CaloEventSetup.CaloTopology_cfi")
 process.load("Geometry.CaloEventSetup.CaloGeometry_cfi")
 process.load("RecoEgamma.EgammaIsolationAlgos.eleIsolationSequence_cff")
-process.load("EcalStudies.JPsiCalib.electronIdSequence_cff")
+#process.load("HiggsAnalysis.HiggsToWW2e.electronIdSequence_cff")
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(100)
+    input = cms.untracked.int32(200)
     )
 
 process.options = cms.untracked.PSet(
@@ -179,14 +179,14 @@ process.FilterSequence6 = cms.Sequence(process.genParticlesForFilter + ~process.
 process.FilterSequence7 = cms.Sequence(process.genParticlesForFilter + ~process.bctoefilter + process.emenrichingfilter7)
 process.FilterSequence8 = cms.Sequence(process.genParticlesForFilter + ~process.bctoefilter + process.emenrichingfilter8)
 
-process.p1 = cms.Path(process.FilterSequence1*process.eIdSequence)
-process.p2 = cms.Path(process.FilterSequence2*process.eIdSequence)
-process.p3 = cms.Path(process.FilterSequence3*process.eIdSequence)
-process.p4 = cms.Path(process.FilterSequence4*process.eIdSequence)
-process.p5 = cms.Path(process.FilterSequence5*process.eIdSequence)
-process.p6 = cms.Path(process.FilterSequence6*process.eIdSequence)
-process.p7 = cms.Path(process.FilterSequence7*process.eIdSequence)
-process.p8 = cms.Path(process.FilterSequence8*process.eIdSequence)
+process.p1 = cms.Path(process.FilterSequence1)#*process.eIdSequence)
+process.p2 = cms.Path(process.FilterSequence2)#*process.eIdSequence)
+process.p3 = cms.Path(process.FilterSequence3)#*process.eIdSequence)
+process.p4 = cms.Path(process.FilterSequence4)#*process.eIdSequence)
+process.p5 = cms.Path(process.FilterSequence5)#*process.eIdSequence)
+process.p6 = cms.Path(process.FilterSequence6)#*process.eIdSequence)
+process.p7 = cms.Path(process.FilterSequence7)#*process.eIdSequence)
+process.p8 = cms.Path(process.FilterSequence8)#*process.eIdSequence)
 
 process.USER = cms.OutputModule("PoolOutputModule",
                                 outputCommands = cms.untracked.vstring('keep *',

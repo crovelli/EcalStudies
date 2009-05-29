@@ -86,11 +86,14 @@ void JPsiFiltering::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
   iEvent.getByLabel( "eleIsoFromDepsHcalFromHits", (*eIsoFromDepsValueMap_)[2] );
 
   // 5) to get default cut based eleID
-  eleIdResults_ = new eleIdContainer(3);
-  iEvent.getByLabel( "egammaIDStandardCutsRobust", (*eleIdResults_)[0] ); 
-  iEvent.getByLabel( "egammaIDStandardCutsLoose", (*eleIdResults_)[1] );
-  iEvent.getByLabel( "egammaIDStandardCutsTight", (*eleIdResults_)[2] );
-
+  eleIdResults_ = new eleIdContainer(4);
+  // iEvent.getByLabel( "egammaIDStandardCutsRobust", (*eleIdResults_)[0] ); 
+  // iEvent.getByLabel( "egammaIDStandardCutsLoose", (*eleIdResults_)[1] );
+  // iEvent.getByLabel( "egammaIDStandardCutsTight", (*eleIdResults_)[2] );
+  iEvent.getByLabel( "eidLoose",       (*eleIdResults_)[0] ); 
+  iEvent.getByLabel( "eidRobustLoose", (*eleIdResults_)[1] );
+  iEvent.getByLabel( "eidRobustTight", (*eleIdResults_)[2] );
+  iEvent.getByLabel( "eidTight",       (*eleIdResults_)[3] );
   
   // ---------------------------------------------------------------------
   // filters infos:
@@ -176,15 +179,18 @@ void JPsiFiltering::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
     const reco::GsfElectronRef eleRef(gsfElectrons,countMP);
     
     // electronID
-    const eleIdMap & eleIdStandardCutsRobustVal = *( (*eleIdResults_)[0] );
-    const eleIdMap & eleIdStandardCutsLooseVal  = *( (*eleIdResults_)[1] );
-    const eleIdMap & eleIdStandardCutsTightVal  = *( (*eleIdResults_)[2] );
-    int eleIdStdRobust = 0;
-    int eleIdStdLoose  = 0;
-    int eleIdStdTight  = 0;
-    if ( eleIdStandardCutsRobustVal[eleRef] ) eleIdStdRobust = 1;
-    if ( eleIdStandardCutsLooseVal[eleRef] )  eleIdStdLoose  = 1;
-    if ( eleIdStandardCutsTightVal[eleRef] )  eleIdStdTight  = 1;
+    const eleIdMap & eleIdLooseVal       = *( (*eleIdResults_)[0] );
+    const eleIdMap & eleIdRobustLooseVal = *( (*eleIdResults_)[1] );
+    const eleIdMap & eleIdRobustTightVal = *( (*eleIdResults_)[2] );
+    const eleIdMap & eleIdTightVal       = *( (*eleIdResults_)[3] );
+    int eleIdLoose    = 0;
+    int eleIdRobLoose = 0;
+    int eleIdRobTight = 0;
+    int eleIdTight    = 0;
+    if ( eleIdLooseVal[eleRef] )       eleIdLoose    = 1;
+    if ( eleIdRobustLooseVal[eleRef] ) eleIdRobLoose = 1;
+    if ( eleIdRobustTightVal[eleRef] ) eleIdRobTight = 1;
+    if ( eleIdTightVal[eleRef] )       eleIdTight    = 1;
     
     // tracker based isolation studies   
     TrackerIsolation trackIsolation( &(*eleIter->gsfTrack()), theTracks );
@@ -217,7 +223,7 @@ void JPsiFiltering::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
     float deta      = eleIter->deltaEtaSuperClusterTrackAtVtx();
     float dphi      = eleIter->deltaPhiSuperClusterTrackAtVtx();
     float eleEoP    = eleIter->eSuperClusterOverP();
-    OutputTree->fillElectrons( eleCharge, elePx, elePy, elePz, eleEta, elePhi, eleEnergy, eleEt, HoE, deta, dphi, eleEoP, sumPt03, sumPt04, sumPt05, jurTrackerEle, jurECALEle, jurHCALEle, eleIdStdRobust, eleIdStdLoose, eleIdStdTight);
+    OutputTree->fillElectrons( eleCharge, elePx, elePy, elePz, eleEta, elePhi, eleEnergy, eleEt, HoE, deta, dphi, eleEoP, sumPt03, sumPt04, sumPt05, jurTrackerEle, jurECALEle, jurHCALEle, eleIdLoose, eleIdRobLoose, eleIdRobTight, eleIdTight);
     
     countMP++;
     

@@ -65,8 +65,9 @@ FilteringTree::FilteringTree(const char * filename) {
   myTree->Branch("jurTrkIsolEle", 	    &jurTrkIsolEle,	     "jurTrkIsolEle[numberOfElectrons]/F");
   myTree->Branch("jurEmIsolEle", 	    &jurEmIsolEle,	     "jurEmIsolEle[numberOfElectrons]/F");
   myTree->Branch("jurHadIsolEle", 	    &jurHadIsolEle,	     "jurHadIsolEle[numberOfElectrons]/F");
-  myTree->Branch("eleIdRobust", 	    &eleIdRobust,	     "eleIdRobust[numberOfElectrons]/I");
   myTree->Branch("eleIdLoose", 	            &eleIdLoose,	     "eleIdLoose[numberOfElectrons]/I");
+  myTree->Branch("eleIdRobLoose", 	    &eleIdRobLoose,	     "eleIdRobLoose[numberOfElectrons]/I");
+  myTree->Branch("eleIdRobTight", 	    &eleIdRobTight,	     "eleIdRobTight[numberOfElectrons]/I");
   myTree->Branch("eleIdTight", 	            &eleIdTight,	     "eleIdTight[numberOfElectrons]/I");
 }
 
@@ -131,7 +132,7 @@ void FilteringTree::fillGenerated( float gen_x, float gen_y, float gen_z, float 
   }
 }
 
-void FilteringTree::fillElectrons( int ele_q, float ele_x, float ele_y, float ele_z, float ele_eta, float ele_phi, float ele_ene, float ele_et, float ele_hoe, float ele_deta, float ele_dphi, float ele_eop, float ele_trk03, float ele_trk04, float ele_trk05, float ele_jtrk, float ele_jem, float ele_jhad, int rob, int loose, int tight ){       
+void FilteringTree::fillElectrons( int ele_q, float ele_x, float ele_y, float ele_z, float ele_eta, float ele_phi, float ele_ene, float ele_et, float ele_hoe, float ele_deta, float ele_dphi, float ele_eop, float ele_trk03, float ele_trk04, float ele_trk05, float ele_jtrk, float ele_jem, float ele_jhad, int loose, int robloose, int robtight, int tight ){       
   
   if (myNumberOfEle < NMAX) {
     chargeEle[myNumberOfEle]              = ele_q;
@@ -152,8 +153,9 @@ void FilteringTree::fillElectrons( int ele_q, float ele_x, float ele_y, float el
     jurTrkIsolEle[myNumberOfEle] 	  = ele_jtrk;
     jurEmIsolEle[myNumberOfEle] 	  = ele_jem;
     jurHadIsolEle[myNumberOfEle] 	  = ele_jhad;
-    eleIdRobust[myNumberOfEle] 	          = rob;
     eleIdLoose[myNumberOfEle] 	          = loose;
+    eleIdRobLoose[myNumberOfEle]          = robloose;
+    eleIdRobTight[myNumberOfEle] 	  = robtight;
     eleIdTight[myNumberOfEle] 	          = tight;
     myNumberOfEle++;
   }
