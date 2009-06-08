@@ -11,11 +11,12 @@
 #include <TChain.h>
 #include "finalJPsiAnalysis.cc"
 #include "finalJPsiAnalysisEle.cc"
+#include "finalLowPtAnalysis.cc"
 #include "invMassStudy.cc"
 
 int main(int argc, char* argv[]) {
 
-  int applic = 1;
+  int applic = 3;
 
   char inputFileName[150];
   if ( argc < 3 ){
@@ -67,6 +68,11 @@ int main(int argc, char* argv[]) {
 
   if (applic==2) {
     invMassStudy jpsiStudy(theChain);
+    jpsiStudy.Loop();
+  }  
+
+  if (applic==3) {
+    finalLowPtAnalysis jpsiStudy(theChain);
     jpsiStudy.Loop();
   }  
 

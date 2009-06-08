@@ -57,13 +57,21 @@ OUTLIB	         = ../lib/
 $(OUTLIB)JPsiTreeBase.o: $(INCLUDEDIR)/JPsiTreeBase.C $(INCLUDEDIR)/finalJPsiAnalysis.cc 
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)JPsiTreeBase.o $<
 
+$(OUTLIB)LowPtTreeBase.o: $(INCLUDEDIR)/LowPtTreeBase.C $(INCLUDEDIR)/finalLowPtAnalysis.cc 
+	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) -o $(OUTLIB)LowPtTreeBase.o $<
+
 $(OUTLIB)finalJPsiAnalysis.o: $(INCLUDEDIR)/finalJPsiAnalysis.cc
+	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) #-o $(OUTLIB)AllNoisyAnalysis.o $<
+$(OUTLIB)finalLowPtAnalysis.o: $(INCLUDEDIR)/finalLowPtAnalysis.cc
+	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) 
+
+$(OUTLIB)finalJPsiAnalysisEle.o: $(INCLUDEDIR)/finalJPsiAnalysisEle.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) #-o $(OUTLIB)AllNoisyAnalysis.o $<
 
 $(OUTLIB)invMassStudy.o: $(INCLUDEDIR)/invMassStudy.cc
 	$(CXX) $(CXXFLAGS) -c -I$(INCLUDEDIR) 
 
-JPsiApp:  $(INCLUDEDIR)JPsiApp.C $(OUTLIB)JPsiTreeBase.o  
+JPsiApp:  $(INCLUDEDIR)JPsiApp.C $(OUTLIB)JPsiTreeBase.o $(OUTLIB)LowPtTreeBase.o  
 	$(CXX) $(CXXFLAGS) -o JPsiApp $(OUTLIB)/*.o $(GLIBS) $ $<
 
 JPsiApp.clean:
