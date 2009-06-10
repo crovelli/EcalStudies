@@ -44,6 +44,7 @@ FilteringTree::FilteringTree(const char * filename) {
   myTree->Branch("etaGen",      &etaGen,      "etaGen[numberOfGenerated]/F");
   myTree->Branch("phiGen",      &phiGen,      "phiGen[numberOfGenerated]/F");
   myTree->Branch("idGen",       &idGen,       "idGen[numberOfGenerated]/I");
+  myTree->Branch("statusGen",   &statusGen,   "statusGen[numberOfGenerated]/I");
   myTree->Branch("motherIdGen", &motherIdGen, "motherIdGen[numberOfGenerated]/I");
 
   // electrons
@@ -117,7 +118,7 @@ void FilteringTree::fillGeneral( int nmc, int ea, int f1, int f2, int f3, int f4
   passedFilter8     = f8;
 }
 
-void FilteringTree::fillGenerated( float gen_x, float gen_y, float gen_z, float gen_ene, float gen_eta, float gen_phi, int gen_id, int gen_mid ){
+void FilteringTree::fillGenerated( float gen_x, float gen_y, float gen_z, float gen_ene, float gen_eta, float gen_phi, int gen_id, int gen_status, int gen_mid ){
 
   if (myNumberOfGen < NGENMAX) {
     pxGen[myNumberOfGen]       = gen_x;
@@ -127,6 +128,7 @@ void FilteringTree::fillGenerated( float gen_x, float gen_y, float gen_z, float 
     etaGen[myNumberOfGen]      = gen_eta;
     phiGen[myNumberOfGen]      = gen_phi;
     idGen[myNumberOfGen]       = gen_id;
+    statusGen[myNumberOfGen]   = gen_status;
     motherIdGen[myNumberOfGen] = gen_mid;
     myNumberOfGen++;
   }

@@ -142,7 +142,7 @@ void JPsiFiltering::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
   HepMC::GenEvent::particle_const_iterator mcIter;
   for ( mcIter=myGenEvent->particles_begin(); mcIter != myGenEvent->particles_end(); mcIter++ ) {
     
-    if (theMcPc>99) continue; 
+    if (theMcPc>499) continue; 
 
     HepMC::GenParticle* mother=0;
     if ( (*mcIter)->production_vertex() ) {
@@ -162,6 +162,7 @@ void JPsiFiltering::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 			       ((*mcIter)->momentum()).eta(),
 			       ((*mcIter)->momentum()).phi(),
 			       (*mcIter)->pdg_id(), 
+			       (*mcIter)->status(), 
 			       mothId );
     theMcPc++;
   }
