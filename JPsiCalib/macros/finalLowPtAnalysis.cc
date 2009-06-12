@@ -65,6 +65,7 @@ void finalLowPtAnalysis::Loop() {
     tot2eEleRobLoose[i] = 0.;
   }
 
+  float totalRealEleMC      = 0.;
   float totalReco           = 0.;
   float totalRecoGt4        = 0.;
   float totalIdentified     = 0.;
@@ -143,6 +144,18 @@ void finalLowPtAnalysis::Loop() {
 
     if (numberOfGenerated == 0) continue;
 
+    int elecMC=0;
+    for(int imc=0;imc<numberOfGenerated ;imc++ ) {
+      
+      // select electrons
+      // pdgid 111 = pi0, 211 = pi+ , 221 = eta, 223 = omega ,411 D+ , 531 = B0s , 4132 = Csi0, 5232 = Csi0, 5122 = lambda 0
+      if ( idGen[imc] == 11 ||  idGen[imc] == -11 ){    
+	elecMC++;
+	//cout << " This is a real electron " << elecMC << " id " << idGen[imc] << " mother " << motherIdGen[imc] << endl; 
+      }
+    }
+    if (elecMC) totalRealEleMC++;
+      
 //       if (chargeGenEle[0]==-1 && chargeGenEle[1]==1) {
     // 	truePos_3P.SetXYZ (pxGenEle[1], pyGenEle[1], pzGenEle[1]);
 // 	trueEle_3P.SetXYZ (pxGenEle[0], pyGenEle[0], pzGenEle[0]);
@@ -214,6 +227,7 @@ void finalLowPtAnalysis::Loop() {
       // further selections
       bool isGood   = false;
       bool isBarrel = true;
+
       TVector3 this3P; 
       TLorentzVector this4P;
       this3P.SetXYZ(xRecoEle[theEle], yRecoEle[theEle], zRecoEle[theEle]);
@@ -260,10 +274,52 @@ void finalLowPtAnalysis::Loop() {
       
       if (!isGood) continue;
       
-      //  only for  selected electrons
+      // From here,  only  selected electrons
       numberOfgoodEle++;
 
 
+      /// Filling of some histograms
+      ScHisto_eta -> Fill(etaRecoEle[theEle]);     
+      ScHisto_et -> Fill(etRecoEle[theEle]);     
+      ScHisto_charge -> Fill(chargeEle[theEle]);     
+      for (int i=0; i<8;i++) {
+	if ( bitFilter[i] ) ScHisto_etaFilt[i]-> Fill(etaRecoEle[theEle]);     
+	if ( bitFilter[i] ) ScHisto_etFilt[i]-> Fill(etRecoEle[theEle]);     
+	if ( bitFilter[i] ) ScHisto_chargeFilt[i]-> Fill(chargeEle[theEle]);     
+      }
+
+      // checking MC particle
+      float hep_deltaR=0;   // in radianti
+      float deltaRele =  9999.;
+      int closerToEle = -1;
+      float deltaReleStable =  9999.;
+      int closerToEleStable = -1;
+
+      for(int imc=0;imc<numberOfGenerated ;imc++ ) {
+
+	if( statusGen[imc] != 3 && idGen[imc] != 21 ) {
+	  trueEle_3P.SetXYZ (pxGen[imc], pyGen[imc], pzGen[imc]);
+	  hep_deltaR = trueEle_3P.DeltaR(this3P);
+	  if( hep_deltaR < deltaRele ) {
+	    deltaRele= hep_deltaR;
+	    closerToEle=imc;
+	  }
+	  if( statusGen[imc] == 1 && ( hep_deltaR < deltaReleStable) ) {
+	    deltaReleStable= hep_deltaR;
+	    closerToEleStable=imc;
+	  }
+	}
+      }
+
+      HepHisto_deltaR->Fill(deltaRele);
+      if (closerToEle>=0) HepHisto_PiD->Fill( abs(idGen[closerToEle]) );
+      if (closerToEleStable>=0) {
+	HepHisto_PiDStable->Fill( abs(idGen[closerToEleStable]) );
+	for (int i = 0;i < 8 ; i++) { 
+	  if ( bitFilter[i] ) HepHisto_PiDStableF[i]->Fill( abs(idGen[closerToEleStable]) );
+	}
+      }
+      
     } // loop over electrones
 
 
@@ -296,15 +352,6 @@ void finalLowPtAnalysis::Loop() {
 	  
 	  if(eleIdRobLoose[theEle]) {
 	    numIdRobLoose++;
-	    /// Filling of some histograms
-	    ScHisto_eta -> Fill(etaRecoEle[theEle]);     
-	    ScHisto_et -> Fill(etRecoEle[theEle]);     
-	    ScHisto_charge -> Fill(chargeEle[theEle]);     
-	    for (int i=0; i<8;i++) {
-	      if ( bitFilter[i] ) ScHisto_etaFilt[i]-> Fill(etaRecoEle[theEle]);     
-	      if ( bitFilter[i] ) ScHisto_etFilt[i]-> Fill(etRecoEle[theEle]);     
-	      if ( bitFilter[i] ) ScHisto_chargeFilt[i]-> Fill(chargeEle[theEle]);     
-	    }
 	  }
 	  
 	  if(eleIdTight[theEle]) {
@@ -380,6 +427,9 @@ void finalLowPtAnalysis::Loop() {
 
   cout << endl;  
 
+  cout << " +++++++++   ELE " << totalRealEleMC << endl; 
+
+
   cout << "          EleLoose  EleRobLoose   RoughEleID  RecoGt4   2EleLoose  2EleRobLoose  2RoughEleID  2RecoGt4" << endl;
   cout << "noFilt " << setw(9) << totalEleLoose << setw(10) << totalEleRobLoose << setw(14) <<  totalIdentified << setw(12) << totalRecoGt4  << setw(11) << total2eEleLoose << setw(11) << total2eEleRobLoose << setw(14) <<  total2eIdentified << setw(12) << total2eRecoGt4 <<  endl;
   for (int i=0; i<8; i++)  cout << "Filt" << i +1 << "  "  << setw(9) << totEleLoose[i] << setw(10) << totEleRobLoose[i] <<  setw(14) <<  totIdent[i] << setw(12) << totRecoGt4[i] << setw(11) << tot2eEleLoose[i] << setw(11) << tot2eEleRobLoose[i] << setw(14) <<  tot2eIdent[i] << setw(12) << tot2eRecoGt4[i] << endl;
@@ -436,23 +486,17 @@ void finalLowPtAnalysis::bookHistos() {
   ScHistoGt4_size      = new TH1F("ScHistoGt4_size",      "Num of electrons with Et>4", 10, 0,10);
 
 
-  HepHisto_size    = new TH1F("HepHisto_size",    "Num of GenElectrons", 120, 0,120);
-  HepHisto_deltaR  = new TH1F("HepHisto_deltaR",  "GenElectrons deltaR", 100, 0.,1.);
-  HepHisto_maxPt   = new TH1F("HepHisto_maxPt",   "GenElectrons max pt", 200, 0.,20.);
-  HepHisto_minPt   = new TH1F("HepHisto_minPt",   "GenElectrons min pt", 200, 0.,20.);
-  HepHisto_eta     = new TH1F("HepHisto_eta",     "GenElectrons eta", 100, -3.,+3.);
-  HepHisto_phi     = new TH1F("HepHisto_phi",     "GenElectrons phi", 100, -3.15,3.15);
-  HepHisto_invMass = new TH1F("HepHisto_invMass", "GenElectrons invariant mass", 150,0.,6.); 
-  HepHisto_PtVsEta = new TH2F("HepHisto_PtVsEta", "GenElectrons Pt vs Eta", 100, -3.,+3., 200, 0.,20.);
-
-  ScHisto_deltaRWrtMc_CloserToMc_more1      = new TH1F("ScHisto_deltaRWrtMc_CloserToMc_more1", "deltaR with Mc - closer to MC",     100, 0.,5.);
-  ScHisto_deltaRWrtMc_HighestEt_more1       = new TH1F("ScHisto_deltaRWrtMc_HighestEt_more1",  "deltaR with Mc - highest Et",       100, 0.,5.);
-  ScHisto_deltaRWrtMc_BestS9S25_more1       = new TH1F("ScHisto_deltaRWrtMc_BestS9S25_more1",  "deltaR with Mc - best S9/S25",      100, 0.,5.);
-  ScHisto_deltaRWrtMc_BestSEE_more1         = new TH1F("ScHisto_deltaRWrtMc_BestSEE_more1",    "deltaR with Mc - best SigmaEtaEta", 100, 0.,5.);
-
-  ScHisto_deltaRComb            = new TH1F("ScHisto_deltaRComb",            "Sc deltaR",          100, 0.,3.);   
-  ScHisto_invMassComb           = new TH1F("ScHisto_invMassComb",           "Sc invariant mass",  150, 0.,6.);   
-  ScHisto_deltaRVsInvMassComb   = new TH2F("ScHisto_deltaRVsInvMassComb",   "Sc deltaR vs Invariant Mass", 150, 0.,6., 100, 0.,3.);
+  HepHisto_size    = new TH1F("HepHisto_size",    "Num of GenElectrons", 500, 0,500);
+  HepHisto_deltaR  = new TH1F("HepHisto_deltaR",  "GenElectrons deltaR", 100, 0.,10.);
+  HepHisto_PiD     = new TH1F("HepHisto_PiD",     "MC ID ( min deltaR)", 1000, 0.,1000.);
+  HepHisto_PiDStable = new TH1F("HepHisto_PiDStable",     "MC ID ( min deltaR- stable particles)", 1000, 0.,1000.);
+  for (int i=0;i<8;i++) {
+    ostringstream name;
+    name << "HepHisto_PiDStableF" << i ;
+    string strname = name.str();
+    TH1F *HepHisto_PiDStabletmp = new TH1F( strname.c_str(), "MC ID ( min deltaR- stable particles) F",  1000, 0.,1000.);
+    HepHisto_PiDStableF.push_back(HepHisto_PiDStabletmp);
+  }
 
 
   Histo_PassVsEffl  = new TH2F("Histo_PassVsEffl",   "EM-enriching filter, selected electrons", 100, 0.,1., 100, 0.,1.);
@@ -536,6 +580,12 @@ void finalLowPtAnalysis::saveHistos() {
   ScHistoGt4_size  -> Write();
 
   HepHisto_size    -> Write();
+  HepHisto_deltaR  -> Write();
+  HepHisto_PiD     -> Write();
+  HepHisto_PiDStable -> Write();
+  for (int i=0;i<8;i++)   {
+    HepHisto_PiDStableF[i]-> Write(); 
+  }
 
   Histo_PassVsEffl ->Write();
   Histo_PassVsEffh ->Write();

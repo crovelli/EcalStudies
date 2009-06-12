@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Tue Jun  2 12:24:48 2009 by ROOT version 5.18/00a
+// Fri Jun 12 14:32:11 2009 by ROOT version 5.18/00a
 // from TTree T1/filter studies tree
-// found on file: /tmp/arcidiac/test_filtering_tree_80.root
+// found on file: /tmp/arcidiac/QCDpt15_22X_merge_9.root
 //////////////////////////////////////////////////////////
 
 #ifndef LowPtTreeBase_h
@@ -31,36 +31,37 @@ public :
    Int_t           runNumber;
    Int_t           eventNumber;
    Int_t           lumiSection;
-   Float_t         pxGen[100];   //[numberOfGenerated]
-   Float_t         pyGen[100];   //[numberOfGenerated]
-   Float_t         pzGen[100];   //[numberOfGenerated]
-   Float_t         eneGen[100];   //[numberOfGenerated]
-   Float_t         etaGen[100];   //[numberOfGenerated]
-   Float_t         phiGen[100];   //[numberOfGenerated]
-   Int_t           idGen[100];   //[numberOfGenerated]
-   Int_t           motherIdGen[100];   //[numberOfGenerated]
-   Int_t           chargeEle[50];   //[numberOfElectrons]
-   Float_t         xRecoEle[50];   //[numberOfElectrons]
-   Float_t         yRecoEle[50];   //[numberOfElectrons]
-   Float_t         zRecoEle[50];   //[numberOfElectrons]
-   Float_t         etaRecoEle[50];   //[numberOfElectrons]
-   Float_t         phiRecoEle[50];   //[numberOfElectrons]
-   Float_t         eneRecoEle[50];   //[numberOfElectrons]
-   Float_t         etRecoEle[50];   //[numberOfElectrons]
-   Float_t         HoverERecoEle[50];   //[numberOfElectrons]
-   Float_t         dEtaWithTrackerRecoEle[50];   //[numberOfElectrons]
-   Float_t         dPhiWithTrackerRecoEle[50];   //[numberOfElectrons]
-   Float_t         EoverPRecoEle[50];   //[numberOfElectrons]
-   Float_t         trkIsolRecoEle_03[50];   //[numberOfElectrons]
-   Float_t         trkIsolRecoEle_04[50];   //[numberOfElectrons]
-   Float_t         trkIsolRecoEle_05[50];   //[numberOfElectrons]
-   Float_t         jurTrkIsolEle[50];   //[numberOfElectrons]
-   Float_t         jurEmIsolEle[50];   //[numberOfElectrons]
-   Float_t         jurHadIsolEle[50];   //[numberOfElectrons]
-   Int_t           eleIdLoose[50];   //[numberOfElectrons]
-   Int_t           eleIdRobLoose[50];   //[numberOfElectrons]
-   Int_t           eleIdRobTight[50];   //[numberOfElectrons]
-   Int_t           eleIdTight[50];   //[numberOfElectrons]
+   Float_t         pxGen[500];   //[numberOfGenerated]
+   Float_t         pyGen[500];   //[numberOfGenerated]
+   Float_t         pzGen[500];   //[numberOfGenerated]
+   Float_t         eneGen[500];   //[numberOfGenerated]
+   Float_t         etaGen[500];   //[numberOfGenerated]
+   Float_t         phiGen[500];   //[numberOfGenerated]
+   Int_t           idGen[500];   //[numberOfGenerated]
+   Int_t           statusGen[500];   //[numberOfGenerated]
+   Int_t           motherIdGen[500];   //[numberOfGenerated]
+   Int_t           chargeEle[100];   //[numberOfElectrons]
+   Float_t         xRecoEle[100];   //[numberOfElectrons]
+   Float_t         yRecoEle[100];   //[numberOfElectrons]
+   Float_t         zRecoEle[100];   //[numberOfElectrons]
+   Float_t         etaRecoEle[100];   //[numberOfElectrons]
+   Float_t         phiRecoEle[100];   //[numberOfElectrons]
+   Float_t         eneRecoEle[100];   //[numberOfElectrons]
+   Float_t         etRecoEle[100];   //[numberOfElectrons]
+   Float_t         HoverERecoEle[100];   //[numberOfElectrons]
+   Float_t         dEtaWithTrackerRecoEle[100];   //[numberOfElectrons]
+   Float_t         dPhiWithTrackerRecoEle[100];   //[numberOfElectrons]
+   Float_t         EoverPRecoEle[100];   //[numberOfElectrons]
+   Float_t         trkIsolRecoEle_03[100];   //[numberOfElectrons]
+   Float_t         trkIsolRecoEle_04[100];   //[numberOfElectrons]
+   Float_t         trkIsolRecoEle_05[100];   //[numberOfElectrons]
+   Float_t         jurTrkIsolEle[100];   //[numberOfElectrons]
+   Float_t         jurEmIsolEle[100];   //[numberOfElectrons]
+   Float_t         jurHadIsolEle[100];   //[numberOfElectrons]
+   Int_t           eleIdLoose[100];   //[numberOfElectrons]
+   Int_t           eleIdRobLoose[100];   //[numberOfElectrons]
+   Int_t           eleIdRobTight[100];   //[numberOfElectrons]
+   Int_t           eleIdTight[100];   //[numberOfElectrons]
 
    // List of branches
    TBranch        *b_numberOfGenerated;   //!
@@ -83,6 +84,7 @@ public :
    TBranch        *b_etaGen;   //!
    TBranch        *b_phiGen;   //!
    TBranch        *b_idGen;   //!
+   TBranch        *b_statusGen;   //!
    TBranch        *b_motherIdGen;   //!
    TBranch        *b_chargeEle;   //!
    TBranch        *b_xRecoEle;   //!
@@ -126,9 +128,9 @@ LowPtTreeBase::LowPtTreeBase(TTree *tree)
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("/tmp/arcidiac/test_filtering_tree_80.root");
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("/tmp/arcidiac/QCDpt15_22X_merge_9.root");
       if (!f) {
-         f = new TFile("/tmp/arcidiac/test_filtering_tree_80.root");
+         f = new TFile("/tmp/arcidiac/QCDpt15_22X_merge_9.root");
       }
       tree = (TTree*)gDirectory->Get("T1");
 
@@ -199,6 +201,7 @@ void LowPtTreeBase::Init(TTree *tree)
    fChain->SetBranchAddress("etaGen", etaGen, &b_etaGen);
    fChain->SetBranchAddress("phiGen", phiGen, &b_phiGen);
    fChain->SetBranchAddress("idGen", idGen, &b_idGen);
+   fChain->SetBranchAddress("statusGen", statusGen, &b_statusGen);
    fChain->SetBranchAddress("motherIdGen", motherIdGen, &b_motherIdGen);
    fChain->SetBranchAddress("chargeEle", chargeEle, &b_chargeEle);
    fChain->SetBranchAddress("xRecoEle", xRecoEle, &b_xRecoEle);
