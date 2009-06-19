@@ -135,20 +135,35 @@ void JPsiFiltering::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
   int numberMcParticle  = 0;
   int numberOfElectrons = 0;
   
-
   // MC info
-  int theMcPc = 0;
-  
+  int theMcPc        = 0;
+  int theMother      = 0;  
+  int theMotherIndex = 0;  
   HepMC::GenEvent::particle_const_iterator mcIter;
+  HepMC::GenEvent::particle_const_iterator motherIter;
+
   for ( mcIter=myGenEvent->particles_begin(); mcIter != myGenEvent->particles_end(); mcIter++ ) {
     
-    if (theMcPc>499) continue; 
-
+    if (theMcPc>1499) continue; 
+    
+    // the mother of this particle
     HepMC::GenParticle* mother=0;
     if ( (*mcIter)->production_vertex() ) {
       if ((*mcIter)->production_vertex()->particles_begin(HepMC::parents) != (*mcIter)->production_vertex()->particles_end(HepMC::parents)) { 
 	mother = *((*mcIter)->production_vertex()->particles_begin(HepMC::parents));
       }}
+    
+    // to find the mother index
+    for ( motherIter=myGenEvent->particles_begin(); motherIter != myGenEvent->particles_end(); motherIter++ ) {
+      if (theMother>5499) continue; 
+      HepMC::GenParticle* mother2=0;
+      if ( (*motherIter)->production_vertex() ) {
+	if ((*motherIter)->production_vertex()->particles_begin(HepMC::parents) != (*motherIter)->production_vertex()->particles_end(HepMC::parents)) { 
+	  mother2 = *((*motherIter)->production_vertex()->particles_begin(HepMC::parents));
+	}}
+      if (mother2==mother) { theMotherIndex = theMother; break; }
+      theMother++;
+    }
     
     // filling the tree    
     int mothId = 0;
@@ -163,7 +178,7 @@ void JPsiFiltering::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 			       ((*mcIter)->momentum()).phi(),
 			       (*mcIter)->pdg_id(), 
 			       (*mcIter)->status(), 
-			       mothId );
+			       mothId, theMother );
     theMcPc++;
   }
   numberMcParticle = theMcPc;
