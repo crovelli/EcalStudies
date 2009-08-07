@@ -60,7 +60,7 @@ process.emenrichingfilter1 = cms.EDFilter("EMEnrichingFilter",
     genParSource = cms.InputTag("genParticlesForFilter"),
     isoConeSize = cms.double(0.2),
     clusterThreshold = cms.double(5.0),
-    seedThreshold = cms.double(5.0)
+    seedThreshold = cms.double(4.0)
     )
                                           )
 
@@ -75,7 +75,7 @@ process.emenrichingfilter2 = cms.EDFilter("EMEnrichingFilter",
     genParSource = cms.InputTag("genParticlesForFilter"),
     isoConeSize = cms.double(0.2),
     clusterThreshold = cms.double(10.0),
-    seedThreshold = cms.double(5.0)
+    seedThreshold = cms.double(4.0)
     )
                                           )
 
@@ -90,7 +90,7 @@ process.emenrichingfilter3 = cms.EDFilter("EMEnrichingFilter",
     genParSource = cms.InputTag("genParticlesForFilter"),
     isoConeSize = cms.double(0.2),
     clusterThreshold = cms.double(15.0),
-    seedThreshold = cms.double(5.0)
+    seedThreshold = cms.double(4.0)
     )
                                           )
 
@@ -105,7 +105,7 @@ process.emenrichingfilter4 = cms.EDFilter("EMEnrichingFilter",
     genParSource = cms.InputTag("genParticlesForFilter"),
     isoConeSize = cms.double(0.2),
     clusterThreshold = cms.double(20.0),
-    seedThreshold = cms.double(5.0)
+    seedThreshold = cms.double(4.0)
     )
                                           )
 
