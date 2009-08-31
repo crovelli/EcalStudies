@@ -60,10 +60,16 @@ bool EMEnrichingFilterAlgo::filter(const edm::Event& iEvent, const edm::EventSet
   iEvent.getByLabel(genParSource_,genParsHandle);
   reco::GenParticleCollection genPars=*genParsHandle;
 
+  bool result = false;
+
+  // cleaning
+  sel1seeds.clear();
+  sel2seeds.clear();
+
   //bending of traj. of charged particles under influence of B-field
   std::vector<reco::GenParticle> genParsCurved=applyBFieldCurv(genPars,iSetup);
 
-  bool result1=filterPhotonElectronSeed(clusterThreshold_,
+  int result1=filterPhotonElectronSeed(clusterThreshold_,
 					seedThreshold_,
 					isoConeSize_,
 					hOverEMax_,
@@ -72,14 +78,23 @@ bool EMEnrichingFilterAlgo::filter(const edm::Event& iEvent, const edm::EventSet
 					requireTrackMatch_,
 					genPars,
 					genParsCurved);
-    
-  bool result2=filterIsoGenPar(isoGenParETMin_,isoGenParConeSize_,genPars,genParsCurved);
+  
+  int result2=filterIsoGenPar(isoGenParETMin_,isoGenParConeSize_,genPars,genParsCurved);
 
 
-  bool result=result1 || result2;
+  // we want 2 different em candidates
+  if ( result1> 1) { 
+    result = true;
+  }
+  else if ( result2> 1) {
+    result = true;  
+  }
+  else if ( result1==1 && result2==1) {
+    if ( (sel1seeds.at(0).eta()!=sel2seeds.at(0).eta()) && (sel1seeds.at(0).phi()!=sel2seeds.at(0).phi()) && (sel1seeds.at(0).et()!=sel2seeds.at(0).et()) ) result = true;
+  }
   
   return result;
-
+	
 }
 
 
@@ -90,7 +105,7 @@ bool EMEnrichingFilterAlgo::filter(const edm::Event& iEvent, const edm::EventSet
 
 
 //seed threshold, total threshold, and cone size/shape are specified separately for the barrel and the endcap
-bool EMEnrichingFilterAlgo::filterPhotonElectronSeed(float clusterthreshold,
+int EMEnrichingFilterAlgo::filterPhotonElectronSeed(float clusterthreshold,
 						     float seedthreshold,
 						     float isoConeSize,
 						     float hOverEMax,
@@ -103,7 +118,7 @@ bool EMEnrichingFilterAlgo::filterPhotonElectronSeed(float clusterthreshold,
   // float seedthreshold=5;
   float conesizeendcap=15;
 
-  bool retval=false;
+  int retval=0;
   
   vector<reco::GenParticle> seeds;
   //find electron and photon seeds - must have E>seedthreshold GeV
@@ -188,8 +203,11 @@ bool EMEnrichingFilterAlgo::filterPhotonElectronSeed(float clusterthreshold,
 
     if (eTInCone>clusterthreshold && (!requiretrackmatch || matchtrack)) {
       //       cout <<"isoET: "<<isoET<<endl;
-      if (hadET/eTInCone<hOverEMax && tkIsoET<tkIsoMax && caloIsoET<caloIsoMax) retval=true;
-      break;
+      if (hadET/eTInCone<hOverEMax && tkIsoET<tkIsoMax && caloIsoET<caloIsoMax) { 
+	retval=retval+1;
+	sel1seeds.push_back(seeds[is]);
+	// break;
+      }
     }
   }
   
@@ -291,10 +309,11 @@ float EMEnrichingFilterAlgo::deltaRxyAtEE(const reco::GenParticle &gp1, const re
 
 //need to have both the the curved and uncurved genpar collections
 //because tracker iso has to be treated differently than calo iso
-bool EMEnrichingFilterAlgo::filterIsoGenPar(float etmin, float conesize,const reco::GenParticleCollection &gph,
-					const reco::GenParticleCollection &gphCurved
-					) {
-  
+int EMEnrichingFilterAlgo::filterIsoGenPar(float etmin, float conesize,const reco::GenParticleCollection &gph,
+					   const reco::GenParticleCollection &gphCurved
+					   ) {
+
+  int passed = 0;
   for (uint32_t ip=0;ip<gph.size();ip++) {
 
     reco::GenParticle gp=gph.at(ip);
@@ -323,8 +342,11 @@ bool EMEnrichingFilterAlgo::filterIsoGenPar(float etmin, float conesize,const re
 	caloiso+=pp.energy();
       }
     }
-    if (tkiso<FILTER_TKISOCUT_ && caloiso<FILTER_CALOISOCUT_) return true;
+    if (tkiso<FILTER_TKISOCUT_ && caloiso<FILTER_CALOISOCUT_) { 
+      sel2seeds.push_back(gpCurved); 
+      passed++;
+    }
   }
-  return false;
+  return passed;
 }
 

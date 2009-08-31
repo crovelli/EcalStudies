@@ -31,19 +31,19 @@ class EMEnrichingFilterAlgo {
   bool filter(const edm::Event& iEvent, const edm::EventSetup& iSetup);
 
  private:
-  bool filterPhotonElectronSeed(float clusterthreshold,
-				float seedthreshold,
-				float isoConeSize,
-				float hOverEMax,
-				float tkIsoMax,
-				float caloIsoMax,
-				bool requiretrackmatch,
-				const std::vector<reco::GenParticle> &genPars,
-				const std::vector<reco::GenParticle> &genParsCurved);
+  int filterPhotonElectronSeed(float clusterthreshold,
+			       float seedthreshold,
+			       float isoConeSize,
+			       float hOverEMax,
+			       float tkIsoMax,
+			       float caloIsoMax,
+			       bool requiretrackmatch,
+			       const std::vector<reco::GenParticle> &genPars,
+			       const std::vector<reco::GenParticle> &genParsCurved);
 
   std::vector<reco::GenParticle> applyBFieldCurv(const std::vector<reco::GenParticle> &genPars, const edm::EventSetup& iSetup);
-  bool filterIsoGenPar(float etmin, float conesize,const reco::GenParticleCollection &gph,
-		       const reco::GenParticleCollection &gphCurved);
+  int filterIsoGenPar(float etmin, float conesize,const reco::GenParticleCollection &gph,
+		      const reco::GenParticleCollection &gphCurved);
   float deltaRxyAtEE(const reco::GenParticle &gp1, const reco::GenParticle &gp2);
     
 		       
@@ -58,8 +58,7 @@ class EMEnrichingFilterAlgo {
   float ECALBARRELRADIUS_;
   float ECALENDCAPZ_;
 
-  //parameters of the filter
-
+  // parameters of the filter
   float isoGenParETMin_;
   float isoGenParConeSize_;
   float clusterThreshold_;
@@ -71,5 +70,8 @@ class EMEnrichingFilterAlgo {
   bool requireTrackMatch_;
   edm::InputTag genParSource_;
 
+  // for double em object
+  std::vector<reco::GenParticle> sel1seeds;
+  std::vector<reco::GenParticle> sel2seeds;
 };
 #endif
