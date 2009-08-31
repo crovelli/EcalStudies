@@ -94,7 +94,13 @@ void JPsiFiltering::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
   iEvent.getByLabel( "eidRobustLoose", (*eleIdResults_)[1] );
   iEvent.getByLabel( "eidRobustTight", (*eleIdResults_)[2] );
   iEvent.getByLabel( "eidTight",       (*eleIdResults_)[3] );
+
+  // 6) pt hat
+  Handle<double> genEventScale;
+  iEvent.getByLabel("genEventScale", genEventScale );
+  float ptHat = *genEventScale;
   
+
   // ---------------------------------------------------------------------
   // filters infos:
   Handle<edm::TriggerResults> FILTERR;  
@@ -129,7 +135,7 @@ void JPsiFiltering::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
   int theRun         = iEvent.id().run();
   int theEvent       = iEvent.id().event();
   int theLumiSection = iEvent.luminosityBlock();
-  OutputTree->fillRunInfos( theRun, theEvent, theLumiSection );
+  OutputTree->fillRunInfos( theRun, theEvent, theLumiSection, ptHat );
   
   // counters for the tree
   int numberMcParticle  = 0;

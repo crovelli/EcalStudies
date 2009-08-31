@@ -11,7 +11,7 @@ class FilteringTree {
    void save();
 
    void fillGeneral( int nmc, int ea, int f1, int f2, int f3, int f4, int f5, int f6, int f7, int f8 );
-   void fillRunInfos( int run, int event, int lumis);
+   void fillRunInfos( int run, int event, int lumis, float pth);
    void fillGenerated( float gen_x, float gen_y, float gen_z, float gen_ene, float gen_eta, float gen_phi, int gen_id, int gen_status, int gen_mid, int gen_mother );
    void fillElectrons( int ele_q, float ele_x, float ele_y, float ele_z, float ele_eta, float ele_phi, float ele_ene, float ele_et, float ele_hoe, float ele_deta, float ele_dphi, float ele_eop, float ele_trk03, float ele_trk04, float ele_trk05, float ele_jtrk, float ele_jem, float ele_jhad, int loose, int robloose, int robtight, int tight );
    
@@ -31,6 +31,7 @@ class FilteringTree {
    int passedFilter5, passedFilter6, passedFilter7, passedFilter8;
    
    int runNumber, eventNumber, lumiSection;
+   float ptHat;
    
    int chargeEle[NMAX];
    float xRecoEle[NMAX], yRecoEle[NMAX], zRecoEle[NMAX];

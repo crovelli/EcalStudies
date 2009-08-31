@@ -35,6 +35,7 @@ FilteringTree::FilteringTree(const char * filename) {
   myTree->Branch("runNumber",     &runNumber,     "runNumber/I");
   myTree->Branch("eventNumber",   &eventNumber,   "eventNumber/I");
   myTree->Branch("lumiSection",   &lumiSection,   "lumiSection/I");
+  myTree->Branch("ptHat",         &ptHat,         "ptHat/F");
 
   // generated electrons
   myTree->Branch("pxGen",       &pxGen,       "pxGen[numberOfGenerated]/F");
@@ -98,11 +99,12 @@ void FilteringTree::save() {
 }
 
 
-void FilteringTree::fillRunInfos( int run, int event, int lumis) {
+void FilteringTree::fillRunInfos( int run, int event, int lumis, float pth) {
   
   runNumber   = run;
   eventNumber = event;
   lumiSection = lumis;
+  ptHat       = pth;
 }
 
 void FilteringTree::fillGeneral( int nmc, int ea, int f1, int f2, int f3, int f4, int f5, int f6, int f7, int f8 ) {
