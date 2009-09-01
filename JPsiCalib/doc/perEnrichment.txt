@@ -9,14 +9,11 @@ cvs co -d EcalStudies/JPsiCalib UserCode/crovelli/EcalStudies/JPsiCalib
 
 cvs co -d EcalStudies/InputForEnrichments UserCode/crovelli/EcalStudies/InputForEnrichments
 
-copy /UserCode/crovelli/EcalStudies/InputForEnrichments/interface/EMEnrichingFilterAlgo_withThr.h 
-in GeneratorInterface/GenFilters/interface/EMEnrichingFilterAlgo.h
+cp EcalStudies/InputForEnrichments/interface/EMEnrichingFilterAlgo_withThr.h  GeneratorInterface/GenFilters/interface/EMEnrichingFilterAlgo.h
 
-copy /UserCode/crovelli/EcalStudies/InputForEnrichments/src/EMEnrichingFilterAlgo_withThr.cc 
-in GeneratorInterface/GenFilters/src/EMEnrichingFilterAlgo.cc
+cp EcalStudies/InputForEnrichments/src/EMEnrichingFilterAlgo_withThr.cc GeneratorInterface/GenFilters/src/EMEnrichingFilterAlgo.cc
 
-copy /UserCode/crovelli/EcalStudies/InputForEnrichments/python/EMEnrichingFilter_withThr_cfi.py
-in GeneratorInterface/GenFilters/python/EMEnrichingFilter_cfi.py
+cp EcalStudies/InputForEnrichments/python/EMEnrichingFilter_withThr_cfi.py GeneratorInterface/GenFilters/python/EMEnrichingFilter_cfi.py
 
 rm -r EcalStudies/InputForEnrichments
 
