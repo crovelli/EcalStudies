@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Fri Jun 19 11:35:17 2009 by ROOT version 5.18/00a
+// Tue Sep  1 12:51:29 2009 by ROOT version 5.18/00a
 // from TTree T1/filter studies tree
-// found on file: /u1/crovelli/dataJPSI/enrichment/QcdPt15/mergedTree_1-10.root
+// found on file: /tmp/arcidiac/test_filtering_tree_3.root
 //////////////////////////////////////////////////////////
 
 #ifndef LowPtTreeBase_h
@@ -31,6 +31,7 @@ public :
    Int_t           runNumber;
    Int_t           eventNumber;
    Int_t           lumiSection;
+   Float_t         ptHat;
    Float_t         pxGen[1500];   //[numberOfGenerated]
    Float_t         pyGen[1500];   //[numberOfGenerated]
    Float_t         pzGen[1500];   //[numberOfGenerated]
@@ -78,6 +79,7 @@ public :
    TBranch        *b_runNumber;   //!
    TBranch        *b_eventNumber;   //!
    TBranch        *b_lumiSection;   //!
+   TBranch        *b_ptHat;   //!
    TBranch        *b_pxGen;   //!
    TBranch        *b_pyGen;   //!
    TBranch        *b_pzGen;   //!
@@ -130,9 +132,9 @@ LowPtTreeBase::LowPtTreeBase(TTree *tree)
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("/u1/crovelli/dataJPSI/enrichment/QcdPt15/mergedTree_1-10.root");
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("/tmp/arcidiac/test_filtering_tree_3.root");
       if (!f) {
-         f = new TFile("/u1/crovelli/dataJPSI/enrichment/QcdPt15/mergedTree_1-10.root");
+         f = new TFile("/tmp/arcidiac/test_filtering_tree_3.root");
       }
       tree = (TTree*)gDirectory->Get("T1");
 
@@ -196,6 +198,7 @@ void LowPtTreeBase::Init(TTree *tree)
    fChain->SetBranchAddress("runNumber", &runNumber, &b_runNumber);
    fChain->SetBranchAddress("eventNumber", &eventNumber, &b_eventNumber);
    fChain->SetBranchAddress("lumiSection", &lumiSection, &b_lumiSection);
+   fChain->SetBranchAddress("ptHat", &ptHat, &b_ptHat);
    fChain->SetBranchAddress("pxGen", pxGen, &b_pxGen);
    fChain->SetBranchAddress("pyGen", pyGen, &b_pyGen);
    fChain->SetBranchAddress("pzGen", pzGen, &b_pzGen);
