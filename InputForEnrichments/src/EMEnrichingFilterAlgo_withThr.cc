@@ -29,12 +29,13 @@ EMEnrichingFilterAlgo::EMEnrichingFilterAlgo(const edm::ParameterSet& iConfig) {
   FILTER_TKISOCUT_=4;
   FILTER_CALOISOCUT_=7;
   FILTER_ETA_MIN_=0;
-  FILTER_ETA_MAX_=2.4;
+  FILTER_ETA_MAX_=2.5;
   ECALBARRELMAXETA_=1.479;
   ECALBARRELRADIUS_=129.0;
   ECALENDCAPZ_=304.5;
 
-  
+  // from bctoe
+  eTThreshold_=(float)iConfig.getParameter<double>("eTThreshold");
   
   isoGenParETMin_=(float) iConfig.getParameter<double>("isoGenParETMin");
   isoGenParConeSize_=(float) iConfig.getParameter<double>("isoGenParConeSize");
@@ -55,16 +56,20 @@ EMEnrichingFilterAlgo::~EMEnrichingFilterAlgo() {
 
 bool EMEnrichingFilterAlgo::filter(const edm::Event& iEvent, const edm::EventSetup& iSetup)  {
 
+  
+  //----------
 
   Handle<reco::GenParticleCollection> genParsHandle;
   iEvent.getByLabel(genParSource_,genParsHandle);
   reco::GenParticleCollection genPars=*genParsHandle;
 
   bool result = false;
+  int BCtoEgood=0;
 
   // cleaning
   sel1seeds.clear();
   sel2seeds.clear();
+  selBCtoEseeds.clear();
 
   //bending of traj. of charged particles under influence of B-field
   std::vector<reco::GenParticle> genParsCurved=applyBFieldCurv(genPars,iSetup);
@@ -82,6 +87,17 @@ bool EMEnrichingFilterAlgo::filter(const edm::Event& iEvent, const edm::EventSet
   int result2=filterIsoGenPar(isoGenParETMin_,isoGenParConeSize_,genPars,genParsCurved);
 
 
+  /// BCtoE filter modified to store particle seeds
+  for (uint32_t ig=0;ig<genPars.size();ig++) {
+    reco::GenParticle gp=genPars.at(ig);
+    if (gp.status()==1 && abs(gp.pdgId())==11 && gp.et()>eTThreshold_ && fabs(gp.eta())<FILTER_ETA_MAX_) {
+      if (hasBCAncestors(gp)) {
+   	BCtoEgood++;
+	selBCtoEseeds.push_back(gp);
+      }
+    }
+  }
+
   // we want 2 different em candidates
   if ( result1> 1) { 
     result = true;
@@ -89,8 +105,17 @@ bool EMEnrichingFilterAlgo::filter(const edm::Event& iEvent, const edm::EventSet
   else if ( result2> 1) {
     result = true;  
   }
+  else if ( BCtoEgood > 1) {
+    result = true;
+  }
   else if ( result1==1 && result2==1) {
     if ( (sel1seeds.at(0).eta()!=sel2seeds.at(0).eta()) && (sel1seeds.at(0).phi()!=sel2seeds.at(0).phi()) && (sel1seeds.at(0).et()!=sel2seeds.at(0).et()) ) result = true;
+  }
+  else if ( result1==1 && BCtoEgood==1) {
+    if ( (sel1seeds.at(0).eta()!=selBCtoEseeds.at(0).eta()) && (sel1seeds.at(0).phi()!=selBCtoEseeds.at(0).phi()) && (sel1seeds.at(0).et()!=selBCtoEseeds.at(0).et()) ) result = true;
+  }
+  else if ( BCtoEgood==1 && result2==1) {
+    if ( (selBCtoEseeds.at(0).eta()!=sel2seeds.at(0).eta()) && (selBCtoEseeds.at(0).phi()!=sel2seeds.at(0).phi()) && (selBCtoEseeds.at(0).et()!=sel2seeds.at(0).et()) ) result = true;
   }
   
   return result;
@@ -350,3 +375,48 @@ int EMEnrichingFilterAlgo::filterIsoGenPar(float etmin, float conesize,const rec
   return passed;
 }
 
+//does this particle have an ancestor (mother, mother of mother, etc.) that is a b or c hadron?
+//attention: the GenParticle argument must have the motherRef correctly filled for this
+//to work.  That is, you had better have got it out of the genParticles collection
+bool EMEnrichingFilterAlgo::hasBCAncestors(reco::GenParticle gp) {
+
+  //stopping condition: this particle is a b or c hadron
+  if (isBCHadron(gp)) return true;
+  //stopping condition: this particle has no mothers
+  if (gp.numberOfMothers()==0) return false;
+  //otherwise continue
+  bool retval=false;
+  for (uint32_t im=0;im<gp.numberOfMothers();im++) {
+    retval=retval || hasBCAncestors(*gp.motherRef(im));
+  }
+  return retval;
+  
+}
+
+bool EMEnrichingFilterAlgo::isBCHadron(reco::GenParticle gp) {
+  return isBCMeson(gp) || isBCBaryon(gp);
+}
+
+bool EMEnrichingFilterAlgo::isBCMeson(reco::GenParticle gp) {
+  
+  uint32_t pdgid=abs(gp.pdgId());
+  uint32_t hundreds=pdgid%1000;
+  if (hundreds>=400 && hundreds<600) {
+    return true;
+  } else {
+    return false;
+  }
+
+}
+
+bool EMEnrichingFilterAlgo::isBCBaryon(reco::GenParticle gp) {
+  
+  uint32_t pdgid=abs(gp.pdgId());
+  uint32_t thousands=pdgid%10000;
+  if (thousands>=4000 && thousands <6000) {
+    return true;
+  } else {
+    return false;
+  }
+
+}

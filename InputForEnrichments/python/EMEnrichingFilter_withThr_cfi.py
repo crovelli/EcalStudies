@@ -10,7 +10,8 @@ emenrichingfilter = cms.EDFilter("EMEnrichingFilter",
         isoGenParETMin = cms.double(20.0),
         hOverEMax = cms.double(0.5),
         clusterThreshold = cms.double(20.0),
-        seedThreshold = cms.double(5.0)
+        seedThreshold = cms.double(5.0),
+        eTThreshold = cms.double(10.0)
     )
 )
 

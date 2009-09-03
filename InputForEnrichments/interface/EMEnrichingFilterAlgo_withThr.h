@@ -30,6 +30,8 @@ class EMEnrichingFilterAlgo {
   
   bool filter(const edm::Event& iEvent, const edm::EventSetup& iSetup);
 
+  bool hasBCAncestors(reco::GenParticle gp);
+
  private:
   int filterPhotonElectronSeed(float clusterthreshold,
 			       float seedthreshold,
@@ -41,10 +43,16 @@ class EMEnrichingFilterAlgo {
 			       const std::vector<reco::GenParticle> &genPars,
 			       const std::vector<reco::GenParticle> &genParsCurved);
 
+
+
   std::vector<reco::GenParticle> applyBFieldCurv(const std::vector<reco::GenParticle> &genPars, const edm::EventSetup& iSetup);
   int filterIsoGenPar(float etmin, float conesize,const reco::GenParticleCollection &gph,
 		      const reco::GenParticleCollection &gphCurved);
   float deltaRxyAtEE(const reco::GenParticle &gp1, const reco::GenParticle &gp2);
+
+  bool isBCHadron(reco::GenParticle gp);
+  bool isBCMeson(reco::GenParticle gp);
+  bool isBCBaryon(reco::GenParticle gp);
     
 		       
  private:
@@ -67,11 +75,14 @@ class EMEnrichingFilterAlgo {
   float hOverEMax_;
   float tkIsoMax_;
   float caloIsoMax_;
+  float eTThreshold_;    // from bctoe
   bool requireTrackMatch_;
   edm::InputTag genParSource_;
-
+  
   // for double em object
   std::vector<reco::GenParticle> sel1seeds;
   std::vector<reco::GenParticle> sel2seeds;
+  std::vector<reco::GenParticle> selBCtoEseeds;
+
 };
 #endif
