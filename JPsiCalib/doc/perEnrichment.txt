@@ -15,6 +15,8 @@ cp EcalStudies/InputForEnrichments/src/EMEnrichingFilterAlgo_withThr.cc Generato
 
 cp EcalStudies/InputForEnrichments/python/EMEnrichingFilter_withThr_cfi.py GeneratorInterface/GenFilters/python/EMEnrichingFilter_cfi.py
 
+cp EcalStudies/InputForEnrichments/src/BCToEFilterAlgo_doubleE.cc GeneratorInterface/GenFilters/src/BCToEFilterAlgo.cc
+
 rm -r EcalStudies/InputForEnrichments
 
 scramv1 b
