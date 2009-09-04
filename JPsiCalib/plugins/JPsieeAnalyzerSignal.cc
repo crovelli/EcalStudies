@@ -41,7 +41,7 @@
 #include "RecoEgamma/EgammaTools/interface/ECALPositionCalculator.h"
 #include "RecoEgamma/EgammaTools/interface/HoECalculator.h"
 #include "RecoEcal/EgammaCoreTools/interface/EcalClusterTools.h"
-#include "SimDataFormats/HepMCProduct/interface/HepMCProduct.h"
+#include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
 #include "TrackingTools/TrajectoryState/interface/FreeTrajectoryState.h" 
 
 // root & others
@@ -184,13 +184,11 @@ void JPsieeAnalyzerSignal::analyze(const edm::Event& iEvent, const edm::EventSet
   if(geometry.isValid()) theGeometry = geometry.product();
   
 
-  // generated electrons
+  // 3) generated electrons 
   const HepMC::GenEvent *myGenEvent;
-  // if (isSignal_){  // chiara, solo x minimum bias
   Handle<edm::HepMCProduct> hepMC;
   iEvent.getByLabel("source", hepMC);
   myGenEvent = hepMC->GetEvent();
-  // }
 
 
   // reconstructed electrons  
@@ -467,15 +465,14 @@ void JPsieeAnalyzerSignal::analyze(const edm::Event& iEvent, const edm::EventSet
 	// electron ID --------------------------------
 
 	// looking to cluster shape variables
-	BasicClusterRef theSeed = scIterRef->seed();
 	const EcalRecHitCollection *rechits = 0;
-	float seedEta = theSeed->position().eta();      
+	float seedEta = scIterRef->seed()->position().eta();      
 	if( fabs(seedEta) < 1.479 ) rechits = rechitsEB;
 	else rechits = rechitsEE;     
-	float e3x3   = EcalClusterTools::e3x3( *theSeed, &(*rechits), theTopology );
-	float e5x5   = EcalClusterTools::e5x5( *theSeed, &(*rechits), theTopology );
+	float e3x3   = EcalClusterTools::e3x3( *(scIterRef->seed()), &(*rechits), theTopology );
+	float e5x5   = EcalClusterTools::e5x5( *(scIterRef->seed()), &(*rechits), theTopology );
 	s9s25  = e3x3/e5x5;
-	std::vector<float> covMatrix = EcalClusterTools::covariances( *theSeed, rechits, theTopology, theGeometry );
+	std::vector<float> covMatrix = EcalClusterTools::covariances( *(scIterRef->seed()), rechits, theTopology, theGeometry );
 	sigmaEE = sqrt(covMatrix[0]); 
 	if( fabs(seedEta) >= 1.479 ) sigmaEE = sigmaEE - 0.02*(fabs(seedEta) - 2.3);
 	
@@ -554,17 +551,16 @@ void JPsieeAnalyzerSignal::analyze(const edm::Event& iEvent, const edm::EventSet
     for (eleIter=gsfElectrons->begin(); eleIter != gsfElectrons->end() ; eleIter++) { 
       
       SuperClusterRef theScRef   = eleIter->get<SuperClusterRef>();
-      BasicClusterRef theSeedRef = theScRef->seed();
 
       // looking to cluster shape variables
       const EcalRecHitCollection *rechits = 0;
-      float seedEta = theSeedRef->position().eta();      
+      float seedEta = theScRef->seed()->position().eta();      
       if( fabs(seedEta) < 1.479 ) rechits = rechitsEB;
       else rechits = rechitsEE;     
-      float e3x3   = EcalClusterTools::e3x3( *theSeedRef, &(*rechits), theTopology );
-      float e5x5   = EcalClusterTools::e5x5( *theSeedRef, &(*rechits), theTopology );
+      float e3x3   = EcalClusterTools::e3x3( *(theScRef->seed()), &(*rechits), theTopology );
+      float e5x5   = EcalClusterTools::e5x5( *(theScRef->seed()), &(*rechits), theTopology );
       float s9s25  = e3x3/e5x5;
-      std::vector<float> covMatrix = EcalClusterTools::covariances( *theSeedRef, rechits, theTopology, theGeometry );
+      std::vector<float> covMatrix = EcalClusterTools::covariances( *(theScRef->seed()), rechits, theTopology, theGeometry );
       float sigmaEE = sqrt(covMatrix[0]); 
       if( fabs(seedEta) >= 1.479 ) sigmaEE = sigmaEE - 0.02*(fabs(seedEta) - 2.3);
       
