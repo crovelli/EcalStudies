@@ -13,7 +13,6 @@ process.load("Configuration.StandardSequences.L1Emulator_cff")
 process.load("L1TriggerConfig.L1GtConfigProducers.Luminosity.lumi1030.L1Menu2008_2E30_cff")
 process.load('Configuration/StandardSequences/FrontierConditions_GlobalTag_cff')
 process.load('Configuration/EventContent/EventContent_cff')
-process.load("RecoEcal.EgammaClusterProducers.geometryForClustering_cff")
 process.load("Configuration.StandardSequences.Geometry_cff")
 process.load("Configuration.StandardSequences.MagneticField_cff")
 process.load("Geometry.CaloEventSetup.CaloTopology_cfi")
@@ -31,7 +30,7 @@ process.source = cms.Source("PoolSource",
                             )
 
 process.myAnalyzer = cms.EDAnalyzer("JPsiFiltering",
-                                    electronCollection = cms.InputTag("pixelMatchGsfElectrons"),
+                                    electronCollection = cms.InputTag("gsfElectrons"),
                                     tracksCollection   = cms.InputTag("generalTracks"),
                                     triggerResults     = cms.InputTag("TriggerResults::LowEneFilter"),
                                     fileTree  = cms.untracked.string("test_filtering_tree.root")
@@ -39,5 +38,5 @@ process.myAnalyzer = cms.EDAnalyzer("JPsiFiltering",
 
 process.p1 = cms.Path(process.myAnalyzer)
 
-process.GlobalTag.globaltag = 'IDEAL_V9::All'
+process.GlobalTag.globaltag = 'MC_31X_V5::All'
 

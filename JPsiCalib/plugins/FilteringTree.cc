@@ -62,16 +62,18 @@ FilteringTree::FilteringTree(const char * filename) {
   myTree->Branch("dEtaWithTrackerRecoEle",  &dEtaWithTrackerRecoEle, "dEtaWithTrackerRecoEle[numberOfElectrons]/F");
   myTree->Branch("dPhiWithTrackerRecoEle",  &dPhiWithTrackerRecoEle, "dPhiWithTrackerRecoEle[numberOfElectrons]/F"); 
   myTree->Branch("EoverPRecoEle",  	    &EoverPRecoEle, 	     "EoverPRecoEle[numberOfElectrons]/F");  
-  myTree->Branch("trkIsolRecoEle_03", 	    &trkIsolRecoEle03,	     "trkIsolRecoEle_03[numberOfElectrons]/F");
-  myTree->Branch("trkIsolRecoEle_04", 	    &trkIsolRecoEle04,	     "trkIsolRecoEle_04[numberOfElectrons]/F");
-  myTree->Branch("trkIsolRecoEle_05", 	    &trkIsolRecoEle05,	     "trkIsolRecoEle_05[numberOfElectrons]/F");
-  myTree->Branch("jurTrkIsolEle", 	    &jurTrkIsolEle,	     "jurTrkIsolEle[numberOfElectrons]/F");
-  myTree->Branch("jurEmIsolEle", 	    &jurEmIsolEle,	     "jurEmIsolEle[numberOfElectrons]/F");
-  myTree->Branch("jurHadIsolEle", 	    &jurHadIsolEle,	     "jurHadIsolEle[numberOfElectrons]/F");
   myTree->Branch("eleIdLoose", 	            &eleIdLoose,	     "eleIdLoose[numberOfElectrons]/I");
   myTree->Branch("eleIdRobLoose", 	    &eleIdRobLoose,	     "eleIdRobLoose[numberOfElectrons]/I");
   myTree->Branch("eleIdRobTight", 	    &eleIdRobTight,	     "eleIdRobTight[numberOfElectrons]/I");
   myTree->Branch("eleIdTight", 	            &eleIdTight,	     "eleIdTight[numberOfElectrons]/I");
+  myTree->Branch("sumPt03", 	            &sumPt03,	             "sumPt03[numberOfElectrons]/F");
+  myTree->Branch("sumPt04", 	            &sumPt04,	             "sumPt04[numberOfElectrons]/F");
+  myTree->Branch("sumEtEcal03", 	    &sumEtEcal03,	     "sumEtEcal03[numberOfElectrons]/F");
+  myTree->Branch("sumEtEcal04", 	    &sumEtEcal04,	     "sumEtEcal04[numberOfElectrons]/F");
+  myTree->Branch("sumEtHcalD103", 	    &sumEtHcalD103,	     "sumEtHcalD103[numberOfElectrons]/F");
+  myTree->Branch("sumEtHcalD104", 	    &sumEtHcalD104,	     "sumEtHcalD104[numberOfElectrons]/F");
+  myTree->Branch("sumEtHcalD203", 	    &sumEtHcalD203,	     "sumEtHcalD203[numberOfElectrons]/F");
+  myTree->Branch("sumEtHcalD204", 	    &sumEtHcalD204,	     "sumEtHcalD204[numberOfElectrons]/F");
 }
 
 FilteringTree::~FilteringTree() {
@@ -138,7 +140,8 @@ void FilteringTree::fillGenerated( float gen_x, float gen_y, float gen_z, float 
   }
 }
 
-void FilteringTree::fillElectrons( int ele_q, float ele_x, float ele_y, float ele_z, float ele_eta, float ele_phi, float ele_ene, float ele_et, float ele_hoe, float ele_deta, float ele_dphi, float ele_eop, float ele_trk03, float ele_trk04, float ele_trk05, float ele_jtrk, float ele_jem, float ele_jhad, int loose, int robloose, int robtight, int tight ){       
+
+void FilteringTree::fillElectrons( int ele_q, float ele_x, float ele_y, float ele_z, float ele_eta, float ele_phi, float ele_ene, float ele_et, float ele_hoe, float ele_deta, float ele_dphi, float ele_eop, int loose, int robloose, int robtight, int tight, float tk03, float tk04, float ecal03, float ecal04, float hcal103, float hcal104, float hcal203, float hcal204 ){       
   
   if (myNumberOfEle < NMAX) {
     chargeEle[myNumberOfEle]              = ele_q;
@@ -153,16 +156,18 @@ void FilteringTree::fillElectrons( int ele_q, float ele_x, float ele_y, float el
     dEtaWithTrackerRecoEle[myNumberOfEle] = ele_deta;
     dPhiWithTrackerRecoEle[myNumberOfEle] = ele_dphi;
     EoverPRecoEle[myNumberOfEle]	  = ele_eop;
-    trkIsolRecoEle03[myNumberOfEle] 	  = ele_trk03;
-    trkIsolRecoEle04[myNumberOfEle] 	  = ele_trk04;
-    trkIsolRecoEle05[myNumberOfEle] 	  = ele_trk05;
-    jurTrkIsolEle[myNumberOfEle] 	  = ele_jtrk;
-    jurEmIsolEle[myNumberOfEle] 	  = ele_jem;
-    jurHadIsolEle[myNumberOfEle] 	  = ele_jhad;
     eleIdLoose[myNumberOfEle] 	          = loose;
     eleIdRobLoose[myNumberOfEle]          = robloose;
     eleIdRobTight[myNumberOfEle] 	  = robtight;
     eleIdTight[myNumberOfEle] 	          = tight;
+    sumPt03[myNumberOfEle]                = tk03;
+    sumPt04[myNumberOfEle]                = tk04;
+    sumEtEcal03[myNumberOfEle]            = ecal03;
+    sumEtEcal04[myNumberOfEle]            = ecal04;
+    sumEtHcalD103[myNumberOfEle]          = hcal103;
+    sumEtHcalD104[myNumberOfEle]          = hcal104;
+    sumEtHcalD203[myNumberOfEle]          = hcal203;
+    sumEtHcalD204[myNumberOfEle]          = hcal204;
     myNumberOfEle++;
   }
 }

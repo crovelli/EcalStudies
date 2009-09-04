@@ -10,12 +10,10 @@
 #include "FWCore/Framework/interface/ESHandle.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "DataFormats/Common/interface/EDProduct.h"
-#include "DataFormats/RecoCandidate/interface/IsoDeposit.h"
-#include "DataFormats/RecoCandidate/interface/IsoDepositFwd.h"
 #include "AnalysisDataFormats/Egamma/interface/ElectronID.h"
-#include "DataFormats/TrackReco/interface/Track.h"
 #include "FWCore/Framework/interface/TriggerNames.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
+#include "DataFormats/Common/interface/ValueMap.h"
 
 #include "TMath.h"
 #include <TFile.h>
@@ -51,12 +49,7 @@ class JPsiFiltering : public edm::EDAnalyzer
   
   // collections
   edm::InputTag electronCollection_;
-  edm::InputTag tracksCollection_;
   edm::InputTag triggerResults_;
-
-  typedef edm::ValueMap<double> isoFromDepositsMap;
-  typedef std::vector< edm::Handle<isoFromDepositsMap> > isoContainer;
-  isoContainer *eIsoFromDepsValueMap_;
 
   typedef edm::ValueMap<float> eleIdMap;
   typedef std::vector< edm::Handle<eleIdMap> > eleIdContainer;

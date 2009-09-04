@@ -10,15 +10,11 @@
 #include "DataFormats/Common/interface/Handle.h"
 #include "DataFormats/EgammaCandidates/interface/GsfElectron.h"
 #include "DataFormats/EgammaCandidates/interface/GsfElectronFwd.h"
-#include "DataFormats/EcalRecHit/interface/EcalRecHitCollections.h"
-#include "DataFormats/EcalDetId/interface/EcalSubdetector.h"
-#include "DataFormats/RecoCandidate/interface/IsoDeposit.h"
-#include "DataFormats/RecoCandidate/interface/IsoDepositFwd.h"
 #include "AnalysisDataFormats/Egamma/interface/ElectronID.h"
-#include "DataFormats/TrackReco/interface/Track.h"
 #include "DataFormats/GsfTrackReco/interface/GsfTrack.h"
 #include "DataFormats/GsfTrackReco/interface/GsfTrackFwd.h"
-#include "SimDataFormats/HepMCProduct/interface/HepMCProduct.h"
+#include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
+#include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
 #include "FWCore/Framework/interface/TriggerNames.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
 
@@ -36,7 +32,6 @@
 
 // my classes
 #include "JPsiFiltering.h"
-#include "../interface/TrackerIsolation.h"		
 
 using namespace reco;
 using namespace std;
@@ -47,7 +42,6 @@ JPsiFiltering::JPsiFiltering(const edm::ParameterSet& iConfig) {
   
   fOutFileTreeName_    = iConfig.getUntrackedParameter<string>("fileTree");
   electronCollection_  = iConfig.getParameter<InputTag>("electronCollection");
-  tracksCollection_    = iConfig.getParameter<InputTag>("tracksCollection");
   triggerResults_      = iConfig.getParameter<InputTag>("triggerResults");
 }
 
@@ -66,40 +60,24 @@ void JPsiFiltering::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
   // 1) generated electrons
   const HepMC::GenEvent *myGenEvent;
   Handle<edm::HepMCProduct> hepMC;
-  iEvent.getByLabel("source", hepMC);
+  iEvent.getByLabel("generator", hepMC);
   myGenEvent = hepMC->GetEvent();
 
   // 2) reconstructed electrons  
   Handle<GsfElectronCollection> gsfElectrons;
   iEvent.getByLabel(electronCollection_,gsfElectrons); 
   
-  // 3) all tracker tracks for isolation studies
-  const TrackCollection *theTracks;
-  Handle<TrackCollection> tracks;
-  iEvent.getByLabel(tracksCollection_, tracks); 
-  if(tracks.isValid()) theTracks = tracks.product() ;
-
-  // 4) jurassic isolation for electrons
-  eIsoFromDepsValueMap_ = new isoContainer(3);
-  iEvent.getByLabel( "eleIsoFromDepsTk", (*eIsoFromDepsValueMap_)[0] );
-  iEvent.getByLabel( "eleIsoFromDepsEcalFromHits", (*eIsoFromDepsValueMap_)[1] );
-  iEvent.getByLabel( "eleIsoFromDepsHcalFromHits", (*eIsoFromDepsValueMap_)[2] );
-
-  // 5) to get default cut based eleID
+  // 3) to get default cut based eleID
   eleIdResults_ = new eleIdContainer(4);
-  // iEvent.getByLabel( "egammaIDStandardCutsRobust", (*eleIdResults_)[0] ); 
-  // iEvent.getByLabel( "egammaIDStandardCutsLoose", (*eleIdResults_)[1] );
-  // iEvent.getByLabel( "egammaIDStandardCutsTight", (*eleIdResults_)[2] );
   iEvent.getByLabel( "eidLoose",       (*eleIdResults_)[0] ); 
   iEvent.getByLabel( "eidRobustLoose", (*eleIdResults_)[1] );
   iEvent.getByLabel( "eidRobustTight", (*eleIdResults_)[2] );
   iEvent.getByLabel( "eidTight",       (*eleIdResults_)[3] );
 
-  // 6) pt hat
-  Handle<double> genEventScale;
-  iEvent.getByLabel("genEventScale", genEventScale );
-  float ptHat = *genEventScale;
-  
+  // 4) pt hat
+  Handle<GenEventInfoProduct> genEventInfo;
+  iEvent.getByLabel("generator", genEventInfo);
+  float ptHat = genEventInfo->qScale();
 
   // ---------------------------------------------------------------------
   // filters infos:
@@ -197,7 +175,6 @@ void JPsiFiltering::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
   for (eleIter=gsfElectrons->begin(); eleIter != gsfElectrons->end() ; eleIter++) { 
     
     SuperClusterRef theScRef   = eleIter->get<SuperClusterRef>();
-    BasicClusterRef theSeedRef = theScRef->seed();
     const reco::GsfElectronRef eleRef(gsfElectrons,countMP);
     
     // electronID
@@ -214,24 +191,17 @@ void JPsiFiltering::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
     if ( eleIdRobustTightVal[eleRef] ) eleIdRobTight = 1;
     if ( eleIdTightVal[eleRef] )       eleIdTight    = 1;
     
-    // tracker based isolation studies   
-    TrackerIsolation trackIsolation( &(*eleIter->gsfTrack()), theTracks );
-    trackIsolation.setIntRadius(0.02);
-    trackIsolation.setExtRadius(0.3);
-    float sumPt03 = trackIsolation.getPtTracks(true);
-    trackIsolation.setExtRadius(0.4);
-    float sumPt04 = trackIsolation.getPtTracks(true);
-    trackIsolation.setExtRadius(0.5);
-    float sumPt05 = trackIsolation.getPtTracks(true);
-    
-    // jurassic isolation
-    const isoFromDepositsMap & eIsoFromDepsTkVal   = *( (*eIsoFromDepsValueMap_)[0] );
-    const isoFromDepositsMap & eIsoFromDepsEcalVal = *( (*eIsoFromDepsValueMap_)[1] );
-    const isoFromDepositsMap & eIsoFromDepsHcalVal = *( (*eIsoFromDepsValueMap_)[2] );
-    float  jurTrackerEle = eIsoFromDepsTkVal[eleRef];
-    float  jurECALEle    = eIsoFromDepsEcalVal[eleRef];
-    float  jurHCALEle    = eIsoFromDepsHcalVal[eleRef];
-    
+    // POG computed isolation    
+    float dr03TkSumPt              = eleIter->dr03TkSumPt();
+    float dr04TkSumPt              = eleIter->dr04TkSumPt();
+    float dr03EcalRecHitSumEt      = eleIter->dr03EcalRecHitSumEt();
+    float dr04EcalRecHitSumEt      = eleIter->dr04EcalRecHitSumEt();
+    float dr03HcalDepth1TowerSumEt = eleIter->dr03HcalDepth1TowerSumEt();
+    float dr04HcalDepth1TowerSumEt = eleIter->dr04HcalDepth1TowerSumEt();
+    float dr03HcalDepth2TowerSumEt = eleIter->dr03HcalDepth2TowerSumEt();
+    float dr04HcalDepth2TowerSumEt = eleIter->dr04HcalDepth2TowerSumEt();
+
+
     // filling the tree with infos on all the reconstructed electrons
     int eleCharge   = eleIter->charge();
     float elePx     = eleIter->momentum().x();
@@ -245,7 +215,7 @@ void JPsiFiltering::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
     float deta      = eleIter->deltaEtaSuperClusterTrackAtVtx();
     float dphi      = eleIter->deltaPhiSuperClusterTrackAtVtx();
     float eleEoP    = eleIter->eSuperClusterOverP();
-    OutputTree->fillElectrons( eleCharge, elePx, elePy, elePz, eleEta, elePhi, eleEnergy, eleEt, HoE, deta, dphi, eleEoP, sumPt03, sumPt04, sumPt05, jurTrackerEle, jurECALEle, jurHCALEle, eleIdLoose, eleIdRobLoose, eleIdRobTight, eleIdTight);
+    OutputTree->fillElectrons( eleCharge, elePx, elePy, elePz, eleEta, elePhi, eleEnergy, eleEt, HoE, deta, dphi, eleEoP, eleIdLoose, eleIdRobLoose, eleIdRobTight, eleIdTight, dr03TkSumPt, dr04TkSumPt, dr03EcalRecHitSumEt, dr04EcalRecHitSumEt, dr03HcalDepth1TowerSumEt, dr04HcalDepth1TowerSumEt, dr03HcalDepth2TowerSumEt, dr04HcalDepth2TowerSumEt );
     
     countMP++;
     
@@ -258,7 +228,6 @@ void JPsiFiltering::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
   OutputTree->store();
   
   // deleting
-  delete eIsoFromDepsValueMap_;
   delete eleIdResults_;
 }
 

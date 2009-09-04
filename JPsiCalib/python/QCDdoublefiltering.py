@@ -13,7 +13,6 @@ process.load("Configuration.StandardSequences.L1Emulator_cff")
 process.load("L1TriggerConfig.L1GtConfigProducers.Luminosity.lumi1030.L1Menu2008_2E30_cff")
 process.load('Configuration/StandardSequences/FrontierConditions_GlobalTag_cff')
 process.load('Configuration/EventContent/EventContent_cff')
-process.load("RecoEcal.EgammaClusterProducers.geometryForClustering_cff")
 process.load("Configuration.StandardSequences.Geometry_cff")
 process.load("Configuration.StandardSequences.MagneticField_cff")
 process.load("Geometry.CaloEventSetup.CaloTopology_cfi")
@@ -21,7 +20,7 @@ process.load("Geometry.CaloEventSetup.CaloGeometry_cfi")
 process.load("RecoEgamma.EgammaIsolationAlgos.eleIsolationSequence_cff")
 
 process.maxEvents = cms.untracked.PSet(
-    input = cms.untracked.int32(1000)
+    input = cms.untracked.int32(2000)
     )
 
 process.options = cms.untracked.PSet(
@@ -31,14 +30,15 @@ process.options = cms.untracked.PSet(
 
 process.source = cms.Source("PoolSource",
                             fileNames = cms.untracked.vstring(
-   'rfio:/castor/cern.ch/cms/store/mc/Summer08/MinBias/GEN-SIM-RECO/IDEAL_V11_redigi_v1/0018/FE5226D6-F9CE-DD11-9000-001BFCDBD15E.root'
-   #'rfio:/castor/cern.ch/user/b/broccolo/5C816A32-6CE4-DD11-9520-0019B9E7EA58.root',
+    #'rfio:/castor/cern.ch/cms/store/mc/Summer08/MinBias/GEN-SIM-RECO/IDEAL_V11_redigi_v1/0018/FE5226D6-F9CE-DD11-9000-001BFCDBD15E.root'
+    'file:/tmp/crovelli/step2_RAW2DIGI_RECO_169.root'
+    #'rfio:/castor/cern.ch/user/b/broccolo/5C816A32-6CE4-DD11-9520-0019B9E7EA58.root',
     )
                             )
 
 process.genParticlesForFilter = cms.EDProducer("GenParticleProducer",
                                                saveBarCodes = cms.untracked.bool(True),
-                                               src = cms.InputTag("source"),
+                                               src = cms.InputTag("generator"),
                                                abortOnUnknownPDGCode = cms.untracked.bool(True)
                                                )
 
@@ -214,5 +214,5 @@ process.USER = cms.OutputModule("PoolOutputModule",
 
 process.outpath = cms.EndPath(process.USER)
 
-process.GlobalTag.globaltag = 'IDEAL_V9::All'
+process.GlobalTag.globaltag = 'MC_31X_V5::All'
 
