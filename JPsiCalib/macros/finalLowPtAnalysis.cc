@@ -60,6 +60,7 @@ void finalLowPtAnalysis::Loop() {
     totEleRobLoose[i] = 0.;
     totEleTight[i]    = 0.;
     totEleRobTight[i] = 0.;
+    tot2eReco[i]      = 0.;
     tot2eRecoGt4[i]     = 0.;
     tot2eIdent[i]       = 0.;
     tot2eEleLoose[i]    = 0.;
@@ -461,7 +462,7 @@ void finalLowPtAnalysis::Loop() {
 //   for (int i=0; i<8; i++)  cout << "Filt" << i +1 << "  "  << setw(9) << totEleLoose[i] << setw(10) << totEleRobLoose[i] <<  setw(14) <<  totIdent[i] << setw(12) << totRecoGt4[i] << setw(11) << tot2eEleLoose[i] << setw(11) << tot2eEleRobLoose[i] << setw(14) <<  tot2eIdent[i] << setw(12) << tot2eRecoGt4[i] << endl;
   
   cout << "           2EleLoose  2EleRobLoose  2RoughEleID  2RecoGt4    2Reco  " << endl;
-  cout << "noFilt " << setw(11) << total2eEleLoose << setw(11) << total2eEleRobLoose << setw(14) <<  total2eIdentified << setw(12) << total2eRecoGt4 << setw(12) << tot2eReco << endl;
+  cout << "noFilt " << setw(11) << total2eEleLoose << setw(11) << total2eEleRobLoose << setw(14) <<  total2eIdentified << setw(12) << total2eRecoGt4 << setw(12) << total2eReco << endl;
   for (int i=0; i<8; i++)  cout << "Filt" << i +1 << "  "  << setw(11) << tot2eEleLoose[i] << setw(11) << tot2eEleRobLoose[i] << setw(14) <<  tot2eIdent[i] << setw(12) << tot2eRecoGt4[i] << setw(12) << tot2eReco[i] << endl;
   
   
