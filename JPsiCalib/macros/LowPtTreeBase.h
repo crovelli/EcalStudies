@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Tue Sep  1 12:51:29 2009 by ROOT version 5.18/00a
+// Mon Sep 14 11:45:42 2009 by ROOT version 5.22/00a
 // from TTree T1/filter studies tree
-// found on file: /tmp/arcidiac/test_filtering_tree_3.root
+// found on file: /tmp/arcidiac/filteringMB_tree_1.root
 //////////////////////////////////////////////////////////
 
 #ifndef LowPtTreeBase_h
@@ -54,16 +54,18 @@ public :
    Float_t         dEtaWithTrackerRecoEle[50];   //[numberOfElectrons]
    Float_t         dPhiWithTrackerRecoEle[50];   //[numberOfElectrons]
    Float_t         EoverPRecoEle[50];   //[numberOfElectrons]
-   Float_t         trkIsolRecoEle_03[50];   //[numberOfElectrons]
-   Float_t         trkIsolRecoEle_04[50];   //[numberOfElectrons]
-   Float_t         trkIsolRecoEle_05[50];   //[numberOfElectrons]
-   Float_t         jurTrkIsolEle[50];   //[numberOfElectrons]
-   Float_t         jurEmIsolEle[50];   //[numberOfElectrons]
-   Float_t         jurHadIsolEle[50];   //[numberOfElectrons]
    Int_t           eleIdLoose[50];   //[numberOfElectrons]
    Int_t           eleIdRobLoose[50];   //[numberOfElectrons]
    Int_t           eleIdRobTight[50];   //[numberOfElectrons]
    Int_t           eleIdTight[50];   //[numberOfElectrons]
+   Float_t         sumPt03[50];   //[numberOfElectrons]
+   Float_t         sumPt04[50];   //[numberOfElectrons]
+   Float_t         sumEtEcal03[50];   //[numberOfElectrons]
+   Float_t         sumEtEcal04[50];   //[numberOfElectrons]
+   Float_t         sumEtHcalD103[50];   //[numberOfElectrons]
+   Float_t         sumEtHcalD104[50];   //[numberOfElectrons]
+   Float_t         sumEtHcalD203[50];   //[numberOfElectrons]
+   Float_t         sumEtHcalD204[50];   //[numberOfElectrons]
 
    // List of branches
    TBranch        *b_numberOfGenerated;   //!
@@ -102,16 +104,18 @@ public :
    TBranch        *b_dEtaWithTrackerRecoEle;   //!
    TBranch        *b_dPhiWithTrackerRecoEle;   //!
    TBranch        *b_EoverPRecoEle;   //!
-   TBranch        *b_trkIsolRecoEle_03;   //!
-   TBranch        *b_trkIsolRecoEle_04;   //!
-   TBranch        *b_trkIsolRecoEle_05;   //!
-   TBranch        *b_jurTrkIsolEle;   //!
-   TBranch        *b_jurEmIsolEle;   //!
-   TBranch        *b_jurHadIsolEle;   //!
    TBranch        *b_eleIdLoose;   //!
    TBranch        *b_eleIdRobLoose;   //!
    TBranch        *b_eleIdRobTight;   //!
    TBranch        *b_eleIdTight;   //!
+   TBranch        *b_sumPt03;   //!
+   TBranch        *b_sumPt04;   //!
+   TBranch        *b_sumEtEcal03;   //!
+   TBranch        *b_sumEtEcal04;   //!
+   TBranch        *b_sumEtHcalD103;   //!
+   TBranch        *b_sumEtHcalD104;   //!
+   TBranch        *b_sumEtHcalD203;   //!
+   TBranch        *b_sumEtHcalD204;   //!
 
    LowPtTreeBase(TTree *tree=0);
    virtual ~LowPtTreeBase();
@@ -132,9 +136,9 @@ LowPtTreeBase::LowPtTreeBase(TTree *tree)
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("/tmp/arcidiac/test_filtering_tree_3.root");
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("/tmp/arcidiac/filteringMB_tree_1.root");
       if (!f) {
-         f = new TFile("/tmp/arcidiac/test_filtering_tree_3.root");
+         f = new TFile("/tmp/arcidiac/filteringMB_tree_1.root");
       }
       tree = (TTree*)gDirectory->Get("T1");
 
@@ -221,16 +225,18 @@ void LowPtTreeBase::Init(TTree *tree)
    fChain->SetBranchAddress("dEtaWithTrackerRecoEle", dEtaWithTrackerRecoEle, &b_dEtaWithTrackerRecoEle);
    fChain->SetBranchAddress("dPhiWithTrackerRecoEle", dPhiWithTrackerRecoEle, &b_dPhiWithTrackerRecoEle);
    fChain->SetBranchAddress("EoverPRecoEle", EoverPRecoEle, &b_EoverPRecoEle);
-   fChain->SetBranchAddress("trkIsolRecoEle_03", trkIsolRecoEle_03, &b_trkIsolRecoEle_03);
-   fChain->SetBranchAddress("trkIsolRecoEle_04", trkIsolRecoEle_04, &b_trkIsolRecoEle_04);
-   fChain->SetBranchAddress("trkIsolRecoEle_05", trkIsolRecoEle_05, &b_trkIsolRecoEle_05);
-   fChain->SetBranchAddress("jurTrkIsolEle", jurTrkIsolEle, &b_jurTrkIsolEle);
-   fChain->SetBranchAddress("jurEmIsolEle", jurEmIsolEle, &b_jurEmIsolEle);
-   fChain->SetBranchAddress("jurHadIsolEle", jurHadIsolEle, &b_jurHadIsolEle);
    fChain->SetBranchAddress("eleIdLoose", eleIdLoose, &b_eleIdLoose);
    fChain->SetBranchAddress("eleIdRobLoose", eleIdRobLoose, &b_eleIdRobLoose);
    fChain->SetBranchAddress("eleIdRobTight", eleIdRobTight, &b_eleIdRobTight);
    fChain->SetBranchAddress("eleIdTight", eleIdTight, &b_eleIdTight);
+   fChain->SetBranchAddress("sumPt03", sumPt03, &b_sumPt03);
+   fChain->SetBranchAddress("sumPt04", sumPt04, &b_sumPt04);
+   fChain->SetBranchAddress("sumEtEcal03", sumEtEcal03, &b_sumEtEcal03);
+   fChain->SetBranchAddress("sumEtEcal04", sumEtEcal04, &b_sumEtEcal04);
+   fChain->SetBranchAddress("sumEtHcalD103", sumEtHcalD103, &b_sumEtHcalD103);
+   fChain->SetBranchAddress("sumEtHcalD104", sumEtHcalD104, &b_sumEtHcalD104);
+   fChain->SetBranchAddress("sumEtHcalD203", sumEtHcalD203, &b_sumEtHcalD203);
+   fChain->SetBranchAddress("sumEtHcalD204", sumEtHcalD204, &b_sumEtHcalD204);
    Notify();
 }
 
