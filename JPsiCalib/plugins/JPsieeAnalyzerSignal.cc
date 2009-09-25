@@ -148,8 +148,6 @@ void JPsieeAnalyzerSignal::analyze(const edm::Event& iEvent, const edm::EventSet
       }}
   }
   
-
-  
   // if background sample and a j/psi is found, skip the event
   if( isSignal_ || !isAJPsi) {
 
@@ -289,10 +287,20 @@ void JPsieeAnalyzerSignal::analyze(const edm::Event& iEvent, const edm::EventSet
       // corrections
       bool isEcalEnergyCorrected = eleIter->isEcalEnergyCorrected();     // true if ecal energy has been corrected
       bool isMomentumCorrected   = eleIter->isMomentumCorrected();       // true if E-p combination has been applied (if not the electron momentum is the ecal corrected energy)
+      int intIsEcalEnergyCorrected, intIsMomentumCorrected;
+      if ( isEcalEnergyCorrected ) intIsEcalEnergyCorrected = 1;
+      if (!isEcalEnergyCorrected ) intIsEcalEnergyCorrected = 0;
+      if ( isMomentumCorrected)    intIsMomentumCorrected = 1;
+      if (!isMomentumCorrected)    intIsMomentumCorrected = 0;
      
       // particle flow or standard electron
       bool isEcalDriven   = eleIter->isEcalDriven();
       bool isParticleFlow = eleIter->isTrackerDriven();
+      int intIsEcalDriven, intIsParticleFlow;
+      if ( isEcalDriven )   intIsEcalDriven = 1;
+      if (!isEcalDriven )   intIsEcalDriven = 0;
+      if ( isParticleFlow ) intIsParticleFlow = 1; 
+      if (!isParticleFlow ) intIsParticleFlow = 0; 
 
       // general infos from candidate: should be the better estimate
       int eleClass    = eleIter->classification();
@@ -306,21 +314,7 @@ void JPsieeAnalyzerSignal::analyze(const edm::Event& iEvent, const edm::EventSet
       float eleEt     = eleIter->et();
       float electronMomentumError = eleIter->electronMomentumError(); // the final electron momentum error
 
-      OutputTree->fillElectrons( 
-				e3x3, e5x5, s9s25, sigmaEtaEta, sigmaIetaIeta, hcalOverEcal,  
-				eleIdLoose, eleIdRobLoose, eleIdRobTight, eleIdTight, pfMva,
-				eSuperClusterOverP, eSeedClusterOverPout, 
-				deltaEtaSuperClusterAtVtx, deltaEtaSeedClusterAtCalo, 
-				deltaPhiSuperClusterAtVtx, deltaPhiSeedClusterAtCalo, fbrem, 
-				dr03TkSumPt, dr04TkSumPt, dr03EcalRecHitSumEt, dr04EcalRecHitSumEt, 
-				dr03HcalDepth1TowerSumEt, dr04HcalDepth1TowerSumEt, dr03HcalDepth2TowerSumEt, dr04HcalDepth2TowerSumEt,
-				rawSCenergy, rawESenergy, ecalEnergy, ecalEnergyError,
-				trackPx, trackPy, trackPz, trackEta, trackPhi, trackMomentumError,
-				isEcalEnergyCorrected, isMomentumCorrected,
-				isEcalDriven, isParticleFlow,
-				eleClass, eleCharge, elePx, elePy, elePz, eleEta, elePhi, eleEnergy, eleEt, electronMomentumError);
-
-
+      OutputTree->fillElectrons( e3x3, e5x5, s9s25, sigmaEtaEta, sigmaIetaIeta, hcalOverEcal, eleIdLoose, eleIdRobLoose, eleIdRobTight, eleIdTight, pfMva, eSuperClusterOverP, eSeedClusterOverPout, deltaEtaSuperClusterAtVtx, deltaEtaSeedClusterAtCalo, deltaPhiSuperClusterAtVtx, deltaPhiSeedClusterAtCalo, fbrem, dr03TkSumPt, dr04TkSumPt, dr03EcalRecHitSumEt, dr04EcalRecHitSumEt, dr03HcalDepth1TowerSumEt, dr04HcalDepth1TowerSumEt, dr03HcalDepth2TowerSumEt, dr04HcalDepth2TowerSumEt, rawSCenergy, rawESenergy, ecalEnergy, ecalEnergyError,trackPx, trackPy, trackPz, trackEta, trackPhi, trackMomentumError,intIsEcalEnergyCorrected, intIsMomentumCorrected,intIsEcalDriven, intIsParticleFlow, eleClass, eleCharge, elePx, elePy, elePz, eleEta, elePhi, eleEnergy, eleEt, electronMomentumError);				
 
       countMP++;
 
