@@ -11,6 +11,8 @@ process.maxEvents = cms.untracked.PSet(
     )
 
 process.source = cms.Source("PoolSource",
+                            noEventSort = cms.untracked.bool(True),
+                            duplicateCheckMode = cms.untracked.string('noDuplicateCheck'),
                             fileNames = cms.untracked.vstring(
     'file:/cmsrm/pc21/emanuele/data/Pool/step2_RAW2DIGI_RECO_169.root'
     ))
@@ -22,7 +24,7 @@ process.myAnalyzerSignal = cms.EDAnalyzer("JPsieeAnalyzerSignal",
                                     #triggerResults            = cms.InputTag("TriggerResults::HLT8E29"),
                                     triggerResults            = cms.InputTag("TriggerResults::HLT"),
                                     isSignal  = cms.untracked.bool(True),
-                                    fileTree  = cms.untracked.string("signal.root")
+                                    fileTree  = cms.untracked.string("signalJPsi10TeV.root")
                                     )
 
 process.p = cms.Path(process.myAnalyzerSignal)
