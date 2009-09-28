@@ -273,18 +273,12 @@ void finalLowPtAnalysis::Loop() {
 	    if( HoverERecoEle[theEle]>0.115 )         {
 	      isGood = false;
 	    }
-	    //if( sigmaEtaEtaRecoEle[theEle]>0.0124 )             isGood = false;
-	    // if( emIsolRecoEle_03[theEle]*this4P.E()*sin(this4P.Theta() )> 30. ) isGood = false;
-	    //if( hadIsolRecoEle_03[theEle]*this4P.E()*sin(this4P.Theta() )>1.5)  isGood = false;
 	  }
 	  
 	  if (!isBarrel){
 	    if( fabs(dEtaWithTrackerRecoEle[theEle])>0.0105 ) isGood = false;
 	    if( fabs(dPhiWithTrackerRecoEle[theEle])>0.092 )   isGood = false;
 	    if( HoverERecoEle[theEle]>0.150 )                  isGood = false;
-	    //if( sigmaEtaEtaRecoEle[theEle]>0.033 )            isGood = false;
-	    	    //	    if( emIsolRecoEle_03[theEle]*this4P.E()*sin(this4P.Theta())> 30. ) isGood = false;
-	    //if( hadIsolRecoEle_03[theEle]*this4P.E()*sin(this4P.Theta())>1.5 ) isGood = false; 
 	  }
 	  
 	} // ok Et
