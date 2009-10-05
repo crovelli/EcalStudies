@@ -75,12 +75,13 @@ void JPsieeAnalyzerSignal::analyze(const edm::Event& iEvent, const edm::EventSet
   bool hltJPsi    = false;
   bool hltUpsilon = false;
   bool hltBoth    = false;
+  // considering the two possible HLTmenu  1e31 or 8e29 
   if (HLTR.isValid()){
     triggerNames_.init(*HLTR);
     for ( unsigned int iHlt=0; iHlt < HLTR->size(); iHlt++ ) {
-      if (triggerNames_.triggerName(iHlt)=="HLT_DoublePhoton5_Jpsi_L1R"    && HLTR->accept(iHlt)==1) hltJPsi = true;
-      if (triggerNames_.triggerName(iHlt)=="HLT_DoublePhoton5_Upsilon_L1R" && HLTR->accept(iHlt)==1) hltUpsilon = true;
-      if (triggerNames_.triggerName(iHlt)=="HLT_DoublePhoton5_eeRes_L1R"   && HLTR->accept(iHlt)==1) hltBoth = true;
+      if (( triggerNames_.triggerName(iHlt)=="HLT_DoubleEle5_SW_Jpsi_L1R"    || triggerNames_.triggerName(iHlt)=="HLT_DoublePhoton5_Jpsi_L1R" )    && HLTR->accept(iHlt)==1) hltJPsi = true;
+      if (( triggerNames_.triggerName(iHlt)=="HLT_DoubleEle5_SW_Upsilon_L1R" || triggerNames_.triggerName(iHlt)=="HLT_DoublePhoton5_Upsilon_L1R" ) && HLTR->accept(iHlt)==1) hltUpsilon = true;
+      if (( triggerNames_.triggerName(iHlt)=="HLT_DoubleEle10_SW_L1R"        || triggerNames_.triggerName(iHlt)=="HLT_DoublePhoton5_eeRes_L1R" )   && HLTR->accept(iHlt)==1) hltBoth = true;
     }
   }
   if ( hltJPsi) intHltJPsi = 1;
