@@ -9,14 +9,14 @@
 #include <TFile.h>
 #include <TTree.h>
 #include <TChain.h>
-#include "finalJPsiAnalysis.cc"
+//#include "finalJPsiAnalysis.cc"
 #include "finalJPsiAnalysisEle.cc"
 #include "finalLowPtAnalysis.cc"
-#include "invMassStudy.cc"
+//#include "invMassStudy.cc"
 
 int main(int argc, char* argv[]) {
 
-  int applic = 3;
+  int applic = 1;
 
   char inputFileName[150];
   if ( argc < 3 ){
@@ -56,20 +56,20 @@ int main(int argc, char* argv[]) {
   inputFile->close();
   delete inputFile;
   
-  if (applic==0) {
-    finalJPsiAnalysis jpsiStudy(theChain);
-    jpsiStudy.Loop();
-  }  
+  //  if (applic==0) {
+  // finalJPsiAnalysis jpsiStudy(theChain);
+  // jpsiStudy.Loop();
+  //}  
 
   if (applic==1) {
     finalJPsiAnalysisEle jpsiStudy(theChain);
     jpsiStudy.Loop(theSample);
   }  
 
-  if (applic==2) {
-    invMassStudy jpsiStudy(theChain);
-    jpsiStudy.Loop();
-  }  
+  //  if (applic==2) {
+  //  invMassStudy jpsiStudy(theChain);
+  //  jpsiStudy.Loop();
+  //}  
 
   if (applic==3) {
     finalLowPtAnalysis jpsiStudy(theChain);
