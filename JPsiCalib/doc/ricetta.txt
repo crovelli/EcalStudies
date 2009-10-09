@@ -1,3 +1,11 @@
+Ricetta per CMSSW_3_1_X
+
+scramv1 project CMSSW CMSSW_3_1_3
+cd CMSSW_3_1_3/src
+cvs co -d EcalStudies/JPsiCalib UserCode/crovelli/EcalStudies/JPsiCalib
+scramv1 b
+
+
 # environment to run the analysis and the calibration 
 -------------------------------------------------------
 
