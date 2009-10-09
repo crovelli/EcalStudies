@@ -64,9 +64,10 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
     Long64_t ientry = LoadTree(jentry);
     if (ientry < 0) break;
     fChain->GetEntry(jentry);
+    if (jentry ==1) std::cout << ">>> Signal is " << signal << std::endl;
     if (jentry%1000 == 0) std::cout << ">>> Processing event # " << jentry << std::endl;
     
-    if (theSample==2) signal = 0;
+    if (theSample==2) signal = 0;  // not-prompt J/psi have the wrong signal values ...
     totalEvents++;
 
     // counters for this entry
@@ -81,9 +82,12 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
     float maxPtGen = 0.;
     float minPtGen = 0.;
     
+    /// if it is signal sample
     if (signal) {
       
       HepHisto_size->Fill(numberOfGenerated);
+      HepHisto_ptHat->Fill(pthat); 
+
       if(numberOfGenerated!=2) continue;
 
       if (chargeGenEle[0]==-1 && chargeGenEle[1]==1) {
@@ -119,13 +123,12 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
       HepHisto_PtVsEta->Fill(truePos_3P.Eta(),truePos_3P.Perp());
     }
 
-    // only for good number of generated
+    // if it is backgroung sample or  number of generated == 2
     if(!signal || numberOfGenerated==2) {
       goodGene++;
       
-      // HLT
-      if (hlt29) {
-	//if (hlt29jpsi) {
+      // selecting HLTbit 
+      if (hltJpsi ) {
 	totalTrigger++;
 	
 	// few numbers: all electrons
@@ -135,8 +138,8 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
 	// few numbers: all electrons, Et > 4
 	for(int theEle=0; theEle<numberOfElectrons; theEle++) { 
 	  if (etRecoEle[theEle]>4) totEleGt4++;
-	  if (etRecoEle[theEle]>4 && chargeEle[theEle]>0) totEleGt4plus++;
-	  if (etRecoEle[theEle]>4 && chargeEle[theEle]<0) totEleGt4minus++;
+	  if (etRecoEle[theEle]>4 && chargeRecoEle[theEle]>0) totEleGt4plus++;
+	  if (etRecoEle[theEle]>4 && chargeRecoEle[theEle]<0) totEleGt4minus++;
 	}
 	ScHistoGt4_size -> Fill(totEleGt4);
 	if(totEleGt4plus>=1)  ScHistoGt4plus_size  -> Fill(totEleGt4plus);
@@ -193,60 +196,65 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
 	  if (totEleGt4plus>=1 && totEleGt4plus>=1) {
 	    
 	    // skipping problematic electrons
-	    if (xRecoEle[theEle]>-700) {
+	    if (pxRecoEle[theEle]>-700) {
 	      
 	      // skipping electrons below threshold
 	      if (etRecoEle[theEle]>4) {
 
+
 		// searching for some criteria to select the two 'best' electrons (among those with Et>=4) ( analysis carried on using ECAL )	      
 		TVector3 this3P; 
 		TLorentzVector this4P;
-		this3P.SetXYZ(xRecoEle[theEle], yRecoEle[theEle], zRecoEle[theEle]);
-		this4P.SetPxPyPzE(xRecoEle[theEle], yRecoEle[theEle], zRecoEle[theEle], eneRecoEle[theEle]);
+		this3P.SetXYZ(pxRecoEle[theEle], pyRecoEle[theEle], pzRecoEle[theEle]);
+		this4P.SetPxPyPzE(pxRecoEle[theEle], pyRecoEle[theEle], pzRecoEle[theEle], eneRecoEle[theEle]);
 		
 		// further selections
 		bool isGood   = true;
 		bool isBarrel = true;
+		bool isPF = false;
+
+		if(isPFlowRecoEle[theEle]) isPF = true;
 		if(fabs(this3P.Eta())>1.479) isBarrel = false;
 		
+
+		fillHistoCutsVariables( theEle );
+
+
 		if (isBarrel){		
-		  if( fabs(dEtaWithTrackerRecoEle[theEle]) > 0.0066 ) isGood = false;
-		  if( fabs(dPhiWithTrackerRecoEle[theEle]) > 0.07 )   isGood = false;
-		  if( HoverERecoEle[theEle]>0.05 )                    isGood = false;
-		  if( sigmaEtaEtaRecoEle[theEle]>0.0124 )             isGood = false;
-		  if( emIsolRecoEle_03[theEle]*this4P.E()*sin(this4P.Theta() )> 30. ) isGood = false;
-		  // if( hadIsolRecoEle_03[theEle]*this4P.E()*sin(this4P.Theta() )>1.5)  isGood = false;
+		  if( fabs(dEtaAtVtxRecoEle[theEle]) > 0.012 ) isGood = false;
+		  if( fabs(dPhiAtVtxRecoEle[theEle]) > 0.1 )   isGood = false;
+		  if( HoverERecoEle[theEle]>0.003 )                    isGood = false;
+		  if( sigmaIetaIetaRecoEle[theEle]>0.022 )             isGood = false;
+		  if( dr03EcalSumEtRecoEle[theEle]>2 ) isGood = false;
 		}
 		
 		if (!isBarrel){
-		  if( fabs(dEtaWithTrackerRecoEle[theEle])>0.0080 ) isGood = false;
-		  if( fabs(dPhiWithTrackerRecoEle[theEle])>0.07 )   isGood = false;
-		  if( HoverERecoEle[theEle]>0.05 )                  isGood = false;
-		  if( sigmaEtaEtaRecoEle[theEle]>0.033 )            isGood = false;
-		  if( emIsolRecoEle_03[theEle]*this4P.E()*sin(this4P.Theta())> 30. ) isGood = false;
-		  // if( hadIsolRecoEle_03[theEle]*this4P.E()*sin(this4P.Theta())>1.5 ) isGood = false; 
+		  if( fabs(dEtaAtVtxRecoEle[theEle])>0.012 ) isGood = false;
+		  if( fabs(dPhiAtVtxRecoEle[theEle])>0.1 )   isGood = false;
+		  if( HoverERecoEle[theEle]>0.003 )          isGood = false;
+		  if( sigmaEtaEtaRecoEle[theEle]>0.06 )      isGood = false;
+		  if( dr03EcalSumEtRecoEle[theEle]>2 )       isGood = false;
 		}
 		
 		if (!isGood) continue;
-		if (chargeEle[theEle]>0) numberOfEleOkPlus++;
-		if (chargeEle[theEle]<0) numberOfEleOkMinus++;
+		if (chargeRecoEle[theEle]>0) numberOfEleOkPlus++;
+		if (chargeRecoEle[theEle]<0) numberOfEleOkMinus++;
 		
-
 		
 		// search for the two reco electrons closer to the generated electrons in case of signal
 		if (signal) {
 		  float deltaRmc=0;
-		  if(chargeEle[theEle]>0) deltaRmc = this3P.DeltaR(truePos_3P);    
-		  if(chargeEle[theEle]<0) deltaRmc = this3P.DeltaR(trueEle_3P);    
+		  if(chargeRecoEle[theEle]>0) deltaRmc = this3P.DeltaR(truePos_3P);    
+		  if(chargeRecoEle[theEle]<0) deltaRmc = this3P.DeltaR(trueEle_3P);    
 		  
-		  if((chargeEle[theEle]>0) && (deltaRmc<deltaRposi)) { 
+		  if((chargeRecoEle[theEle]>0) && (deltaRmc<deltaRposi)) { 
 		    theDeltaRp=theEle;
 		    deltaRposi=deltaRmc; 
 		    closerToMc3p=this3P; 
 		    closerToMc4p=this4P; 
 		  }
 		  
-		  if((chargeEle[theEle]<0) && (deltaRmc<deltaRelec)) { 
+		  if((chargeRecoEle[theEle]<0) && (deltaRmc<deltaRelec)) { 
 		    theDeltaRe=theEle;
 		    deltaRelec=deltaRmc; 
 		    closerToMc3e=this3P; 
@@ -256,7 +264,7 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
 		
 		
 		// search for highest Et electrons which charge hp = 1
-		if ( (chargeEle[theEle]>0) && (etRecoEle[theEle]>=highestEtp) ){ 
+		if ( (chargeRecoEle[theEle]>0) && (etRecoEle[theEle]>=highestEtp) ){ 
 		  theHighestEtp        = theEle;
 		  highestEtp           = etRecoEle[theEle];
 		  highestEt_3p         = this3P;
@@ -264,29 +272,29 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
 		  highestEt_S9S25p     = e9e25RecoEle[theEle];
 		  highestEt_SEEp       = sigmaEtaEtaRecoEle[theEle];
 		  highestEt_HoEp       = HoverERecoEle[theEle];
-		  highestEt_dEtap      = dEtaWithTrackerRecoEle[theEle];
-		  highestEt_dPhip      = dPhiWithTrackerRecoEle[theEle];
-		  highestEt_TIso03p    = trkIsolRecoEle_03[theEle];
+		  highestEt_dEtap      = dEtaAtVtxRecoEle[theEle];
+		  highestEt_dPhip      = dPhiAtVtxRecoEle[theEle];
+		  highestEt_TIso03p    = dr03TkSumPtRecoEle[theEle];
 		}
 		
 		// search for highest Et electrons which charge hp = -1
-		if ( (chargeEle[theEle]<0) && (etRecoEle[theEle]>=highestEte) ){
-		  theHighestEte        = theEle;
-		  highestEte           = etRecoEle[theEle];
-		  highestEt_3e         = this3P;
-		  highestEt_4e         = this4P;
-		  highestEt_S9S25e     = e9e25RecoEle[theEle];
+		if ( (chargeRecoEle[theEle]<0) && (etRecoEle[theEle]>=highestEte) ){
+		  theHighestEte        = theEle;                    
+		  highestEte           = etRecoEle[theEle];         
+		  highestEt_3e         = this3P;                    
+		  highestEt_4e         = this4P;                    
+		  highestEt_S9S25e     = e9e25RecoEle[theEle];      
 		  highestEt_SEEe       = sigmaEtaEtaRecoEle[theEle];
-		  highestEt_HoEe       = HoverERecoEle[theEle];
-		  highestEt_dEtae      = dEtaWithTrackerRecoEle[theEle];
-		  highestEt_dPhie      = dPhiWithTrackerRecoEle[theEle];
-		  highestEt_TIso03e    = trkIsolRecoEle_03[theEle];
+		  highestEt_HoEe       = HoverERecoEle[theEle];     
+		  highestEt_dEtae      = dEtaAtVtxRecoEle[theEle];  
+		  highestEt_dPhie      = dPhiAtVtxRecoEle[theEle];  
+		  highestEt_TIso03e    = dr03TkSumPtRecoEle[theEle];
 		}
 		
 		
 		// search for best E9/E25 electrons with charge Hp = +1
 		float s9s25diff = fabs(e9e25RecoEle[theEle] - 1.);
-		if ( (chargeEle[theEle]>0) && (s9s25diff<=bestS9S25p) ){
+		if ( (chargeRecoEle[theEle]>0) && (s9s25diff<=bestS9S25p) ){
 		  theBestS9S25p = theEle;
 		  bestS9S25p    = s9s25diff;
 		  bestS9S25_3p  = this3P;
@@ -294,7 +302,7 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
 		}
 		
 		// search for best E9/E25 electrons with charge Hp = -1
-		if ( (chargeEle[theEle]<0) && (s9s25diff<=bestS9S25e) ){
+		if ( (chargeRecoEle[theEle]<0) && (s9s25diff<=bestS9S25e) ){
 		  theBestS9S25e = theEle;
 		  bestS9S25e    = s9s25diff;
 		  bestS9S25_3e  = this3P;
@@ -304,7 +312,7 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
 		
 		// search for best sigmaEtaEta electrons with charge Hp = +1
 		float sEEdiff = fabs(sigmaEtaEtaRecoEle[theEle]);
-		if ( (chargeEle[theEle]>0) && (sEEdiff<=bestSEEp) ){
+		if ( (chargeRecoEle[theEle]>0) && (sEEdiff<=bestSEEp) ){
 		  theBestSEEp = theEle;
 		  bestSEEp    = sEEdiff;
 		  bestSEE_3p  = this3P;
@@ -312,7 +320,7 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
 		}
 		
 		// search for best E9/E25 electrons with charge Hp = -1
-		if ( (chargeEle[theEle]<0) && (sEEdiff<=bestSEEe) ){
+		if ( (chargeRecoEle[theEle]<0) && (sEEdiff<=bestSEEe) ){
 		  theBestSEEe = theEle;
 		  bestSEEe    = sEEdiff;
 		  bestSEE_3e  = this3P;
@@ -320,8 +328,8 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
 		}
 		
 		// search for best dEta electrons with charge Hp = +1	      
-		float absDeta = fabs(dEtaWithTrackerRecoEle[theEle]);
-		if ( (chargeEle[theEle]>0) && (absDeta<=bestDetap) ){
+		float absDeta = fabs(dEtaAtVtxRecoEle[theEle]);
+		if ( (chargeRecoEle[theEle]>0) && (absDeta<=bestDetap) ){
 		  theBestDetap = theEle;
 		  bestDetap    = absDeta;
 		  bestDeta_3p  = this3P;
@@ -329,7 +337,7 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
 		}
 		
 		// search for best dEta electrons with charge Hp = +1	      
-		if ( (chargeEle[theEle]<0) && (absDeta<=bestDetae) ){
+		if ( (chargeRecoEle[theEle]<0) && (absDeta<=bestDetae) ){
 		  theBestDetae = theEle;
 		  bestDetae    = absDeta;
 		  bestDeta_3e  = this3P;
@@ -341,7 +349,7 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
 	    
 	  } // two matched electons
 	  
-	} // loop over superclusters
+	} // loop over electron collection
 	
 
 	if (numberOfEleOkPlus>0 && numberOfEleOkMinus>0) totalIdentified++;
@@ -431,7 +439,7 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
 	    ScHisto_etaHighestEt->Fill(highestEt_3e.Eta());
 	    ScHisto_phiHighestEt->Fill(highestEt_3p.Phi());
 	    ScHisto_phiHighestEt->Fill(highestEt_3e.Phi());
-	  
+	    
 	    float maxEt_highestEt = 0.;
 	    float minEt_highestEt = 0.;
 	    if (highestEt_4p.Et()>highestEt_4e.Et()){ 
@@ -452,24 +460,7 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
 	    ScHisto_invMassHighestEt->Fill(mee_highestEt);
 	    if (mee_highestEt<4. && mee_highestEt>2.5) numbersOfInvMassOk++;
 	    
-	    // to study EB/ EE depencency: both in barrel only
-	    if ( fabs(highestEt_3p.Eta())<1.479 && fabs(highestEt_3e.Eta())<1.479 ){
-	      ScHisto_deltaRHighestEt_EB  -> Fill(deltaR_highestEt);	
-	      ScHisto_invMassHighestEt_EB -> Fill(mee_highestEt);
-	    }
 	    
-	    // both in endcap only
-	    if ( fabs(highestEt_3p.Eta())>1.479 && fabs(highestEt_3e.Eta())>1.479 ){
-	      ScHisto_deltaRHighestEt_EE  -> Fill(deltaR_highestEt);	
-	      ScHisto_invMassHighestEt_EE -> Fill(mee_highestEt);
-	    }
-	    
-	    // one and one
-	    if (  (fabs(highestEt_3p.Eta())<1.479 && fabs(highestEt_3e.Eta())>1.479) || (fabs(highestEt_3e.Eta())<1.479 && fabs(highestEt_3p.Eta())>1.479) ) {
-	      ScHisto_deltaRHighestEt_EBEE       -> Fill(deltaR_highestEt);	
-	      ScHisto_invMassHighestEt_EBEE      -> Fill(mee_highestEt);
-	    }
-
 	    // study of possible biases for signal
 	    if (signal) {    
 	      float jpsi_ene = (highestEt_4p + highestEt_4e).E();	  
@@ -477,7 +468,7 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
 	      float jpsi_eta = (highestEt_4p + highestEt_4e).Eta();	  
 	      float jpsi_phi = (highestEt_4p + highestEt_4e).Phi();	  
 	      float deltaR   =  highestEt_4p.DeltaR(highestEt_4e);
-
+	      
 	      ScHisto_JeneVsJeta_highestEt      -> Fill(jpsi_eta, jpsi_ene);
 	      ScHisto_JetVsJeta_highestEt       -> Fill(jpsi_eta, jpsi_et);
 	      ScHisto_InvMassVsJeta_highestEt   -> Fill(jpsi_eta, mee_highestEt);                
@@ -497,19 +488,19 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
 	// plots with all combinatorics
 	if ( numberOfEleOkPlus>=1 && numberOfEleOkMinus>=1 && numberOfPairsOk>=1 ){ 
 	  for(int theEle1=0; theEle1<numberOfElectrons; theEle1++) { 
-	    if (xRecoEle[theEle1]<-700) continue;
+	    if (pxRecoEle[theEle1]<-700) continue;
 	    if (etRecoEle[theEle1]<4)     continue;
 
 	    for(int theEle2=(theEle1+1); theEle2<numberOfElectrons; theEle2++) { 
-	      if (xRecoEle[theEle2]<-700) continue;
+	      if (pxRecoEle[theEle2]<-700) continue;
 	      if (etRecoEle[theEle2]<4)     continue;
 
 		TLorentzVector tlvTheEle1, tlvTheEle2;
 		TVector3 tv3TheEle1, tv3TheEle2;
-		tlvTheEle1.SetPxPyPzE(xRecoEle[theEle1], yRecoEle[theEle1], zRecoEle[theEle1], eneRecoEle[theEle1]);
-		tlvTheEle2.SetPxPyPzE(xRecoEle[theEle2], yRecoEle[theEle2], zRecoEle[theEle2], eneRecoEle[theEle2]);
-		tv3TheEle1.SetXYZ (xRecoEle[theEle1], yRecoEle[theEle1], zRecoEle[theEle1]);
-		tv3TheEle2.SetXYZ (xRecoEle[theEle2], yRecoEle[theEle2], zRecoEle[theEle2]);
+		tlvTheEle1.SetPxPyPzE(pxRecoEle[theEle1], pyRecoEle[theEle1], pzRecoEle[theEle1], eneRecoEle[theEle1]);
+		tlvTheEle2.SetPxPyPzE(pxRecoEle[theEle2], pyRecoEle[theEle2], pzRecoEle[theEle2], eneRecoEle[theEle2]);
+		tv3TheEle1.SetXYZ (pxRecoEle[theEle1], pyRecoEle[theEle1], pzRecoEle[theEle1]);
+		tv3TheEle2.SetXYZ (pxRecoEle[theEle2], pyRecoEle[theEle2], pzRecoEle[theEle2]);
 		
 		float deltaR = tv3TheEle1.DeltaR(tv3TheEle2);
 		float mee    = (tlvTheEle1 + tlvTheEle2).M();
@@ -518,15 +509,10 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
 		ScHisto_deltaRVsInvMassComb->Fill(mee,deltaR);
 	    }}
 	}
-
-      } // ok HLT
-      
-    } // ok generated
-    
-
-    
-    
+	//      } // ok HLT
+    } // ok generated    
   } // loop over entries
+
 
   cout << endl;
   cout << "to choose the best criterium" << endl;
@@ -539,7 +525,7 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
 
   saveHistos();
 
-  drawPlots();
+  //  drawPlots();
 
 
   // summary
@@ -602,10 +588,32 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
   cout << "in the inv mass region     : " << 10.*exp_okMass   << endl; 
     
 
-
 } // end of program
 
 
+
+void finalJPsiAnalysisEle::fillHistoCutsVariables(  int theEle ){
+
+  EleHisto_eta->Fill(etaRecoEle[theEle]);
+  EleHisto_phi->Fill(phiRecoEle[theEle]);
+  EleHisto_detaVtx->Fill(dEtaAtVtxRecoEle[theEle]);   
+  EleHisto_dphiVtx->Fill(dPhiAtVtxRecoEle[theEle]);   
+  EleHisto_HoE->Fill(HoverERecoEle[theEle]); 
+  EleHisto_EoP->Fill(EoverPRecoEle[theEle]);       
+  EleHisto_fbrem->Fill(fBremRecoEle[theEle]);       
+  EleHisto_sigmaIeta->Fill(sigmaIetaIetaRecoEle[theEle]);
+  EleHisto_sigmaEta->Fill(sigmaEtaEtaRecoEle[theEle]);
+  EleHisto_dr03ecal->Fill(dr03EcalSumEtRecoEle[theEle]);
+  EleHisto_dr03tk->Fill(dr03TkSumPtRecoEle[theEle]);
+  EleHisto_dr03hcal1->Fill(dr03Hcal1SumEtRecoEle[theEle]);
+  EleHisto_dr03hcal2->Fill(dr03Hcal2SumEtRecoEle[theEle]);
+  EleHisto_momErr->Fill(momentumErrorRecoEle[theEle]);
+  EleHisto_isPF->Fill(isPFlowRecoEle[theEle]);
+  EleHisto_isEcal->Fill(isEcalDrivenRecoEle[theEle]);
+  EleHisto_mva->Fill(pFlowMvaRecoEle[theEle]);
+}
+
+      
 void finalJPsiAnalysisEle::bookHistos() {
 
   ScHistoEle_size      = new TH1F("ScHistoEle_size",      "Num of electrons", 10, 0,10);      
@@ -613,14 +621,34 @@ void finalJPsiAnalysisEle::bookHistos() {
   ScHistoGt4plus_size  = new TH1F("ScHistoGt4plus_size",  "Num of positrons (+) with Et>4", 10, 0,10);
   ScHistoGt4minus_size = new TH1F("ScHistoGt4minus_size", "Num of electrons (-) with Et>4", 10, 0,10);
 
-  HepHisto_size    = new TH1F("HepHisto_size",    "Num of GenElectrons", 10, 0,10);
-  HepHisto_deltaR  = new TH1F("HepHisto_deltaR",  "GenElectrons deltaR", 100, 0.,1.);
-  HepHisto_maxPt   = new TH1F("HepHisto_maxPt",   "GenElectrons max pt", 200, 0.,20.);
-  HepHisto_minPt   = new TH1F("HepHisto_minPt",   "GenElectrons min pt", 200, 0.,20.);
-  HepHisto_eta     = new TH1F("HepHisto_eta",     "GenElectrons eta", 100, -3.,+3.);
-  HepHisto_phi     = new TH1F("HepHisto_phi",     "GenElectrons phi", 100, -3.15,3.15);
+  HepHisto_size    = new TH1F("HepHisto_size",    "Num of GenElectrons ",  10, 0,  10 );
+  HepHisto_ptHat   = new TH1F("HepHisto_ptHat",   "Pt hat distributions", 800, 0, 200.);
+  HepHisto_deltaR  = new TH1F("HepHisto_deltaR",  "GenElectrons deltaR ", 100, 0.,  1.);
+  HepHisto_maxPt   = new TH1F("HepHisto_maxPt",   "GenElectrons max pt ", 200, 0., 20.);
+  HepHisto_minPt   = new TH1F("HepHisto_minPt",   "GenElectrons min pt ", 200, 0., 20.);
+  HepHisto_eta     = new TH1F("HepHisto_eta",     "GenElectrons eta    ", 100, -3.,+3.);
+  HepHisto_phi     = new TH1F("HepHisto_phi",     "GenElectrons phi    ", 100, -3.15,3.15);
   HepHisto_invMass = new TH1F("HepHisto_invMass", "GenElectrons invariant mass", 150,0.,6.); 
   HepHisto_PtVsEta = new TH2F("HepHisto_PtVsEta", "GenElectrons Pt vs Eta", 100, -3.,+3., 200, 0.,20.);
+
+  EleHisto_eta       = new  TH1F("EleHisto_eta      ", " Eta recoEle", 200  , -3.,  3.);      
+  EleHisto_phi       = new  TH1F("EleHisto_phi      ", " Phi recoEle", 200, -3.15,3.15);      
+  EleHisto_detaVtx   = new  TH1F("EleHisto_detaVtx  ", " deta AtVtx ", 200,  -0.4, 0.4);  
+  EleHisto_dphiVtx   = new  TH1F("EleHisto_dphiVtx  ", " dphy AtVtx ", 200,   -1.,  1.);  
+  EleHisto_HoE       = new  TH1F("EleHisto_HoE      ", " HoverE Ele ", 200,    0., 0.3);      
+  EleHisto_EoP       = new  TH1F("EleHisto_EoP      ", " EoverP Ele ", 200,    0.,  5.);      
+  EleHisto_fbrem     = new  TH1F("EleHisto_fbrem    ", " fBrem Ele  ", 200,  -30.,  2.);   
+  EleHisto_sigmaIeta = new  TH1F("EleHisto_sigmaIeta", " sigmaIetaIeta", 300,    0., 1.5);
+  EleHisto_sigmaEta  = new  TH1F("EleHisto_sigmaEta ", " sigmaEtaEta", 300,    0., 0.5); 
+  EleHisto_dr03ecal  = new  TH1F("EleHisto_dr03ecal ", " dr03ecal   ", 200,   -5.,  60); 
+  EleHisto_dr03tk    = new  TH1F("EleHisto_dr03tk   ", " dr03tk     ", 200,   -5.,  60);   
+  EleHisto_dr03hcal1 = new  TH1F("EleHisto_dr03hcal1", " dr03hcal1  ", 200,   -5.,  30);
+  EleHisto_dr03hcal2 = new  TH1F("EleHisto_dr03hcal2", " dr03hcal2  ", 200,   -5.,  30);
+  EleHisto_momErr    = new  TH1F("EleHisto_momErr   ", " momentum error", 500,    0., 10000.);   
+  EleHisto_isPF      = new  TH1F("EleHisto_isPF     ", " isPFlow Ele",   2,    0.,   2);     
+  EleHisto_isEcal    = new  TH1F("EleHisto_isEcal   ", " isEcalDriven",  2,    0.,   2);   
+  EleHisto_mva       = new  TH1F("EleHisto_mva      ", " MvaPFlow   ",   100,    -1.2,   1.2);      
+				     
 
   ScHisto_deltaRWrtMc_CloserToMc_more1      = new TH1F("ScHisto_deltaRWrtMc_CloserToMc_more1", "deltaR with Mc - closer to MC",     100, 0.,5.);
   ScHisto_deltaRWrtMc_HighestEt_more1       = new TH1F("ScHisto_deltaRWrtMc_HighestEt_more1",  "deltaR with Mc - highest Et",       100, 0.,5.);
@@ -643,12 +671,6 @@ void finalJPsiAnalysisEle::bookHistos() {
   ScHisto_dEtaTrHighestEt       = new TH1F("ScHisto_dEtaTrHighestEt",       "#Delta #eta",        100, 0., 0.3);
   ScHisto_dPhiTrHighestEt       = new TH1F("ScHisto_dPhiTrHighestEt",       "#Delta #phi",        100, 0., 0.3);
 
-  ScHisto_deltaRHighestEt_EB    = new TH1F("ScHisto_deltaRHighestEt_EB",       "Sc deltaR",          100, 0.,5.);   
-  ScHisto_invMassHighestEt_EB   = new TH1F("ScHisto_invMassHighestEt_EB",      "Sc invariant mass",  150, 0.,6.);   
-  ScHisto_deltaRHighestEt_EE    = new TH1F("ScHisto_deltaRHighestEt_EE",       "Sc deltaR",          100, 0.,5.);
-  ScHisto_invMassHighestEt_EE   = new TH1F("ScHisto_invMassHighestEt_EE",      "Sc invariant mass",  150, 0.,6.);
-  ScHisto_deltaRHighestEt_EBEE  = new TH1F("ScHisto_deltaRHighestEt_EBEE",       "Sc deltaR",          100, 0.,5.);
-  ScHisto_invMassHighestEt_EBEE = new TH1F("ScHisto_invMassHighestEt_EBEE",      "Sc invariant mass",  150, 0.,6.);
 
   ScHisto_JeneVsJeta_highestEt       = new TH2F("ScHisto_JeneVsJeta_highestEt",      "ScHisto_JeneVsJeta_highestEt",      100,  0., 2.5,    50, 5., 100.);
   ScHisto_JetVsJeta_highestEt        = new TH2F("ScHisto_JetVsJeta_highestEt",       "ScHisto_JetVsJeta_highestEt",       100,  0., 2.5,    50, 5., 30.);
@@ -722,18 +744,6 @@ void finalJPsiAnalysisEle::drawPlots() {
   ScHisto_dEtaTrHighestEt       -> Draw();  c.Print("scDetaTr.eps");
   ScHisto_dPhiTrHighestEt       -> Draw();  c.Print("scDphiTr.eps");
 
-  c.SetLogy(0);
-  ScHisto_deltaRHighestEt_EB    -> Draw();  c.Print("scDeltaR_EB.eps");
-  ScHisto_invMassHighestEt_EB   -> Draw();  c.Print("scInvMass_EB.eps");
-
-  c.SetLogy(0);
-  ScHisto_deltaRHighestEt_EE    -> Draw();  c.Print("scDeltaR_EE.eps");
-  ScHisto_invMassHighestEt_EE   -> Draw();  c.Print("scInvMass_EE.eps");
-
-  c.SetLogy(0);
-  ScHisto_deltaRHighestEt_EBEE   -> Draw();  c.Print("scDeltaR_EBEE.eps");
-  ScHisto_invMassHighestEt_EBEE  -> Draw();  c.Print("scInvMass_EBEE.eps");
-
 
   // to study the invariant mass
   if (signal) {
@@ -780,7 +790,7 @@ void finalJPsiAnalysisEle::drawPlots() {
 
 void finalJPsiAnalysisEle::saveHistos() {
 
-  TFile fOut("Outfile_histo.root", "RECREATE");
+  TFile fOut("JPsi_histo.root", "RECREATE");
   fOut.cd();
   
   ScHistoEle_size       -> Write();
@@ -788,13 +798,11 @@ void finalJPsiAnalysisEle::saveHistos() {
   ScHistoGt4minus_size  -> Write();
 
   ScHisto_invMassHighestEt      -> Write();
-  ScHisto_invMassHighestEt_EB   -> Write();
-  ScHisto_invMassHighestEt_EE   -> Write();
-  ScHisto_invMassHighestEt_EBEE -> Write();
-
 
   if (signal) {
-    /*
+
+    HepHisto_size   -> Write();
+    HepHisto_ptHat   -> Write();
     HepHisto_deltaR   -> Write();
     HepHisto_maxPt    -> Write();
     HepHisto_minPt    -> Write();
@@ -802,55 +810,45 @@ void finalJPsiAnalysisEle::saveHistos() {
     HepHisto_phi      -> Write();
     HepHisto_invMass  -> Write();
     HepHisto_PtVsEta  -> Write();
-    */
   }
 
-  /*
-  ScHisto_deltaRComb            -> Write();
-  ScHisto_invMassComb           -> Write();
+  EleHisto_eta        -> Write();
+  EleHisto_phi        -> Write();
+  EleHisto_detaVtx    -> Write();
+  EleHisto_dphiVtx    -> Write();
+  EleHisto_HoE        -> Write();
+  EleHisto_EoP        -> Write();
+  EleHisto_fbrem      -> Write();
+  EleHisto_sigmaIeta  -> Write();
+  EleHisto_sigmaEta   -> Write();
+  EleHisto_dr03ecal   -> Write();
+  EleHisto_dr03tk     -> Write();
+  EleHisto_dr03hcal1  -> Write();
+  EleHisto_dr03hcal2  -> Write();
+  EleHisto_momErr     -> Write();
+  EleHisto_isPF       -> Write();
+  EleHisto_isEcal     -> Write();
+  EleHisto_mva        -> Write();
+		      
+  ScHisto_deltaRComb        -> Write();
+  ScHisto_invMassComb       -> Write();
 
-  ScHisto_etaHighestEt          -> Write();
-  ScHisto_phiHighestEt          -> Write();
-  ScHisto_maxEtHighestEt        -> Write();
-  ScHisto_minEtHighestEt        -> Write();
-  ScHisto_deltaRHighestEt       -> Write();
-  ScHisto_invMassHighestEt      -> Write();
-  ScHisto_s9s25HighestEt        -> Write();
-  ScHisto_sEEHighestEt          -> Write();
-  ScHisto_hoeHighestEt          -> Write();
-  ScHisto_dEtaTrHighestEt       -> Write();
-  ScHisto_dPhiTrHighestEt       -> Write();
+  ScHisto_etaHighestEt      -> Write();
+  ScHisto_phiHighestEt      -> Write();
+  ScHisto_maxEtHighestEt    -> Write();
+  ScHisto_minEtHighestEt    -> Write();
+  ScHisto_deltaRHighestEt   -> Write();
+  ScHisto_invMassHighestEt  -> Write();
+  ScHisto_s9s25HighestEt    -> Write();
+  ScHisto_sEEHighestEt      -> Write();
+  ScHisto_hoeHighestEt      -> Write();
+  ScHisto_dEtaTrHighestEt   -> Write();
+  ScHisto_dPhiTrHighestEt   -> Write();
 
-  ScHisto_deltaRHighestEt_EB    -> Write();   
-  ScHisto_invMassHighestEt_EB   -> Write();   
-  ScHisto_s9s25HighestEt_EB     -> Write();   
-  ScHisto_sEEHighestEt_EB       -> Write();   
-  ScHisto_hoeHighestEt_EB       -> Write();   
-  ScHisto_dEtaTrHighestEt_EB    -> Write();   
-  ScHisto_dPhiTrHighestEt_EB    -> Write();   
-
-  ScHisto_deltaRHighestEt_EE    -> Write();      
-  ScHisto_invMassHighestEt_EE   -> Write();      
-  ScHisto_s9s25HighestEt_EE     -> Write();      
-  ScHisto_sEEHighestEt_EE       -> Write();      
-  ScHisto_hoeHighestEt_EE       -> Write();      
-  ScHisto_dEtaTrHighestEt_EE    -> Write();      
-  ScHisto_dPhiTrHighestEt_EE    -> Write();      
-
-  ScHisto_deltaRHighestEt_EBEE    -> Write();    
-  ScHisto_invMassHighestEt_EBEE   -> Write();    
-  ScHisto_s9s25HighestEt_EBEE     -> Write();    
-  ScHisto_sEEHighestEt_EBEE       -> Write();    
-  ScHisto_hoeHighestEt_EBEE       -> Write();    
-  ScHisto_dEtaTrHighestEt_EBEE    -> Write();    
-  ScHisto_dPhiTrHighestEt_EBEE    -> Write();    
 
   ScHisto_InvMassVsJene_highestEt  -> Write();         
   ScHisto_InvMassVsJeta_highestEt  -> Write();         
   ScHisto_InvMassVsJphi_highestEt  -> Write();         
-  ScHisto_thRecOverThTrueVsJene_highestEt -> Write();         
-  ScHisto_EoEtrueVsErec_highestEt1 -> Write();        
-  ScHisto_EoEtrueVsErec_highestEt2 -> Write();        
-  */
+
 }
 

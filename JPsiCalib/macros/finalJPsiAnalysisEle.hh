@@ -22,7 +22,8 @@ private:
   void bookHistos();
   void drawPlots();
   void saveHistos();
-  
+  void fillHistoCutsVariables( int Eleindex);
+
   // histos
   TH1F *ScHistoEle_size;
   TH1F *ScHistoGt4_size;
@@ -30,6 +31,7 @@ private:
   TH1F *ScHistoGt4minus_size;
 
   TH1F *HepHisto_size;
+  TH1F *HepHisto_ptHat;
   TH1F *HepHisto_deltaR;
   TH1F *HepHisto_maxPt;
   TH1F *HepHisto_minPt;
@@ -37,6 +39,25 @@ private:
   TH1F *HepHisto_phi;
   TH1F *HepHisto_invMass;
   TH2F *HepHisto_PtVsEta;
+
+  TH1F *EleHisto_eta;      
+  TH1F *EleHisto_phi;      
+  TH1F *EleHisto_detaVtx;  
+  TH1F *EleHisto_dphiVtx;  
+  TH1F *EleHisto_HoE;      
+  TH1F *EleHisto_EoP;      
+  TH1F *EleHisto_fbrem;   
+  TH1F *EleHisto_sigmaIeta;
+  TH1F *EleHisto_sigmaEta; 
+  TH1F *EleHisto_dr03ecal; 
+  TH1F *EleHisto_dr03tk;   
+  TH1F *EleHisto_dr03hcal1;
+  TH1F *EleHisto_dr03hcal2;
+  TH1F *EleHisto_momErr;   
+  TH1F *EleHisto_isPF;     
+  TH1F *EleHisto_isEcal;   
+  TH1F *EleHisto_mva;      
+
 
   TH1F *ScHisto_deltaRWrtMc_CloserToMc;  
   TH1F *ScHisto_deltaRWrtMc_HighestEt; 
@@ -68,33 +89,6 @@ private:
   TH1F *ScHisto_hoeHighestEt;          
   TH1F *ScHisto_dEtaTrHighestEt;
   TH1F *ScHisto_dPhiTrHighestEt;
-
-  TH1F *ScHisto_deltaRHighestEt_EB;       
-  TH1F *ScHisto_invMassHighestEt_EB;      
-  TH1F *ScHisto_s9s25HighestEt_EB;        
-  TH1F *ScHisto_sEEHighestEt_EB;          
-  TH1F *ScHisto_hcalIsolHighestEt_EB;     
-  TH1F *ScHisto_hoeHighestEt_EB;          
-  TH1F *ScHisto_dEtaTrHighestEt_EB;
-  TH1F *ScHisto_dPhiTrHighestEt_EB;
-
-  TH1F *ScHisto_deltaRHighestEt_EE;       
-  TH1F *ScHisto_invMassHighestEt_EE;      
-  TH1F *ScHisto_s9s25HighestEt_EE;        
-  TH1F *ScHisto_sEEHighestEt_EE;          
-  TH1F *ScHisto_hcalIsolHighestEt_EE;     
-  TH1F *ScHisto_hoeHighestEt_EE;          
-  TH1F *ScHisto_dEtaTrHighestEt_EE;
-  TH1F *ScHisto_dPhiTrHighestEt_EE;
-
-  TH1F *ScHisto_deltaRHighestEt_EBEE;       
-  TH1F *ScHisto_invMassHighestEt_EBEE;      
-  TH1F *ScHisto_s9s25HighestEt_EBEE;        
-  TH1F *ScHisto_sEEHighestEt_EBEE;          
-  TH1F *ScHisto_hcalIsolHighestEt_EBEE;     
-  TH1F *ScHisto_hoeHighestEt_EBEE;
-  TH1F *ScHisto_dEtaTrHighestEt_EBEE;
-  TH1F *ScHisto_dPhiTrHighestEt_EBEE;
 
   TH2F *ScHisto_InvMassVsJene_highestEt;         
   TH2F *ScHisto_InvMassVsJet_highestEt;          
