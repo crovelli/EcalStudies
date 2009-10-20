@@ -350,8 +350,8 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
 	  } // two matched electons
 	  
 	} // loop over electron collection
-	
 
+	
 	if (numberOfEleOkPlus>0 && numberOfEleOkMinus>0) totalIdentified++;
 	if ((numberOfEleOkPlus>0 && numberOfEleOkMinus>1) || (numberOfEleOkPlus>1 && numberOfEleOkMinus>0)) totalIdentifiedMore++;
 	
@@ -362,7 +362,7 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
 	  if (numberOfEleOkPlus>=1 && numberOfEleOkMinus>=1) {
 	    
 	    if ( theBestDetap==-1 || theBestDetae==-1 ) cout << "non deve succede mai" << endl;
-
+	    
 	    float deltaR_WrtMcEle_closerToMc = closerToMc3e.DeltaR(trueEle_3P);
 	    float deltaR_WrtMcPos_closerToMc = closerToMc3p.DeltaR(truePos_3P);
 	    float deltaR_WrtMcEle_highestEt  = highestEt_3e.DeltaR(trueEle_3P);
@@ -373,17 +373,17 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
 	    float deltaR_WrtMcPos_bestSEE    = bestSEE_3p.DeltaR(truePos_3P);
 	    float deltaR_WrtMcEle_bestDeta   = bestDeta_3e.DeltaR(trueEle_3P);
 	    float deltaR_WrtMcPos_bestDeta   = bestDeta_3p.DeltaR(truePos_3P);
-
+	  
 	    // how many times the electron/positron pair we use is correct?
 	    if (deltaR_WrtMcEle_closerToMc < 0.5 && deltaR_WrtMcPos_closerToMc<0.5) okEvent_McTruth++; 
 	    if (deltaR_WrtMcEle_highestEt < 0.5 && deltaR_WrtMcPos_highestEt<0.5)   okEvent_Highest++; 
-
+	  
 	    if (numberOfEleOkPlus>1) {
 	      ScHisto_deltaRWrtMc_CloserToMc_more1 -> Fill(deltaR_WrtMcPos_closerToMc);
 	      ScHisto_deltaRWrtMc_HighestEt_more1  -> Fill(deltaR_WrtMcPos_highestEt);
 	      ScHisto_deltaRWrtMc_BestS9S25_more1  -> Fill(deltaR_WrtMcPos_bestS9S25);
 	      ScHisto_deltaRWrtMc_BestSEE_more1    -> Fill(deltaR_WrtMcPos_bestSEE);
-	      
+	    
 	      // count how many times we get the correct one
 	      if (deltaRposi<0.5){
 		if (theDeltaRp==theHighestEtp) okHighest_many++;
@@ -396,13 +396,13 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
 		else wrongBestDeta_many++;
 	      }
 	    }
-	    
+	  
 	    if (numberOfEleOkMinus>1) {
 	      ScHisto_deltaRWrtMc_CloserToMc_more1 -> Fill(deltaR_WrtMcEle_closerToMc);
 	      ScHisto_deltaRWrtMc_HighestEt_more1  -> Fill(deltaR_WrtMcEle_highestEt);
 	      ScHisto_deltaRWrtMc_BestS9S25_more1  -> Fill(deltaR_WrtMcEle_bestS9S25);
 	      ScHisto_deltaRWrtMc_BestSEE_more1    -> Fill(deltaR_WrtMcEle_bestSEE);
-	      
+	    
 	      // count how many times we get the correct one
 	      if (deltaRelec<0.5){
 		if (theDeltaRe==theHighestEte) okHighest_many++;
@@ -417,29 +417,29 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
 	    }
 	  }  // ok matched   
 	} // signal
-
-	
+      
+      
 	// to compare the distributions: use the two highest Et electrons
-        if (numberOfEleOkPlus>=1 && numberOfEleOkMinus>=1) {  
-
+	if (numberOfEleOkPlus>=1 && numberOfEleOkMinus>=1) {  
+	
 	  // tracker isolation added here
 	  float deltaR_highestEt = highestEt_3p.DeltaR(highestEt_3e);	
-          if (deltaR_highestEt < 0.3) {
+	  if (deltaR_highestEt < 0.3) {
 	    highestEt_TIso03p -= (highestEt_4e.Et()/highestEt_4p.Et());
 	    if (highestEt_TIso03p < 0.) highestEt_TIso03p = 0.;
 	    highestEt_TIso03e -= (highestEt_4p.Et()/highestEt_4e.Et());
 	    if (highestEt_TIso03e < 0.) highestEt_TIso03e = 0.;
 	  }
 	
-          // BEST PAIR CUTS
-          if (highestEt_TIso03p*highestEt_4p.Et() < 2.8 && highestEt_TIso03e*highestEt_4e.Et() < 2.8) numberOfPairsOk++;
-	  
+	  // BEST PAIR CUTS
+	  if (highestEt_TIso03p*highestEt_4p.Et() < 2.8 && highestEt_TIso03e*highestEt_4e.Et() < 2.8) numberOfPairsOk++;
+	
 	  if (highestEt_TIso03p*highestEt_4p.Et() < 2.8 && highestEt_TIso03e*highestEt_4e.Et() < 2.8) {
 	    ScHisto_etaHighestEt->Fill(highestEt_3p.Eta());
 	    ScHisto_etaHighestEt->Fill(highestEt_3e.Eta());
 	    ScHisto_phiHighestEt->Fill(highestEt_3p.Phi());
 	    ScHisto_phiHighestEt->Fill(highestEt_3e.Phi());
-	    
+	  
 	    float maxEt_highestEt = 0.;
 	    float minEt_highestEt = 0.;
 	    if (highestEt_4p.Et()>highestEt_4e.Et()){ 
@@ -452,15 +452,15 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
 	    }
 	    ScHisto_maxEtHighestEt->Fill(maxEt_highestEt);
 	    ScHisto_minEtHighestEt->Fill(minEt_highestEt);
-	    
+	  
 	    float deltaR_highestEt = highestEt_3p.DeltaR(highestEt_3e);
 	    ScHisto_deltaRHighestEt->Fill(deltaR_highestEt);	
-	    
+	  
 	    float mee_highestEt = (highestEt_4p + highestEt_4e).M();
 	    ScHisto_invMassHighestEt->Fill(mee_highestEt);
 	    if (mee_highestEt<4. && mee_highestEt>2.5) numbersOfInvMassOk++;
-	    
-	    
+	  
+	  
 	    // study of possible biases for signal
 	    if (signal) {    
 	      float jpsi_ene = (highestEt_4p + highestEt_4e).E();	  
@@ -468,7 +468,7 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
 	      float jpsi_eta = (highestEt_4p + highestEt_4e).Eta();	  
 	      float jpsi_phi = (highestEt_4p + highestEt_4e).Phi();	  
 	      float deltaR   =  highestEt_4p.DeltaR(highestEt_4e);
-	      
+	    
 	      ScHisto_JeneVsJeta_highestEt      -> Fill(jpsi_eta, jpsi_ene);
 	      ScHisto_JetVsJeta_highestEt       -> Fill(jpsi_eta, jpsi_et);
 	      ScHisto_InvMassVsJeta_highestEt   -> Fill(jpsi_eta, mee_highestEt);                
@@ -480,40 +480,41 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
 	      if (fabs(jpsi_eta)>1.5) ScHisto_InvMassVsJeneEE_highestEt -> Fill(jpsi_ene, mee_highestEt);        
 	      if (fabs(jpsi_eta)<1.5) ScHisto_InvMassVsJetEB_highestEt  -> Fill(jpsi_et,  mee_highestEt);        
 	      if (fabs(jpsi_eta)>1.5) ScHisto_InvMassVsJetEE_highestEt  -> Fill(jpsi_et,  mee_highestEt);        
-	      }
-	    
+	    }
+	  
 	  } // ok best pair
 	} // ok matched
-
+      
 	// plots with all combinatorics
 	if ( numberOfEleOkPlus>=1 && numberOfEleOkMinus>=1 && numberOfPairsOk>=1 ){ 
 	  for(int theEle1=0; theEle1<numberOfElectrons; theEle1++) { 
 	    if (pxRecoEle[theEle1]<-700) continue;
 	    if (etRecoEle[theEle1]<4)     continue;
-
+	  
 	    for(int theEle2=(theEle1+1); theEle2<numberOfElectrons; theEle2++) { 
 	      if (pxRecoEle[theEle2]<-700) continue;
 	      if (etRecoEle[theEle2]<4)     continue;
-
-		TLorentzVector tlvTheEle1, tlvTheEle2;
-		TVector3 tv3TheEle1, tv3TheEle2;
-		tlvTheEle1.SetPxPyPzE(pxRecoEle[theEle1], pyRecoEle[theEle1], pzRecoEle[theEle1], eneRecoEle[theEle1]);
-		tlvTheEle2.SetPxPyPzE(pxRecoEle[theEle2], pyRecoEle[theEle2], pzRecoEle[theEle2], eneRecoEle[theEle2]);
-		tv3TheEle1.SetXYZ (pxRecoEle[theEle1], pyRecoEle[theEle1], pzRecoEle[theEle1]);
-		tv3TheEle2.SetXYZ (pxRecoEle[theEle2], pyRecoEle[theEle2], pzRecoEle[theEle2]);
-		
-		float deltaR = tv3TheEle1.DeltaR(tv3TheEle2);
-		float mee    = (tlvTheEle1 + tlvTheEle2).M();
-		ScHisto_deltaRComb->Fill(deltaR);
-		ScHisto_invMassComb->Fill(mee);
-		ScHisto_deltaRVsInvMassComb->Fill(mee,deltaR);
-	    }}
+	    
+	      TLorentzVector tlvTheEle1, tlvTheEle2;
+	      TVector3 tv3TheEle1, tv3TheEle2;
+	      tlvTheEle1.SetPxPyPzE(pxRecoEle[theEle1], pyRecoEle[theEle1], pzRecoEle[theEle1], eneRecoEle[theEle1]);
+	      tlvTheEle2.SetPxPyPzE(pxRecoEle[theEle2], pyRecoEle[theEle2], pzRecoEle[theEle2], eneRecoEle[theEle2]);
+	      tv3TheEle1.SetXYZ (pxRecoEle[theEle1], pyRecoEle[theEle1], pzRecoEle[theEle1]);
+	      tv3TheEle2.SetXYZ (pxRecoEle[theEle2], pyRecoEle[theEle2], pzRecoEle[theEle2]);
+	    
+	      float deltaR = tv3TheEle1.DeltaR(tv3TheEle2);
+	      float mee    = (tlvTheEle1 + tlvTheEle2).M();
+	      ScHisto_deltaRComb->Fill(deltaR);
+	      ScHisto_invMassComb->Fill(mee);
+	      ScHisto_deltaRVsInvMassComb->Fill(mee,deltaR);
+	    }
+	  }
 	}
-	//      } // ok HLT
+      } // ok HLT
     } // ok generated    
   } // loop over entries
-
-
+  
+  
   cout << endl;
   cout << "to choose the best criterium" << endl;
   cout << "highest ET: ok    = " << okHighest_many   << ", wrong = " << wrongHighest_many   << endl;
