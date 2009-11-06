@@ -23,9 +23,9 @@ process.myAnalyzerSignal = cms.EDAnalyzer("JPsieeAnalyzerSignal",
                                     ecalrechitsCollectionEE   = cms.InputTag("reducedEcalRecHitsEE"),
                                     triggerResults            = cms.InputTag("TriggerResults::HLT8E29"),
                                     #triggerResults            = cms.InputTag("TriggerResults::HLT"),
-                                    isSignal  = cms.untracked.bool(True),
+                                    isSignal  = cms.untracked.bool(False),
                                     isUpsiAnalysis  = cms.untracked.bool(False),
-                                    fileTree  = cms.untracked.string("signalJPsi7TeV.root")
+                                    fileTree  = cms.untracked.string("background7TeV.root")
                                     )
 
 process.p = cms.Path(process.myAnalyzerSignal)
