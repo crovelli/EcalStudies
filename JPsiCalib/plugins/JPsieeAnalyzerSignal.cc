@@ -51,6 +51,7 @@ JPsieeAnalyzerSignal::JPsieeAnalyzerSignal(const edm::ParameterSet& iConfig) {
   ecalRechitsCollectionEE_ = iConfig.getParameter<InputTag>("ecalrechitsCollectionEE");  
   triggerResults_	   = iConfig.getParameter<InputTag>("triggerResults");
   isSignal_                = iConfig.getUntrackedParameter<bool>("isSignal");
+  isUpsiAnalysis_          = iConfig.getUntrackedParameter<bool>("isUpsiAnalysis");
 }
 
 
@@ -135,7 +136,7 @@ void JPsieeAnalyzerSignal::analyze(const edm::Event& iEvent, const edm::EventSet
   // generator level informations
   
   // if running on background samples we skip events with true j/psi 
-  bool isAJPsi = false;
+  bool isASignal = false;
   if( !isSignal_ ) {
     HepMC::GenEvent::particle_const_iterator mcIter;
     for ( mcIter=myGenEvent->particles_begin(); mcIter != myGenEvent->particles_end(); mcIter++ ) {
@@ -145,12 +146,21 @@ void JPsieeAnalyzerSignal::analyze(const edm::Event& iEvent, const edm::EventSet
 	  if ((*mcIter)->production_vertex()->particles_begin(HepMC::parents) != (*mcIter)->production_vertex()->particles_end(HepMC::parents)) { 
 	    mother = *((*mcIter)->production_vertex()->particles_begin(HepMC::parents));
 	  }}
-	if ((mother != 0) && (mother->pdg_id() == 443)) isAJPsi = true; 
-      }}
-  }
+	if (isUpsiAnalysis_) {
+	  if (mother != 0 && ((mother->pdg_id() == 553) || (mother->pdg_id() == 100553) || (mother->pdg_id() == 200553) )) {
+	    isASignal = true; 
+	  }
+	} else {
+	  if ((mother != 0) && ((mother->pdg_id() == 443) ) ) {
+	    isASignal = true; 
+	  }
+	}
+      } // if electron
+    }
+  } // if signal
   
   // if background sample and a j/psi is found, skip the event
-  if( isSignal_ || !isAJPsi) {
+  if( isSignal_ ||  !isASignal ) {
 
     // ------------------------------------------------
     // run infos:
@@ -189,7 +199,7 @@ void JPsieeAnalyzerSignal::analyze(const edm::Event& iEvent, const edm::EventSet
 	      mother = *((*mcIter)->production_vertex()->particles_begin(HepMC::parents));
 	    }}
 	  
-	  if ((mother != 0) && (mother->pdg_id() == 443)) {
+	  if ((mother != 0) && ((mother->pdg_id() == 443) || (mother->pdg_id() == 553) || (mother->pdg_id() == 100553) || (mother->pdg_id() == 200553) ) ) {
 	    
 	    // filling the tree
 	    pxGenEle[theMcPc]  = ((*mcIter)->momentum()).x();
@@ -208,8 +218,7 @@ void JPsieeAnalyzerSignal::analyze(const edm::Event& iEvent, const edm::EventSet
     
     // for the tree
     numberMcParticle = theMcPc;
-    
-    
+        
 
     // reconstructed electrons
     int countMP = 0;
@@ -324,7 +333,7 @@ void JPsieeAnalyzerSignal::analyze(const edm::Event& iEvent, const edm::EventSet
     
     // filling the tree: some summary numbers
     int signal = 0;
-    if (isSignal_) signal = 1;
+    if ( isSignal_  ) signal = 1;
     OutputTree->fillGeneral(signal, numberMcParticle, numberOfElectrons, intHltJPsi, intHltUpsilon, intHltBoth);
     
     OutputTree->store();
