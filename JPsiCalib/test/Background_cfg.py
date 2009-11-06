@@ -24,7 +24,6 @@ process.myAnalyzerSignal = cms.EDAnalyzer("JPsieeAnalyzerSignal",
                                     triggerResults            = cms.InputTag("TriggerResults::HLT8E29"),
                                     #triggerResults            = cms.InputTag("TriggerResults::HLT"),
                                     isSignal  = cms.untracked.bool(False),
-                                    isUpsiAnalysis  = cms.untracked.bool(False),
                                     fileTree  = cms.untracked.string("background7TeV.root")
                                     )
 
