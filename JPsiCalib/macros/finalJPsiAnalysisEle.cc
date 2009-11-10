@@ -82,12 +82,12 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
     float maxPtGen = 0.;
     float minPtGen = 0.;
     
+    HepHisto_ptHat->Fill(pthat); 
     /// if it is signal sample
     if (signal) {
       
       HepHisto_size->Fill(numberOfGenerated);
-      HepHisto_ptHat->Fill(pthat); 
-
+    
       if(numberOfGenerated!=2) continue;
 
       if (chargeGenEle[0]==-1 && chargeGenEle[1]==1) {
@@ -128,13 +128,14 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
       goodGene++;
       
       // selecting HLTbit 
-      if (hltJpsi ) {
+      if (hltJpsi || hltUpsilon ) {
 	totalTrigger++;
+	
+	ScHistoEle_size -> Fill(numberOfElectrons);
 	
 	// few numbers: all electrons
 	if (numberOfElectrons>1) totalReco++;
-	ScHistoEle_size -> Fill(numberOfElectrons);
-	
+
 	// few numbers: all electrons, Et > 4
 	for(int theEle=0; theEle<numberOfElectrons; theEle++) { 
 	  if (etRecoEle[theEle]>4) totEleGt4++;
@@ -213,11 +214,11 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
 		bool isBarrel = true;
 		bool isPF = false;
 
-		if(isPFlowRecoEle[theEle]) isPF = true;
-		if(fabs(this3P.Eta())>1.479) isBarrel = false;
-		
-
 		fillHistoCutsVariables( theEle );
+
+		if(isPFlowRecoEle[theEle]) isPF = true;
+
+		if(fabs(this3P.Eta())>1.479) isBarrel = false;
 
 
 		if (isBarrel){		
@@ -351,9 +352,23 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
 	  
 	} // loop over electron collection
 
+
+	for(int theEle=0; theEle<numberOfElectrons; theEle++) { 
+	  if (totEleGt4plus>=1 && totEleGt4plus>=1) {
+	    // skipping problematic electrons
+	    if (pxRecoEle[theEle]>-700) {
+	      // skipping electrons below threshold
+	      if (etRecoEle[theEle]>4) {
+		;
+		
+	      } // ok Et
+	    }  // ok matching with track
+	  } // two matched electons
+	} // loop over electron collection
+
 	
-	if (numberOfEleOkPlus>0 && numberOfEleOkMinus>0) totalIdentified++;
-	if ((numberOfEleOkPlus>0 && numberOfEleOkMinus>1) || (numberOfEleOkPlus>1 && numberOfEleOkMinus>0)) totalIdentifiedMore++;
+	if ( numberOfEleOkPlus>0 && numberOfEleOkMinus>0 ) totalIdentified++;
+	if ((numberOfEleOkPlus>0 && numberOfEleOkMinus>1 ) || (numberOfEleOkPlus>1 && numberOfEleOkMinus>0)) totalIdentifiedMore++;
 	
 	
 	// to choose, signal only
@@ -527,16 +542,19 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
   saveHistos();
 
   //  drawPlots();
-
+  float effHLT    = totalTrigger/goodGene;
+  float erreffHLT = sqrt(effHLT *(1-effHLT)/goodGene);
+  float effSelected    = totalIdentified/totalTrigger;
+  float erreffSelected = sqrt(effSelected *(1-effSelected)/totalTrigger);
 
   // summary
   cout << "total number of events = "              << totalEvents     << endl;
   cout << "good number of gene MC = "              << goodGene        << endl;
-  cout << "total number of events passing HLT = "  << totalTrigger    << endl;
+  cout << "total number of events passing HLT = "  << totalTrigger    << ";  eff->" << effHLT <<"+-" << erreffHLT << endl;
   cout << "total number of reco = "                << totalReco       << endl;
   cout << "total number of reco & Et>4= "          << totalRecoGt4    << endl;
   cout << "total number of reco & Et>4 & charge requirement = " << totalRecoGt4Charge << endl;
-  cout << "total number of reco & Et>4 & id & isol = " << totalIdentified << endl;
+  cout << "total number of reco & Et>4 & id & isol = " << totalIdentified <<  ";  eff->" << effSelected <<"+-" << erreffSelected << endl;
   cout << "total number of reco & ET>4 & id & full isol (tracker also) = " << numberOfPairsOk << endl;
   cout << "total number of reco & ET>4 & id & full isol (tracker also) + invMass in 2.5 - 4 = " << numbersOfInvMassOk << endl;
   cout << endl;
@@ -546,6 +564,7 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
   cout << "total number of events with highest Et match MC within dR=0.5 = "   << okEvent_Highest << endl; 
 
   
+  cout << " ***************| NOT UPDATED ***********************" << endl;
   // normalizing to cross sections
   float hltEff_prod; 
   float filterEff_prod;
@@ -624,7 +643,7 @@ void finalJPsiAnalysisEle::bookHistos() {
 
   HepHisto_size    = new TH1F("HepHisto_size",    "Num of GenElectrons ",  10, 0,  10 );
   HepHisto_ptHat   = new TH1F("HepHisto_ptHat",   "Pt hat distributions", 800, 0, 200.);
-  HepHisto_deltaR  = new TH1F("HepHisto_deltaR",  "GenElectrons deltaR ", 100, 0.,  1.);
+  HepHisto_deltaR  = new TH1F("HepHisto_deltaR",  "GenElectrons deltaR ", 200, 0.,  2.);
   HepHisto_maxPt   = new TH1F("HepHisto_maxPt",   "GenElectrons max pt ", 200, 0., 20.);
   HepHisto_minPt   = new TH1F("HepHisto_minPt",   "GenElectrons min pt ", 200, 0., 20.);
   HepHisto_eta     = new TH1F("HepHisto_eta",     "GenElectrons eta    ", 100, -3.,+3.);
@@ -636,7 +655,7 @@ void finalJPsiAnalysisEle::bookHistos() {
   EleHisto_phi       = new  TH1F("EleHisto_phi      ", " Phi recoEle", 200, -3.15,3.15);      
   EleHisto_detaVtx   = new  TH1F("EleHisto_detaVtx  ", " deta AtVtx ", 200,  -0.4, 0.4);  
   EleHisto_dphiVtx   = new  TH1F("EleHisto_dphiVtx  ", " dphy AtVtx ", 200,   -1.,  1.);  
-  EleHisto_HoE       = new  TH1F("EleHisto_HoE      ", " HoverE Ele ", 200,    0., 0.3);      
+  EleHisto_HoE       = new  TH1F("EleHisto_HoE      ", " HoverE Ele ", 200,    0., 0.1);      
   EleHisto_EoP       = new  TH1F("EleHisto_EoP      ", " EoverP Ele ", 200,    0.,  5.);      
   EleHisto_fbrem     = new  TH1F("EleHisto_fbrem    ", " fBrem Ele  ", 200,  -30.,  2.);   
   EleHisto_sigmaIeta = new  TH1F("EleHisto_sigmaIeta", " sigmaIetaIeta", 300,    0., 1.5);
@@ -645,7 +664,7 @@ void finalJPsiAnalysisEle::bookHistos() {
   EleHisto_dr03tk    = new  TH1F("EleHisto_dr03tk   ", " dr03tk     ", 200,   -5.,  60);   
   EleHisto_dr03hcal1 = new  TH1F("EleHisto_dr03hcal1", " dr03hcal1  ", 200,   -5.,  30);
   EleHisto_dr03hcal2 = new  TH1F("EleHisto_dr03hcal2", " dr03hcal2  ", 200,   -5.,  30);
-  EleHisto_momErr    = new  TH1F("EleHisto_momErr   ", " momentum error", 500,    0., 10000.);   
+  EleHisto_momErr    = new  TH1F("EleHisto_momErr   ", " momentum error", 500,    0., 1100.);   
   EleHisto_isPF      = new  TH1F("EleHisto_isPF     ", " isPFlow Ele",   2,    0.,   2);     
   EleHisto_isEcal    = new  TH1F("EleHisto_isEcal   ", " isEcalDriven",  2,    0.,   2);   
   EleHisto_mva       = new  TH1F("EleHisto_mva      ", " MvaPFlow   ",   100,    -1.2,   1.2);      
@@ -795,6 +814,7 @@ void finalJPsiAnalysisEle::saveHistos() {
   fOut.cd();
   
   ScHistoEle_size       -> Write();
+  ScHistoGt4_size       -> Write();
   ScHistoGt4plus_size   -> Write();
   ScHistoGt4minus_size  -> Write();
 
