@@ -1,8 +1,8 @@
 //////////////////////////////////////////////////////////
 // This class has been automatically generated on
-// Mon Sep 28 11:12:17 2009 by ROOT version 5.22/00a
+// Tue Nov 10 16:39:09 2009 by ROOT version 5.22/00a
 // from TTree T1/lowEnergyElectronsTree
-// found on file: /tmp/arcidiac/signalJPsi10TeV_1.root
+// found on file: /tmp/arcidiac/JPsi7TeV.root
 //////////////////////////////////////////////////////////
 
 #ifndef JPsiTreeBase_h
@@ -28,6 +28,8 @@ public :
    Int_t           hltJpsi;
    Int_t           hltUpsilon;
    Int_t           hltBoth;
+   Int_t           isJPsi;
+   Int_t           isUpsi;
    Int_t           chargeGenEle[50];   //[numberOfGenerated]
    Float_t         pxGenEle[50];   //[numberOfGenerated]
    Float_t         pyGenEle[50];   //[numberOfGenerated]
@@ -95,6 +97,8 @@ public :
    TBranch        *b_hltJpsi;   //!
    TBranch        *b_hltUpsilon;   //!
    TBranch        *b_hltBoth;   //!
+   TBranch        *b_isJPsi;   //!
+   TBranch        *b_isUpsi;   //!
    TBranch        *b_chargeGenEle;   //!
    TBranch        *b_pxGenEle;   //!
    TBranch        *b_pyGenEle;   //!
@@ -170,9 +174,9 @@ JPsiTreeBase::JPsiTreeBase(TTree *tree)
 // if parameter tree is not specified (or zero), connect the file
 // used to generate this class and read the Tree.
    if (tree == 0) {
-      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("/tmp/arcidiac/signalJPsi10TeV_1.root");
+      TFile *f = (TFile*)gROOT->GetListOfFiles()->FindObject("/tmp/arcidiac/JPsi7TeV.root");
       if (!f) {
-         f = new TFile("/tmp/arcidiac/signalJPsi10TeV_1.root");
+         f = new TFile("/tmp/arcidiac/JPsi7TeV.root");
       }
       tree = (TTree*)gDirectory->Get("T1");
 
@@ -233,6 +237,8 @@ void JPsiTreeBase::Init(TTree *tree)
    fChain->SetBranchAddress("hltJpsi", &hltJpsi, &b_hltJpsi);
    fChain->SetBranchAddress("hltUpsilon", &hltUpsilon, &b_hltUpsilon);
    fChain->SetBranchAddress("hltBoth", &hltBoth, &b_hltBoth);
+   fChain->SetBranchAddress("isJPsi", &isJPsi, &b_isJPsi);
+   fChain->SetBranchAddress("isUpsi", &isUpsi, &b_isUpsi);
    fChain->SetBranchAddress("chargeGenEle", chargeGenEle, &b_chargeGenEle);
    fChain->SetBranchAddress("pxGenEle", pxGenEle, &b_pxGenEle);
    fChain->SetBranchAddress("pyGenEle", pyGenEle, &b_pyGenEle);
