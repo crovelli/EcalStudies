@@ -12,7 +12,7 @@ public:
 
   void fillRunInfos( int run, int event, int lumis, float pth);
   
-  void fillGeneral( int sgn, int nmc, int nreco, int trJ, int trU, int trB );
+  void fillGeneral( int sgn, int nmc, int nreco, int trJ, int trU, int trB , int jpsi, int upsi);
 
   void fillGenerated( int gen_q, float gen_x, float gen_y, float gen_z, float gen_ene );
 
@@ -37,6 +37,8 @@ private:
   int hltJpsi;
   int hltUpsilon;
   int hltBoth;
+  int isJPsi;
+  int isUpsi;
 
   float e9RecoEle[NMAX], e25RecoEle[NMAX], e9e25RecoEle[NMAX];
   float sigmaEtaEtaRecoEle[NMAX], sigmaIetaIetaRecoEle[NMAX];

@@ -51,7 +51,6 @@ JPsieeAnalyzerSignal::JPsieeAnalyzerSignal(const edm::ParameterSet& iConfig) {
   ecalRechitsCollectionEE_ = iConfig.getParameter<InputTag>("ecalrechitsCollectionEE");  
   triggerResults_	   = iConfig.getParameter<InputTag>("triggerResults");
   isSignal_                = iConfig.getUntrackedParameter<bool>("isSignal");
-  isUpsiAnalysis_          = iConfig.getUntrackedParameter<bool>("isUpsiAnalysis");
 }
 
 
@@ -136,7 +135,10 @@ void JPsieeAnalyzerSignal::analyze(const edm::Event& iEvent, const edm::EventSet
   // generator level informations
   
   // if running on background samples we skip events with true j/psi 
-  bool isASignal = false;
+  //  bool isASignal = false;
+  int isJPsi = 0;
+  int isUpsi = 0;
+
   if( !isSignal_ ) {
     HepMC::GenEvent::particle_const_iterator mcIter;
     for ( mcIter=myGenEvent->particles_begin(); mcIter != myGenEvent->particles_end(); mcIter++ ) {
@@ -145,201 +147,195 @@ void JPsieeAnalyzerSignal::analyze(const edm::Event& iEvent, const edm::EventSet
 	if ( (*mcIter)->production_vertex() ) {
 	  if ((*mcIter)->production_vertex()->particles_begin(HepMC::parents) != (*mcIter)->production_vertex()->particles_end(HepMC::parents)) { 
 	    mother = *((*mcIter)->production_vertex()->particles_begin(HepMC::parents));
-	  }}
-	if (isUpsiAnalysis_) {
-	  if (mother != 0 && ((mother->pdg_id() == 553) || (mother->pdg_id() == 100553) || (mother->pdg_id() == 200553) )) {
-	    isASignal = true; 
-	  }
-	} else {
-	  if ((mother != 0) && ((mother->pdg_id() == 443) ) ) {
-	    isASignal = true; 
 	  }
 	}
+	if (mother != 0 && ((mother->pdg_id() == 553) || (mother->pdg_id() == 100553) || (mother->pdg_id() == 200553) )) isUpsi = 1; 
+	if ((mother != 0) && ((mother->pdg_id() == 443) ) ) isJPsi = 1; 
       } // if electron
     }
   } // if signal
   
   // if background sample and a j/psi is found, skip the event
-  if( isSignal_ ||  !isASignal ) {
-
-    // ------------------------------------------------
-    // run infos:
-    int theRun         = iEvent.id().run();
-    int theEvent       = iEvent.id().event();
-    int theLumiSection = iEvent.luminosityBlock();
-    OutputTree->fillRunInfos( theRun, theEvent, theLumiSection, ptHat );
+  //  if( isSignal_ ||  !isASignal ) {
+  
+  // ------------------------------------------------
+  // run infos:
+  int theRun         = iEvent.id().run();
+  int theEvent       = iEvent.id().event();
+  int theLumiSection = iEvent.luminosityBlock();
+  OutputTree->fillRunInfos( theRun, theEvent, theLumiSection, ptHat );
+  
+  
+  // counters for the tree
+  int numberMcParticle  = 0;
+  int numberOfElectrons = 0;
+  
+  
+  // for signal only, MC info: electrons from j/psi
+  int theMcPc = 0;
+  if( isSignal_ ) {
     
-
-    // counters for the tree
-    int numberMcParticle  = 0;
-    int numberOfElectrons = 0;
+    float pxGenEle[2];
+    float pyGenEle[2];
+    float pzGenEle[2];
+    float eneGenEle[2];
+    int chargeGenEle[2];
+    for(int ii=0; ii<2; ii++) chargeGenEle[ii] = 0;
     
-
-    // for signal only, MC info: electrons from j/psi
-    int theMcPc = 0;
-    if( isSignal_ ) {
+    HepMC::GenEvent::particle_const_iterator mcIter;
+    for ( mcIter=myGenEvent->particles_begin(); mcIter != myGenEvent->particles_end(); mcIter++ ) {
       
-      float pxGenEle[2];
-      float pyGenEle[2];
-      float pzGenEle[2];
-      float eneGenEle[2];
-      int chargeGenEle[2];
-      for(int ii=0; ii<2; ii++) chargeGenEle[ii] = 0;
-      
-      HepMC::GenEvent::particle_const_iterator mcIter;
-      for ( mcIter=myGenEvent->particles_begin(); mcIter != myGenEvent->particles_end(); mcIter++ ) {
+      // select electrons
+      if ( fabs((*mcIter)->pdg_id()) == 11) {
 	
-	// select electrons
-	if ( fabs((*mcIter)->pdg_id()) == 11) {
+	// electrons from J/Psi
+	HepMC::GenParticle* mother=0;
+	if ( (*mcIter)->production_vertex() ) {
+	  if ((*mcIter)->production_vertex()->particles_begin(HepMC::parents) != (*mcIter)->production_vertex()->particles_end(HepMC::parents)) { 
+	    mother = *((*mcIter)->production_vertex()->particles_begin(HepMC::parents));
+	  }}
+	
+	if ((mother != 0) && ((mother->pdg_id() == 443) || (mother->pdg_id() == 553) || (mother->pdg_id() == 100553) || (mother->pdg_id() == 200553) ) ) {
 	  
-	  // electrons from J/Psi
-	  HepMC::GenParticle* mother=0;
-	  if ( (*mcIter)->production_vertex() ) {
-	    if ((*mcIter)->production_vertex()->particles_begin(HepMC::parents) != (*mcIter)->production_vertex()->particles_end(HepMC::parents)) { 
-	      mother = *((*mcIter)->production_vertex()->particles_begin(HepMC::parents));
-	    }}
-	  
-	  if ((mother != 0) && ((mother->pdg_id() == 443) || (mother->pdg_id() == 553) || (mother->pdg_id() == 100553) || (mother->pdg_id() == 200553) ) ) {
-	    
-	    // filling the tree
-	    pxGenEle[theMcPc]  = ((*mcIter)->momentum()).x();
-	    pyGenEle[theMcPc]  = ((*mcIter)->momentum()).y();
-	    pzGenEle[theMcPc]  = ((*mcIter)->momentum()).z();
-	    eneGenEle[theMcPc] = ((*mcIter)->momentum()).e();	
-	    if((*mcIter)->pdg_id()==11)  chargeGenEle[theMcPc] = -1;
-	    if((*mcIter)->pdg_id()==-11) chargeGenEle[theMcPc] = +1;
-	    if(chargeGenEle[theMcPc]) OutputTree->fillGenerated( chargeGenEle[theMcPc], pxGenEle[theMcPc], pyGenEle[theMcPc], pzGenEle[theMcPc], eneGenEle[theMcPc] );
-	    theMcPc++;
-	  }
+	  // filling the tree
+	  pxGenEle[theMcPc]  = ((*mcIter)->momentum()).x();
+	  pyGenEle[theMcPc]  = ((*mcIter)->momentum()).y();
+	  pzGenEle[theMcPc]  = ((*mcIter)->momentum()).z();
+	  eneGenEle[theMcPc] = ((*mcIter)->momentum()).e();	
+	  if((*mcIter)->pdg_id()==11)  chargeGenEle[theMcPc] = -1;
+	  if((*mcIter)->pdg_id()==-11) chargeGenEle[theMcPc] = +1;
+	  if(chargeGenEle[theMcPc]) OutputTree->fillGenerated( chargeGenEle[theMcPc], pxGenEle[theMcPc], pyGenEle[theMcPc], pzGenEle[theMcPc], eneGenEle[theMcPc] );
+	  theMcPc++;
 	}
       }
-          
-    } // is signal
+    }
     
+  } // is signal
+  
     // for the tree
-    numberMcParticle = theMcPc;
-        
-
-    // reconstructed electrons
-    int countMP = 0;
-    numberOfElectrons = gsfElectrons->size();
-    GsfElectronCollection::const_iterator eleIter;
-    for (eleIter=gsfElectrons->begin(); eleIter != gsfElectrons->end() ; eleIter++) { 
-      
-      // reference to the electron
-      const reco::GsfElectronRef eleRef(gsfElectrons,countMP);
-
-      // taking the supercluster
-      SuperClusterRef theScRef = eleIter->superCluster();
-
-      // cluster shape variables
-      const EcalRecHitCollection *rechits = 0;
-      float seedEta = theScRef->seed()->position().eta();      
-      if( fabs(seedEta) < 1.479 ) rechits = rechitsEB;
-      else rechits = rechitsEE;     
-      float e3x3   = EcalClusterTools::e3x3( *(theScRef->seed()), &(*rechits), theTopology );
-      float e5x5   = EcalClusterTools::e5x5( *(theScRef->seed()), &(*rechits), theTopology );
-      float s9s25  = e3x3/e5x5;
-      float sigmaEtaEta   = eleIter->sigmaEtaEta();        
-      float sigmaIetaIeta = eleIter->sigmaIetaIeta();    
-      float hcalOverEcal  = eleIter->hcalOverEcal();
-
-      // POG computed electronID
-      const eleIdMap & eleIdLooseVal       = *( (*eleIdResults_)[0] );
-      const eleIdMap & eleIdRobustLooseVal = *( (*eleIdResults_)[1] );
-      const eleIdMap & eleIdRobustTightVal = *( (*eleIdResults_)[2] );
-      const eleIdMap & eleIdTightVal       = *( (*eleIdResults_)[3] );
-      int eleIdLoose    = 0;
-      int eleIdRobLoose = 0;
-      int eleIdRobTight = 0;
-      int eleIdTight    = 0;
-      if ( eleIdLooseVal[eleRef] )       eleIdLoose    = 1;
-      if ( eleIdRobustLooseVal[eleRef] ) eleIdRobLoose = 1;
-      if ( eleIdRobustTightVal[eleRef] ) eleIdRobTight = 1;
-      if ( eleIdTightVal[eleRef] )       eleIdTight    = 1;
+  numberMcParticle = theMcPc;
+  
+  
+  // reconstructed electrons
+  int countMP = 0;
+  numberOfElectrons = gsfElectrons->size();
+  GsfElectronCollection::const_iterator eleIter;
+  for (eleIter=gsfElectrons->begin(); eleIter != gsfElectrons->end() ; eleIter++) { 
     
-      // PF electron id
-      float pfMva = eleIter->mva();
-
-      // other useful quantities to study electron id
-      float eSuperClusterOverP        = eleIter->eSuperClusterOverP();        
-      float eSeedClusterOverPout      = eleIter->eSeedClusterOverPout();      
-      float deltaEtaSuperClusterAtVtx = eleIter->deltaEtaSuperClusterTrackAtVtx(); 
-      float deltaEtaSeedClusterAtCalo = eleIter->deltaEtaSeedClusterTrackAtCalo(); 
-      float deltaPhiSuperClusterAtVtx = eleIter->deltaPhiSuperClusterTrackAtVtx(); 
-      float deltaPhiSeedClusterAtCalo = eleIter->deltaPhiSeedClusterTrackAtCalo(); 
-      float fbrem                     = eleIter->fbrem();
-
-      // POG computed isolation
-      float dr03TkSumPt              = eleIter->dr03TkSumPt();
-      float dr04TkSumPt              = eleIter->dr04TkSumPt();
-      float dr03EcalRecHitSumEt      = eleIter->dr03EcalRecHitSumEt();
-      float dr04EcalRecHitSumEt      = eleIter->dr04EcalRecHitSumEt();
-      float dr03HcalDepth1TowerSumEt = eleIter->dr03HcalDepth1TowerSumEt();
-      float dr04HcalDepth1TowerSumEt = eleIter->dr04HcalDepth1TowerSumEt();
-      float dr03HcalDepth2TowerSumEt = eleIter->dr03HcalDepth2TowerSumEt();
-      float dr04HcalDepth2TowerSumEt = eleIter->dr04HcalDepth2TowerSumEt();
-
-      // ECAL based quantities
-      float rawSCenergy     = theScRef->rawEnergy();
-      float rawESenergy     = theScRef->preshowerEnergy();      
-      float ecalEnergy      = eleIter->ecalEnergy();          // ecal corrected energy (if !isEcalEnergyCorrected this value is identical to the supercluster energy
-      float ecalEnergyError = eleIter->ecalEnergyError();     // error on correctedCaloEnergy
-
-      // tracker based quantities
-      float trackPx            = eleIter->trackMomentumAtVtx().x();
-      float trackPy            = eleIter->trackMomentumAtVtx().y();
-      float trackPz            = eleIter->trackMomentumAtVtx().z();
-      float trackEta           = eleIter->trackMomentumAtVtx().eta();
-      float trackPhi           = eleIter->trackMomentumAtVtx().phi();
-      float trackMomentumError = eleIter->trackMomentumError();          // track momentum error from gsf fit
-
-      // corrections
-      bool isEcalEnergyCorrected = eleIter->isEcalEnergyCorrected();     // true if ecal energy has been corrected
-      bool isMomentumCorrected   = eleIter->isMomentumCorrected();       // true if E-p combination has been applied (if not the electron momentum is the ecal corrected energy)
-      int intIsEcalEnergyCorrected, intIsMomentumCorrected;
-      if ( isEcalEnergyCorrected ) intIsEcalEnergyCorrected = 1;
-      if (!isEcalEnergyCorrected ) intIsEcalEnergyCorrected = 0;
-      if ( isMomentumCorrected)    intIsMomentumCorrected = 1;
-      if (!isMomentumCorrected)    intIsMomentumCorrected = 0;
-     
-      // particle flow or standard electron
-      bool isEcalDriven   = eleIter->isEcalDriven();
-      bool isParticleFlow = eleIter->isTrackerDriven();
-      int intIsEcalDriven, intIsParticleFlow;
-      if ( isEcalDriven )   intIsEcalDriven = 1;
-      if (!isEcalDriven )   intIsEcalDriven = 0;
-      if ( isParticleFlow ) intIsParticleFlow = 1; 
-      if (!isParticleFlow ) intIsParticleFlow = 0; 
-
-      // general infos from candidate: should be the better estimate
-      int eleClass    = eleIter->classification();
-      int eleCharge   = eleIter->charge();
-      float elePx     = eleIter->momentum().x();
-      float elePy     = eleIter->momentum().y();
-      float elePz     = eleIter->momentum().z();
-      float eleEta    = eleIter->momentum().eta();
-      float elePhi    = eleIter->momentum().phi();
-      float eleEnergy = eleIter->energy();
-      float eleEt     = eleIter->et();
-      float electronMomentumError = eleIter->electronMomentumError(); // the final electron momentum error
-
-      OutputTree->fillElectrons( e3x3, e5x5, s9s25, sigmaEtaEta, sigmaIetaIeta, hcalOverEcal, eleIdLoose, eleIdRobLoose, eleIdRobTight, eleIdTight, pfMva, eSuperClusterOverP, eSeedClusterOverPout, deltaEtaSuperClusterAtVtx, deltaEtaSeedClusterAtCalo, deltaPhiSuperClusterAtVtx, deltaPhiSeedClusterAtCalo, fbrem, dr03TkSumPt, dr04TkSumPt, dr03EcalRecHitSumEt, dr04EcalRecHitSumEt, dr03HcalDepth1TowerSumEt, dr04HcalDepth1TowerSumEt, dr03HcalDepth2TowerSumEt, dr04HcalDepth2TowerSumEt, rawSCenergy, rawESenergy, ecalEnergy, ecalEnergyError,trackPx, trackPy, trackPz, trackEta, trackPhi, trackMomentumError,intIsEcalEnergyCorrected, intIsMomentumCorrected,intIsEcalDriven, intIsParticleFlow, eleClass, eleCharge, elePx, elePy, elePz, eleEta, elePhi, eleEnergy, eleEt, electronMomentumError);				
-
-      countMP++;
-
-    } // loop over electrons
-
+    // reference to the electron
+    const reco::GsfElectronRef eleRef(gsfElectrons,countMP);
     
+    // taking the supercluster
+    SuperClusterRef theScRef = eleIter->superCluster();
+    
+    // cluster shape variables
+    const EcalRecHitCollection *rechits = 0;
+    float seedEta = theScRef->seed()->position().eta();      
+    if( fabs(seedEta) < 1.479 ) rechits = rechitsEB;
+    else rechits = rechitsEE;     
+    float e3x3   = EcalClusterTools::e3x3( *(theScRef->seed()), &(*rechits), theTopology );
+    float e5x5   = EcalClusterTools::e5x5( *(theScRef->seed()), &(*rechits), theTopology );
+    float s9s25  = e3x3/e5x5;
+    float sigmaEtaEta   = eleIter->sigmaEtaEta();        
+    float sigmaIetaIeta = eleIter->sigmaIetaIeta();    
+    float hcalOverEcal  = eleIter->hcalOverEcal();
+    
+    // POG computed electronID
+    const eleIdMap & eleIdLooseVal       = *( (*eleIdResults_)[0] );
+    const eleIdMap & eleIdRobustLooseVal = *( (*eleIdResults_)[1] );
+    const eleIdMap & eleIdRobustTightVal = *( (*eleIdResults_)[2] );
+    const eleIdMap & eleIdTightVal       = *( (*eleIdResults_)[3] );
+    int eleIdLoose    = 0;
+    int eleIdRobLoose = 0;
+    int eleIdRobTight = 0;
+    int eleIdTight    = 0;
+    if ( eleIdLooseVal[eleRef] )       eleIdLoose    = 1;
+    if ( eleIdRobustLooseVal[eleRef] ) eleIdRobLoose = 1;
+    if ( eleIdRobustTightVal[eleRef] ) eleIdRobTight = 1;
+    if ( eleIdTightVal[eleRef] )       eleIdTight    = 1;
+    
+    // PF electron id
+    float pfMva = eleIter->mva();
+    
+    // other useful quantities to study electron id
+    float eSuperClusterOverP        = eleIter->eSuperClusterOverP();        
+    float eSeedClusterOverPout      = eleIter->eSeedClusterOverPout();      
+    float deltaEtaSuperClusterAtVtx = eleIter->deltaEtaSuperClusterTrackAtVtx(); 
+    float deltaEtaSeedClusterAtCalo = eleIter->deltaEtaSeedClusterTrackAtCalo(); 
+    float deltaPhiSuperClusterAtVtx = eleIter->deltaPhiSuperClusterTrackAtVtx(); 
+    float deltaPhiSeedClusterAtCalo = eleIter->deltaPhiSeedClusterTrackAtCalo(); 
+    float fbrem                     = eleIter->fbrem();
+    
+    // POG computed isolation
+    float dr03TkSumPt              = eleIter->dr03TkSumPt();
+    float dr04TkSumPt              = eleIter->dr04TkSumPt();
+    float dr03EcalRecHitSumEt      = eleIter->dr03EcalRecHitSumEt();
+    float dr04EcalRecHitSumEt      = eleIter->dr04EcalRecHitSumEt();
+    float dr03HcalDepth1TowerSumEt = eleIter->dr03HcalDepth1TowerSumEt();
+    float dr04HcalDepth1TowerSumEt = eleIter->dr04HcalDepth1TowerSumEt();
+    float dr03HcalDepth2TowerSumEt = eleIter->dr03HcalDepth2TowerSumEt();
+    float dr04HcalDepth2TowerSumEt = eleIter->dr04HcalDepth2TowerSumEt();
+    
+    // ECAL based quantities
+    float rawSCenergy     = theScRef->rawEnergy();
+    float rawESenergy     = theScRef->preshowerEnergy();      
+    float ecalEnergy      = eleIter->ecalEnergy();          // ecal corrected energy (if !isEcalEnergyCorrected this value is identical to the supercluster energy
+    float ecalEnergyError = eleIter->ecalEnergyError();     // error on correctedCaloEnergy
+    
+    // tracker based quantities
+    float trackPx            = eleIter->trackMomentumAtVtx().x();
+    float trackPy            = eleIter->trackMomentumAtVtx().y();
+    float trackPz            = eleIter->trackMomentumAtVtx().z();
+    float trackEta           = eleIter->trackMomentumAtVtx().eta();
+    float trackPhi           = eleIter->trackMomentumAtVtx().phi();
+    float trackMomentumError = eleIter->trackMomentumError();          // track momentum error from gsf fit
+    
+    // corrections
+    bool isEcalEnergyCorrected = eleIter->isEcalEnergyCorrected();     // true if ecal energy has been corrected
+    bool isMomentumCorrected   = eleIter->isMomentumCorrected();       // true if E-p combination has been applied (if not the electron momentum is the ecal corrected energy)
+    int intIsEcalEnergyCorrected, intIsMomentumCorrected;
+    if ( isEcalEnergyCorrected ) intIsEcalEnergyCorrected = 1;
+    if (!isEcalEnergyCorrected ) intIsEcalEnergyCorrected = 0;
+    if ( isMomentumCorrected)    intIsMomentumCorrected = 1;
+    if (!isMomentumCorrected)    intIsMomentumCorrected = 0;
+    
+    // particle flow or standard electron
+    bool isEcalDriven   = eleIter->isEcalDriven();
+    bool isParticleFlow = eleIter->isTrackerDriven();
+    int intIsEcalDriven, intIsParticleFlow;
+    if ( isEcalDriven )   intIsEcalDriven = 1;
+    if (!isEcalDriven )   intIsEcalDriven = 0;
+    if ( isParticleFlow ) intIsParticleFlow = 1; 
+    if (!isParticleFlow ) intIsParticleFlow = 0; 
+    
+    // general infos from candidate: should be the better estimate
+    int eleClass    = eleIter->classification();
+    int eleCharge   = eleIter->charge();
+    float elePx     = eleIter->momentum().x();
+    float elePy     = eleIter->momentum().y();
+    float elePz     = eleIter->momentum().z();
+    float eleEta    = eleIter->momentum().eta();
+    float elePhi    = eleIter->momentum().phi();
+    float eleEnergy = eleIter->energy();
+    float eleEt     = eleIter->et();
+    float electronMomentumError = eleIter->electronMomentumError(); // the final electron momentum error
+    
+    OutputTree->fillElectrons( e3x3, e5x5, s9s25, sigmaEtaEta, sigmaIetaIeta, hcalOverEcal, eleIdLoose, eleIdRobLoose, eleIdRobTight, eleIdTight, pfMva, eSuperClusterOverP, eSeedClusterOverPout, deltaEtaSuperClusterAtVtx, deltaEtaSeedClusterAtCalo, deltaPhiSuperClusterAtVtx, deltaPhiSeedClusterAtCalo, fbrem, dr03TkSumPt, dr04TkSumPt, dr03EcalRecHitSumEt, dr04EcalRecHitSumEt, dr03HcalDepth1TowerSumEt, dr04HcalDepth1TowerSumEt, dr03HcalDepth2TowerSumEt, dr04HcalDepth2TowerSumEt, rawSCenergy, rawESenergy, ecalEnergy, ecalEnergyError,trackPx, trackPy, trackPz, trackEta, trackPhi, trackMomentumError,intIsEcalEnergyCorrected, intIsMomentumCorrected,intIsEcalDriven, intIsParticleFlow, eleClass, eleCharge, elePx, elePy, elePz, eleEta, elePhi, eleEnergy, eleEt, electronMomentumError);				
+    
+    countMP++;
+    
+  } // loop over electrons
+  
+  
     // filling the tree: some summary numbers
-    int signal = 0;
-    if ( isSignal_  ) signal = 1;
-    OutputTree->fillGeneral(signal, numberMcParticle, numberOfElectrons, intHltJPsi, intHltUpsilon, intHltBoth);
-    
-    OutputTree->store();
-
-  } // signal or background
-
+  int signal = 0;
+  if ( isSignal_  ) signal = 1;
+  OutputTree->fillGeneral(signal, numberMcParticle, numberOfElectrons, intHltJPsi, intHltUpsilon, intHltBoth, isJPsi, isUpsi);
+  
+  OutputTree->store();
+  
+  //} // signal or background
+  
 
 }
 

@@ -32,6 +32,8 @@ JPsiTree::JPsiTree(const char * filename) {
   myTree->Branch("hltJpsi",              &hltJpsi,             "hltJpsi/I");  
   myTree->Branch("hltUpsilon",           &hltUpsilon,          "hltUpsilon/I");  
   myTree->Branch("hltBoth",              &hltBoth,             "hltBoth/I");  
+  myTree->Branch("isJPsi",               &isJPsi,              "isJPsi/I");  
+  myTree->Branch("isUpsi",               &isUpsi,              "isUpsi/I");  
 
   // generated electrons
   myTree->Branch("chargeGenEle",  &chargeGenEle, "chargeEl[numberOfGenerated]/I");
@@ -125,7 +127,7 @@ void JPsiTree::fillRunInfos( int run, int event, int lumis, float pth) {
   pthat       = pth;
 }
 
-void JPsiTree::fillGeneral( int sgn, int nmc, int nreco, int trJ, int trU, int trB ){
+void JPsiTree::fillGeneral( int sgn, int nmc, int nreco, int trJ, int trU, int trB , int jpsi, int upsi){
 
   signal            = sgn;			    
   numberOfGenerated = nmc;
@@ -133,6 +135,8 @@ void JPsiTree::fillGeneral( int sgn, int nmc, int nreco, int trJ, int trU, int t
   hltJpsi           = trJ;
   hltUpsilon        = trU;
   hltBoth           = trB;
+  isJPsi            = jpsi;
+  isUpsi            = upsi;
 }
 
 void JPsiTree::fillGenerated( int gen_q, float gen_x, float gen_y, float gen_z, float gen_ene ){
