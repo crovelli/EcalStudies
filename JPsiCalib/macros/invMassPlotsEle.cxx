@@ -35,84 +35,87 @@ TH1F *ScHisto_invMassHighestEt_EBEE_normL[8];
 TH1F *ScHisto_invMassHighestEt_normL_all;
 
 void chargeFiles() {
-  file[0] = new TFile("signalPrompt.root");
-  file[1] = new TFile("signalNonPrompt.root");
-  file[2] = new TFile("bce2030.root");
-  file[3] = new TFile("bce3080.root");
-  file[4] = new TFile("bce80170.root");
-  file[5] = new TFile("emEnrich3080.root");
-  file[6] = new TFile("emEnrich80170.root");
-  file[7] = new TFile("minBias.root");
+  file[0] = new TFile("Outfile_Jpsi.root");
+  file[1] = new TFile("Outfile_bce2030.root");
+  file[2] = new TFile("Outfile_bce3080.root");
+  file[3] = new TFile("Outfile_bce80170.root");
+  file[4] = new TFile("Outfile_EM20to30.root");
+  file[5] = new TFile("Outfile_EM30to80.root");
+  file[6] = new TFile("Outfile_EM80to170.root");
+  file[7] = new TFile("Outfile_doubleEM.root");
 }
 
 void setExpected(int theStep) {
 
-  float lumi = 100.;   // pb-1
+  float lumi = 1.;   // pb-1
+
+  // float exp_         =           kineEff  * filterEff_prod*crossSection;
+  // cout << "after HLT  : " << 10.*exp_hlt      << endl; 
 
   if (theStep==1) {     // after HLT only
-    expected[0] =    1644.*lumi;
-    expected[1] =     286.*lumi;
-    expected[2] =    6624.*lumi;
-    expected[3] =   26856.*lumi;
-    expected[4] =    4676.*lumi;
-    expected[5] =  321480.*lumi;
-    expected[6] =   36275.*lumi;
-    expected[7] = 5947120.*lumi;
+    expected[0] =  9411.04*lumi;
+    expected[1] =  160481.*lumi;
+    expected[2] =  205563.*lumi;
+    expected[3] =  36137.3*lumi;
+    expected[4] =  733553.*lumi;
+    expected[5] =  3746500.*lumi;
+    expected[6] =  381960.*lumi;
+    expected[7] =  4402330.*lumi;
   }
 
   if (theStep==2) {     // after HLT + reco
-    expected[0] =   1168.*lumi;
-    expected[1] =    168.*lumi;
-    expected[2] =   1259.*lumi;
-    expected[3] =   7174.*lumi;
-    expected[4] =   1750.*lumi;
-    expected[5] =  32066.*lumi;
-    expected[6] =   8430.*lumi;
-    expected[7] = 471329.*lumi;
+    expected[0] = 8192.73*lumi;
+    expected[1] = 73696.3*lumi;
+    expected[2] = 94399.1*lumi;
+    expected[3] = 20059.1*lumi;
+    expected[4] = 102448*lumi;
+    expected[5] = 785246*lumi;
+    expected[6] = 120682*lumi;
+    expected[7] = 296849*lumi;
   }
 
   if (theStep==3) {     // after HLT + reco + Et>4 
-    expected[0] =   1167.*lumi;
-    expected[1] =    167.*lumi;
-    expected[2] =   1245.*lumi;
-    expected[3] =   7105.*lumi;
-    expected[4] =   1738.*lumi;
-    expected[5] =  31518.*lumi;
-    expected[6] =   8287.*lumi;
-    expected[7] = 460410.*lumi;
+    expected[0] = 8006.41*lumi;
+    expected[1] = 61305.3*lumi;
+    expected[2] = 78527.2*lumi;
+    expected[3] = 16578.6*lumi;
+    expected[4] = 68837.1*lumi;
+    expected[5] = 557055*lumi;
+    expected[6] = 85397*lumi;
+    expected[7] = 229638*lumi;
   }
 
   if (theStep==4) {     // after HLT + reco + Et>4 + charge 
-    expected[0] =   1142.*lumi;
-    expected[1] =    158.*lumi;
-    expected[2] =    819.*lumi;
-    expected[3] =   4389.*lumi;
-    expected[4] =   1069.*lumi;
-    expected[5] =  18197.*lumi; 
-    expected[6] =   4782.*lumi; 
-    expected[7] = 298448.*lumi;
+    expected[0] = 7831.54*lumi;
+    expected[1] = 38579.5*lumi;
+    expected[2] = 49417.2*lumi;
+    expected[3] = 10395.7*lumi;
+    expected[4] = 42469*lumi;
+    expected[5] = 327059*lumi; 
+    expected[6] = 50312.9*lumi; 
+    expected[7] = 162427*lumi;
   }
 
   if (theStep==5) {     // after HLT + reco + Et>4 + charge + eleID 
-    expected[0] =   803.*lumi;
-    expected[1] =    94.*lumi;
-    expected[2] =   222.*lumi;
-    expected[3] =   740.*lumi;
-    expected[4] =    86.*lumi;
-    expected[5] =   659.*lumi;
-    expected[6] =   115.*lumi;
-    expected[7] = 10919.*lumi;
+    expected[0] =   3769.58*lumi;
+    expected[1] = 1002.55*lumi;
+    expected[2] = 1284.1*lumi;
+    expected[3] = 58.98*lumi;
+    expected[4] = 3216.6*lumi;
+    expected[5] = 5860.14*lumi;
+    expected[6] = 295.439*lumi;
+    expected[7] = 33605.6*lumi;
   }
 
   if (theStep==6) {     // after HLT + reco + Et>4 + charge + eleID + isol 
-    expected[0] = 710.*lumi;
-    expected[1] =  50.*lumi;
-    expected[2] =  80.*lumi;
-    expected[3] = 129.*lumi;
-    expected[4] =   5.*lumi;
-    expected[5] =  76.*lumi;
-    expected[6] =   9.*lumi;
-    expected[7] =   0.*lumi;
+    expected[0] = 2350.*lumi;
+    expected[1] =  55.9*lumi;
+    expected[2] =  71.6*lumi;
+    expected[3] =  2.73*lumi;
+    expected[4] = 547.0*lumi;
+    expected[5] = 582.28*lumi;
+    expected[6] = 25.97*lumi;
+    expected[7] = 5600.9*lumi;
   }
 }
 
@@ -243,14 +246,14 @@ void drawSvsB(int theStep) {
   tesiStyle->cd();
 
   TLegend leg(0.7,0.8,0.85,0.92);
-  leg.AddEntry(ScHisto_invMassHighestEt_normL[0], "prompt signal",      "f");
-  leg.AddEntry(ScHisto_invMassHighestEt_normL[1], "non prompt signal",  "f");
-  leg.AddEntry(ScHisto_invMassHighestEt_normL[2], "bc->e, 20-30",       "f");
-  leg.AddEntry(ScHisto_invMassHighestEt_normL[3], "bc->e, 30-80",       "f");
-  leg.AddEntry(ScHisto_invMassHighestEt_normL[4], "bc->e, 80-170",      "f");
-  leg.AddEntry(ScHisto_invMassHighestEt_normL[5], "em.enriched, 30-80", "f");
-  leg.AddEntry(ScHisto_invMassHighestEt_normL[6], "em.enriched, 80-170","f");
-  leg.AddEntry(ScHisto_invMassHighestEt_normL[7], "minimum bias","f");
+  leg.AddEntry(ScHisto_invMassHighestEt_normL[0], "Jpsi prompt signal",  "f");
+  leg.AddEntry(ScHisto_invMassHighestEt_normL[1], "bc->e, 20-30"      ,  "f");
+  leg.AddEntry(ScHisto_invMassHighestEt_normL[2], "bc->e, 30-80"      ,  "f");
+  leg.AddEntry(ScHisto_invMassHighestEt_normL[3], "bc->e, 80-170",       "f");
+  leg.AddEntry(ScHisto_invMassHighestEt_normL[4], "em.enriched,  20-30", "f");
+  leg.AddEntry(ScHisto_invMassHighestEt_normL[5], "em.enriched,  30-80", "f");
+  leg.AddEntry(ScHisto_invMassHighestEt_normL[6], "em.enriched, 80-170", "f");
+  leg.AddEntry(ScHisto_invMassHighestEt_normL[7], "double em.enr  6-20", "f");
   leg.SetFillColor(0);
   leg.SetBorderSize(0.4);
 
@@ -276,11 +279,11 @@ void drawSvsB(int theStep) {
   // summing up backgrounds and signals
   THStack staB_invMassHighestEt("staB_invMassHighestEt","staB_invMassHighestEt");
   staB_invMassHighestEt.Add(ScHisto_invMassHighestEt_normL[7]);
-  for (int ii=2; ii<7; ii++) {
+  for (int ii=1; ii<7; ii++) {
     staB_invMassHighestEt.Add(ScHisto_invMassHighestEt_normL[ii]);
   }
   THStack staS_invMassHighestEt("staS_invMassHighestEt","staS_invMassHighestEt");
-  for (int ii=0; ii<2; ii++) {
+  for (int ii=0; ii<1; ii++) {
     staS_invMassHighestEt.Add(ScHisto_invMassHighestEt_normL[ii]);
   }
   TCanvas c31("c31","all",1);  

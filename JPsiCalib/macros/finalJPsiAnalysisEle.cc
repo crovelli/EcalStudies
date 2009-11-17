@@ -36,18 +36,19 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
   std::cout << "Number of entries = " << nentries << std::endl;
 
   // counters
-  float totalEvents         = 0.;
-  float totalReco           = 0.;
-  float totalRecoGt4        = 0.;
-  float totalRecoGt4Charge  = 0.;
-  float totalTrigger        = 0.;
-  float totalIdentified     = 0.;
-  float numberOfPairsOk     = 0.;
-  float numbersOfInvMassOk  = 0.;
-  float totalIdentifiedMore = 0.;
-  float goodGene            = 0.;
-  float okEvent_McTruth     = 0.;
-  float okEvent_Highest     = 0.;
+  long AllIncluded         = 0;
+  long totalEvents         = 0;
+  long totalReco           = 0;
+  long totalRecoGt4        = 0;
+  long totalRecoGt4Charge  = 0;
+  long totalTrigger        = 0;
+  long totalIdentified     = 0;
+  long numberOfPairsOk     = 0;
+  long numbersOfInvMassOk  = 0;
+  long totalIdentifiedMore = 0;
+  long goodGene            = 0;
+  long okEvent_McTruth     = 0;
+  long okEvent_Highest     = 0;
 
   // to choose the best pair
   int okHighest_many      = 0;
@@ -65,9 +66,12 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
     if (ientry < 0) break;
     fChain->GetEntry(jentry);
     if (jentry ==1) std::cout << ">>> Signal is " << signal << std::endl;
-    if (jentry%1000 == 0) std::cout << ">>> Processing event # " << jentry << std::endl;
-    
-    if (theSample==2) signal = 0;  // not-prompt J/psi have the wrong signal values ...
+    if (jentry%50000 == 0) std::cout << ">>> Processing event # " << jentry << std::endl;
+
+    AllIncluded++;
+
+    if ( !signal && isJPsi ) continue;  // important! remove J/psi events in background samples
+
     totalEvents++;
 
     // counters for this entry
@@ -474,6 +478,24 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
 	    float mee_highestEt = (highestEt_4p + highestEt_4e).M();
 	    ScHisto_invMassHighestEt->Fill(mee_highestEt);
 	    if (mee_highestEt<4. && mee_highestEt>2.5) numbersOfInvMassOk++;
+
+           // to study EB/ EE depencency: both in barrel only
+            if ( fabs(highestEt_3p.Eta())<1.479 && fabs(highestEt_3e.Eta())<1.479 ){
+              ScHisto_deltaRHighestEt_EB  -> Fill(deltaR_highestEt);
+              ScHisto_invMassHighestEt_EB -> Fill(mee_highestEt);
+            }
+
+            // both in endcap only
+            if ( fabs(highestEt_3p.Eta())>1.479 && fabs(highestEt_3e.Eta())>1.479 ){
+              ScHisto_deltaRHighestEt_EE  -> Fill(deltaR_highestEt);
+              ScHisto_invMassHighestEt_EE -> Fill(mee_highestEt);
+            }
+
+            // one and one
+            if (  (fabs(highestEt_3p.Eta())<1.479 && fabs(highestEt_3e.Eta())>1.479) || (fabs(highestEt_3e.Eta())<1.479 && fabs(highestEt_3p.Eta())>1.479) ) {
+              ScHisto_deltaRHighestEt_EBEE       -> Fill(deltaR_highestEt);
+              ScHisto_invMassHighestEt_EBEE      -> Fill(mee_highestEt);
+            }
 	  
 	  
 	    // study of possible biases for signal
@@ -542,19 +564,19 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
   saveHistos();
 
   //  drawPlots();
-  float effHLT    = totalTrigger/goodGene;
+  float effHLT    = (double) totalTrigger/goodGene;
   float erreffHLT = sqrt(effHLT *(1-effHLT)/goodGene);
-  float effSelected    = totalIdentified/totalTrigger;
+  float effSelected    = (double) totalIdentified/totalTrigger;
   float erreffSelected = sqrt(effSelected *(1-effSelected)/totalTrigger);
 
   // summary
-  cout << "total number of events = "              << totalEvents     << endl;
+  cout << "total number of events = "              << totalEvents     << " ALL " << AllIncluded << endl;
   cout << "good number of gene MC = "              << goodGene        << endl;
-  cout << "total number of events passing HLT = "  << totalTrigger    << ";  eff->" << effHLT <<"+-" << erreffHLT << endl;
+  cout << "total number of events passing HLT = "  << totalTrigger    << ";  eff-> " << effHLT <<"+-" << erreffHLT << endl;
   cout << "total number of reco = "                << totalReco       << endl;
   cout << "total number of reco & Et>4= "          << totalRecoGt4    << endl;
   cout << "total number of reco & Et>4 & charge requirement = " << totalRecoGt4Charge << endl;
-  cout << "total number of reco & Et>4 & id & isol = " << totalIdentified <<  ";  eff->" << effSelected <<"+-" << erreffSelected << endl;
+  cout << "total number of reco & Et>4 & id & isol = " << totalIdentified <<  ";  eff-> " << effSelected <<"+-" << erreffSelected << endl;
   cout << "total number of reco & ET>4 & id & full isol (tracker also) = " << numberOfPairsOk << endl;
   cout << "total number of reco & ET>4 & id & full isol (tracker also) + invMass in 2.5 - 4 = " << numbersOfInvMassOk << endl;
   cout << endl;
@@ -564,39 +586,35 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
   cout << "total number of events with highest Et match MC within dR=0.5 = "   << okEvent_Highest << endl; 
 
   
-  cout << " ***************| NOT UPDATED ***********************" << endl;
   // normalizing to cross sections
-  float hltEff_prod; 
   float filterEff_prod;
-  float crossSection;
-  if (theSample==1) { hltEff_prod=1.;       filterEff_prod = 1.;      crossSection = 17000.;       }    // hltEff_prod = j/psi only 
-  if (theSample==2) { hltEff_prod=1.;       filterEff_prod = 1.;      crossSection = 2500;         }
-  if (theSample==3) { hltEff_prod=0.0345;   filterEff_prod = 0.00048; crossSection = 400000000.;   } 
-  if (theSample==4) { hltEff_prod=0.1119;   filterEff_prod = 0.0024;  crossSection = 100000000.;   } 
-  if (theSample==5) { hltEff_prod=0.2051;   filterEff_prod = 0.012;   crossSection = 1900000.;     } 
-  if (theSample==6) { hltEff_prod=1.;       filterEff_prod = 0.0080;  crossSection = 400000000.;   }
-  if (theSample==7) { hltEff_prod=0.0684;   filterEff_prod = 0.047;   crossSection = 100000000.;   }  
-  if (theSample==8) { hltEff_prod=0.12728;  filterEff_prod = 0.15;    crossSection = 1900000.;     }
-  if (theSample==9) { hltEff_prod=0.000079; filterEff_prod = 1.;      crossSection = 75280000000.; }
+  long crossSection;
+  if (theSample==1) { filterEff_prod = 0.00285;  crossSection =    13420000; }   // Jpsi7teV        13420000      0.00285 
+  if (theSample==2) { filterEff_prod = 0.00046;  crossSection =   235500000;}    // BCtoE20to30     0.2355 mb     0.00046
+  if (theSample==3) { filterEff_prod = 0.00234;  crossSection =    59300000; }   // BCtoE30to80     0.0593 mb     0.00234
+  if (theSample==4) { filterEff_prod = 0.0104 ;  crossSection =      906000;   } // BCtoE80to170    0.906e-3 mb   0.0104
+  if (theSample==5) { filterEff_prod = 0.0073 ;  crossSection =   235500000;}    // EMenrich20to30  0.2355 mb     0.0073
+  if (theSample==6) { filterEff_prod = 0.059  ;  crossSection =    59300000; }   // EMenrich30to80  0.0593 mb     0.059
+  if (theSample==7) { filterEff_prod = 0.148  ;  crossSection =      906000;   } // EMenrich80to170 0.906e-3 mb   0.148
+  if (theSample==8) { filterEff_prod = 2.3  ;    crossSection = 208000000;  }    // !!doubleem       20.8 mb  	  0.023  
+  if (theSample==9) { filterEff_prod = 1.;       crossSection = 1; }    /// nulla
+ 
+  long numEvents;
+  numEvents = goodGene; 
+  float kineEff_reco          = (double) totalReco/numEvents;
+  float kineEff_recoGt4       = (double) totalRecoGt4/numEvents;
+  float kineEff_recoGt4charge = (double) totalRecoGt4Charge/numEvents;
+  float kineEff_id            = (double) totalIdentified/numEvents;
+  float kineEff_isol          = (double) numberOfPairsOk/numEvents;
+  float kineEff_invMass       = (double) numbersOfInvMassOk/numEvents;
 
-  float numEvents;
-  if(theSample > 2) numEvents = totalTrigger/hltEff_prod; 
-  if(theSample <=2) numEvents = goodGene;
-  float kineEff_hlt           = totalTrigger/numEvents;
-  float kineEff_reco          = totalReco/numEvents;
-  float kineEff_recoGt4       = totalRecoGt4/numEvents;
-  float kineEff_recoGt4charge = totalRecoGt4Charge/numEvents;
-  float kineEff_id            = totalIdentified/numEvents;
-  float kineEff_isol          = numberOfPairsOk/numEvents;
-  float kineEff_invMass       = numbersOfInvMassOk/numEvents;
-
-  float exp_hlt            = kineEff_hlt           * filterEff_prod*crossSection;
+  float exp_hlt            = effHLT                * filterEff_prod*crossSection;
   float exp_reco           = kineEff_reco          * filterEff_prod*crossSection;
   float exp_recoGt4        = kineEff_recoGt4       * filterEff_prod*crossSection;
   float exp_recoGt4charge  = kineEff_recoGt4charge * filterEff_prod*crossSection;
   float exp_id             = kineEff_id            * filterEff_prod*crossSection;
   float exp_isol           = kineEff_isol          * filterEff_prod*crossSection;
-  float exp_okMass         = kineEff_invMass       * filterEff_prod * crossSection;
+  float exp_okMass         = kineEff_invMass       * filterEff_prod*crossSection;
   
   cout << "number of expected events in 10 pb-1: "            << endl;
   cout << "after HLT                  : " << 10.*exp_hlt      << endl; 
@@ -690,6 +708,14 @@ void finalJPsiAnalysisEle::bookHistos() {
   ScHisto_hoeHighestEt          = new TH1F("ScHisto_hoeHighestEt",          "H/E",                100, -0.1, 1.);
   ScHisto_dEtaTrHighestEt       = new TH1F("ScHisto_dEtaTrHighestEt",       "#Delta #eta",        100, 0., 0.3);
   ScHisto_dPhiTrHighestEt       = new TH1F("ScHisto_dPhiTrHighestEt",       "#Delta #phi",        100, 0., 0.3);
+
+  ScHisto_deltaRHighestEt_EB    = new TH1F("ScHisto_deltaRHighestEt_EB",       "Sc deltaR",          100, 0.,5.);
+  ScHisto_invMassHighestEt_EB   = new TH1F("ScHisto_invMassHighestEt_EB",      "Sc invariant mass",  150, 0.,6.);
+  ScHisto_deltaRHighestEt_EE    = new TH1F("ScHisto_deltaRHighestEt_EE",       "Sc deltaR",          100, 0.,5.);
+  ScHisto_invMassHighestEt_EE   = new TH1F("ScHisto_invMassHighestEt_EE",      "Sc invariant mass",  150, 0.,6.);
+  ScHisto_deltaRHighestEt_EBEE  = new TH1F("ScHisto_deltaRHighestEt_EBEE",       "Sc deltaR",          100, 0.,5.);
+  ScHisto_invMassHighestEt_EBEE = new TH1F("ScHisto_invMassHighestEt_EBEE",      "Sc invariant mass",  150, 0.,6.);
+
 
 
   ScHisto_JeneVsJeta_highestEt       = new TH2F("ScHisto_JeneVsJeta_highestEt",      "ScHisto_JeneVsJeta_highestEt",      100,  0., 2.5,    50, 5., 100.);
@@ -818,8 +844,6 @@ void finalJPsiAnalysisEle::saveHistos() {
   ScHistoGt4plus_size   -> Write();
   ScHistoGt4minus_size  -> Write();
 
-  ScHisto_invMassHighestEt      -> Write();
-
   if (signal) {
 
     HepHisto_size   -> Write();
@@ -865,6 +889,16 @@ void finalJPsiAnalysisEle::saveHistos() {
   ScHisto_hoeHighestEt      -> Write();
   ScHisto_dEtaTrHighestEt   -> Write();
   ScHisto_dPhiTrHighestEt   -> Write();
+
+  ScHisto_deltaRHighestEt_EB    -> Write();
+  ScHisto_invMassHighestEt_EB   -> Write();
+  
+  ScHisto_deltaRHighestEt_EE    -> Write();
+  ScHisto_invMassHighestEt_EE   -> Write();
+  
+  ScHisto_deltaRHighestEt_EBEE    -> Write();
+  ScHisto_invMassHighestEt_EBEE   -> Write();
+
 
 
   ScHisto_InvMassVsJene_highestEt  -> Write();         

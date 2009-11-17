@@ -90,6 +90,16 @@ private:
   TH1F *ScHisto_dEtaTrHighestEt;
   TH1F *ScHisto_dPhiTrHighestEt;
 
+  TH1F *ScHisto_deltaRHighestEt_EB;
+  TH1F *ScHisto_invMassHighestEt_EB;
+
+  TH1F *ScHisto_deltaRHighestEt_EE;  
+  TH1F *ScHisto_invMassHighestEt_EE;
+  
+  TH1F *ScHisto_deltaRHighestEt_EBEE;
+  TH1F *ScHisto_invMassHighestEt_EBEE;
+  
+
   TH2F *ScHisto_InvMassVsJene_highestEt;         
   TH2F *ScHisto_InvMassVsJet_highestEt;          
   TH2F *ScHisto_InvMassVsJeneEB_highestEt;         

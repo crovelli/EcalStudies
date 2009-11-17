@@ -1,4 +1,44 @@
-SEGNALI:
+******************************************** CMSSW_3_1_3  ********************************
+
+samples:
+   /JPsiEE/Summer09-MC_31X_V3_7TeV-v1/GEN-SIM-RECO
+   /Upsilon1StoEE/Summer09-MC_31X_V3_7TeV-v1/GEN-SIM-RECO
+   /Upsilon2StoEE/Summer09-MC_31X_V3_7TeV-v1/GEN-SIM-RECO
+   /Upsilon3StoEE/Summer09-MC_31X_V3_7TeV-v1/GEN-SIM-RECO
+   /QCD_BCtoE_Pt20to30/Summer09-MC_31X_V3_7TeV-v1/GEN-SIM-RECO
+   /QCD_BCtoE_Pt30to80/Summer09-MC_31X_V3_7TeV-v1/GEN-SIM-RECO
+   /QCD_BCtoE_Pt80to170/Summer09-MC_31X_V3_7TeV-v1/GEN-SIM-RECO
+   /QCD_EMEnriched_Pt20to30/Summer09-MC_31X_V3_7TeV-v1/GEN-SIM-RECO
+   /QCD_BCtoE_Pt30to80/Summer09-MC_31X_V3_7TeV-v1/GEN-SIM-RECO
+   /QCD_EMEnriched_Pt80to170/Summer09-MC_31X_V3_7TeV-v1/GEN-SIM-RECO
+   /QCD_EMDoubleEnriched_Pt6to20/Summer09-MC_31X_V3_7TeV_preproduction-v1/GEN -SIM-RECO
+
+
+SEGNALI  7TeV
+-------
+
+JPsi      -> /castor/cern.ch/user/a/arcidiac/CMSSW_3X_7TeV/signalJPsi/
+Upsilon3S -> /castor/cern.ch/user/a/arcidiac/CMSSW_3X_7TeV/Upsilon3S/ 
+Upsilon2S -> /castor/cern.ch/user/c/crovelli/CrabMio/JPsi/CMSSW_3X_7TeV/Upsilon2StoEE
+
+
+
+FONDI   7TeV
+-----
+
+/castor/cern.ch/user/a/arcidiac/CMSSW_3X_7TeV/EMenrich20to30/  
+/castor/cern.ch/user/a/arcidiac/CMSSW_3X_7TeV/EMenrich30to80/  
+/castor/cern.ch/user/a/arcidiac/CMSSW_3X_7TeV/EMenrich80to170/ 
+/castor/cern.ch/user/a/arcidiac/CMSSW_3X_7TeV/backBCtoE20to30/ 
+/castor/cern.ch/user/a/arcidiac/CMSSW_3X_7TeV/backBCtoE30to80/ 
+/castor/cern.ch/user/a/arcidiac/CMSSW_3X_7TeV/backBCtoE80to170/
+/castor/cern.ch/user/a/arcidiac/CMSSW_3X_7TeV/EMDoubleEnrich6to20/
+
+
+
+******************************************** CMSSW_2_2_X  ********************************
+
+ SEGNALI:
 --------
 
 1) segnale j/psi prompt:
