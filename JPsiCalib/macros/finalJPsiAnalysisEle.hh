@@ -51,6 +51,7 @@ private:
   TH1F *EleHisto_sigmaEta; 
   TH1F *EleHisto_dr03ecal; 
   TH1F *EleHisto_dr03tk;   
+  TH1F *EleHisto_dr03tkcorr;   
   TH1F *EleHisto_dr03hcal1;
   TH1F *EleHisto_dr03hcal2;
   TH1F *EleHisto_momErr;   
