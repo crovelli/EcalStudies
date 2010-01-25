@@ -236,7 +236,7 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
 		if (!isBarrel){
 		  if( fabs(dEtaAtVtxRecoEle[theEle])>0.012 ) isGood = false;
 		  if( fabs(dPhiAtVtxRecoEle[theEle])>0.06 )   isGood = false;
-		  if( fabs(EoverPRecoEle[theEle] -1)> 0.4 )   isGood = false;
+		  if( fabs((EoverPRecoEle[theEle] -1))> 0.4 )   isGood = false;
 		  //if( HoverERecoEle[theEle]>0.003 )          isGood = false;
 		  //if( sigmaEtaEtaRecoEle[theEle]>0.06 )      isGood = false;
 		  if( dr03EcalSumEtRecoEle[theEle]>12 )       isGood = false;
