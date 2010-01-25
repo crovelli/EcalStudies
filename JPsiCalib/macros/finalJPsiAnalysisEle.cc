@@ -132,7 +132,7 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
       goodGene++;
       
       // selecting HLTbit 
-      if (hltJpsi || hltUpsilon ) {
+      if (hltJpsi ) {
 	totalTrigger++;
 	
 	ScHistoEle_size -> Fill(numberOfElectrons);
@@ -206,7 +206,6 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
 	      // skipping electrons below threshold
 	      if (etRecoEle[theEle]>4) {
 
-
 		// searching for some criteria to select the two 'best' electrons (among those with Et>=4) ( analysis carried on using ECAL )	      
 		TVector3 this3P; 
 		TLorentzVector this4P;
@@ -227,18 +226,20 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
 
 		if (isBarrel){		
 		  if( fabs(dEtaAtVtxRecoEle[theEle]) > 0.012 ) isGood = false;
-		  if( fabs(dPhiAtVtxRecoEle[theEle]) > 0.1 )   isGood = false;
-		  if( HoverERecoEle[theEle]>0.003 )                    isGood = false;
-		  if( sigmaIetaIetaRecoEle[theEle]>0.022 )             isGood = false;
-		  if( dr03EcalSumEtRecoEle[theEle]>2 ) isGood = false;
+		  if( fabs(dPhiAtVtxRecoEle[theEle]) > 0.06 )   isGood = false;
+		  if( fabs(EoverPRecoEle[theEle] -1) > 0.4 )   isGood = false;
+		  ///if( HoverERecoEle[theEle]>0.003 )                    isGood = false;
+		  ///if( sigmaIetaIetaRecoEle[theEle]>0.022 )             isGood = false;
+		  if( dr03EcalSumEtRecoEle[theEle]>12 ) isGood = false;
 		}
 		
 		if (!isBarrel){
 		  if( fabs(dEtaAtVtxRecoEle[theEle])>0.012 ) isGood = false;
-		  if( fabs(dPhiAtVtxRecoEle[theEle])>0.1 )   isGood = false;
-		  if( HoverERecoEle[theEle]>0.003 )          isGood = false;
-		  if( sigmaEtaEtaRecoEle[theEle]>0.06 )      isGood = false;
-		  if( dr03EcalSumEtRecoEle[theEle]>2 )       isGood = false;
+		  if( fabs(dPhiAtVtxRecoEle[theEle])>0.06 )   isGood = false;
+		  if( fabs(EoverPRecoEle[theEle] -1)> 0.4 )   isGood = false;
+		  //if( HoverERecoEle[theEle]>0.003 )          isGood = false;
+		  //if( sigmaEtaEtaRecoEle[theEle]>0.06 )      isGood = false;
+		  if( dr03EcalSumEtRecoEle[theEle]>12 )       isGood = false;
 		}
 		
 		if (!isGood) continue;
@@ -357,19 +358,6 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
 	} // loop over electron collection
 
 
-	for(int theEle=0; theEle<numberOfElectrons; theEle++) { 
-	  if (totEleGt4plus>=1 && totEleGt4plus>=1) {
-	    // skipping problematic electrons
-	    if (pxRecoEle[theEle]>-700) {
-	      // skipping electrons below threshold
-	      if (etRecoEle[theEle]>4) {
-		;
-		
-	      } // ok Et
-	    }  // ok matching with track
-	  } // two matched electons
-	} // loop over electron collection
-
 	
 	if ( numberOfEleOkPlus>0 && numberOfEleOkMinus>0 ) totalIdentified++;
 	if ((numberOfEleOkPlus>0 && numberOfEleOkMinus>1 ) || (numberOfEleOkPlus>1 && numberOfEleOkMinus>0)) totalIdentifiedMore++;
@@ -444,16 +432,19 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
 	  // tracker isolation added here
 	  float deltaR_highestEt = highestEt_3p.DeltaR(highestEt_3e);	
 	  if (deltaR_highestEt < 0.3) {
-	    highestEt_TIso03p -= (highestEt_4e.Et()/highestEt_4p.Et());
+	    highestEt_TIso03p -= highestEt_4e.Et();
 	    if (highestEt_TIso03p < 0.) highestEt_TIso03p = 0.;
-	    highestEt_TIso03e -= (highestEt_4p.Et()/highestEt_4e.Et());
+	    highestEt_TIso03e -= highestEt_4p.Et();
 	    if (highestEt_TIso03e < 0.) highestEt_TIso03e = 0.;
 	  }
 	
-	  // BEST PAIR CUTS
-	  if (highestEt_TIso03p*highestEt_4p.Et() < 2.8 && highestEt_TIso03e*highestEt_4e.Et() < 2.8) numberOfPairsOk++;
+	  EleHisto_dr03tkcorr->Fill(highestEt_TIso03e);
+	  EleHisto_dr03tkcorr->Fill(highestEt_TIso03p);
+
+	  // BEST PAIR CUTS  it was 2.8 !!
+	  if (highestEt_TIso03p < 2 && highestEt_TIso03e < 2 ) numberOfPairsOk++;
 	
-	  if (highestEt_TIso03p*highestEt_4p.Et() < 2.8 && highestEt_TIso03e*highestEt_4e.Et() < 2.8) {
+	  if (highestEt_TIso03p < 2 && highestEt_TIso03e < 2 ) {
 	    ScHisto_etaHighestEt->Fill(highestEt_3p.Eta());
 	    ScHisto_etaHighestEt->Fill(highestEt_3e.Eta());
 	    ScHisto_phiHighestEt->Fill(highestEt_3p.Phi());
@@ -568,6 +559,8 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
   float erreffHLT = sqrt(effHLT *(1-effHLT)/goodGene);
   float effSelected    = (double) totalIdentified/totalTrigger;
   float erreffSelected = sqrt(effSelected *(1-effSelected)/totalTrigger);
+  float effSelIsol    = (double) numberOfPairsOk/totalTrigger;
+  float erreffSelIsol = sqrt(effSelIsol *(1-effSelIsol)/totalTrigger);
 
   // summary
   cout << "total number of events = "              << totalEvents     << " ALL " << AllIncluded << endl;
@@ -577,8 +570,8 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
   cout << "total number of reco & Et>4= "          << totalRecoGt4    << endl;
   cout << "total number of reco & Et>4 & charge requirement = " << totalRecoGt4Charge << endl;
   cout << "total number of reco & Et>4 & id & isol = " << totalIdentified <<  ";  eff-> " << effSelected <<"+-" << erreffSelected << endl;
-  cout << "total number of reco & ET>4 & id & full isol (tracker also) = " << numberOfPairsOk << endl;
-  cout << "total number of reco & ET>4 & id & full isol (tracker also) + invMass in 2.5 - 4 = " << numbersOfInvMassOk << endl;
+  cout << "total number of reco & ET>4 & id & full isol (tracker also) = " << numberOfPairsOk << ";  eff-> " << effSelIsol <<"+-" << erreffSelIsol << endl;
+  cout << "total number of reco & ET>4 & id & full isol (tracker also) + invMass in 2.5 - 3.7 = " << numbersOfInvMassOk << endl;
   cout << endl;
   cout << "total number of reco & matched & id, more than 2 = " << totalIdentifiedMore << endl;
   cout << endl;
@@ -622,7 +615,7 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
   cout << "after reco                 : " << 10.*exp_reco     << endl; 
   cout << "after reco + Et>4          : " << 10.*exp_recoGt4  << endl; 
   cout << "after reco + Et>4 + charge : " << 10.*exp_recoGt4charge << endl; 
-  cout << "after id                   : " << 10.*exp_id       << endl; 
+  cout << "after id + ecal isol       : " << 10.*exp_id       << endl; 
   cout << "after isolation            : " << 10.*exp_isol     << endl; 
   cout << "in the inv mass region     : " << 10.*exp_okMass   << endl; 
     
@@ -681,6 +674,7 @@ void finalJPsiAnalysisEle::bookHistos() {
   EleHisto_sigmaEta  = new  TH1F("EleHisto_sigmaEta ", " sigmaEtaEta", 300,    0., 0.5); 
   EleHisto_dr03ecal  = new  TH1F("EleHisto_dr03ecal ", " dr03ecal   ", 200,   -5.,  60); 
   EleHisto_dr03tk    = new  TH1F("EleHisto_dr03tk   ", " dr03tk     ", 200,   -5.,  60);   
+  EleHisto_dr03tkcorr= new  TH1F("EleHisto_dr03tkCorr", " dr03tk corr ", 200,   -5.,  60);   
   EleHisto_dr03hcal1 = new  TH1F("EleHisto_dr03hcal1", " dr03hcal1  ", 200,   -5.,  30);
   EleHisto_dr03hcal2 = new  TH1F("EleHisto_dr03hcal2", " dr03hcal2  ", 200,   -5.,  30);
   EleHisto_momErr    = new  TH1F("EleHisto_momErr   ", " momentum error", 500,    0., 1100.);   
@@ -710,11 +704,11 @@ void finalJPsiAnalysisEle::bookHistos() {
   ScHisto_dEtaTrHighestEt       = new TH1F("ScHisto_dEtaTrHighestEt",       "#Delta #eta",        100, 0., 0.3);
   ScHisto_dPhiTrHighestEt       = new TH1F("ScHisto_dPhiTrHighestEt",       "#Delta #phi",        100, 0., 0.3);
 
-  ScHisto_deltaRHighestEt_EB    = new TH1F("ScHisto_deltaRHighestEt_EB",       "Sc deltaR",          100, 0.,5.);
+  ScHisto_deltaRHighestEt_EB    = new TH1F("ScHisto_deltaRHighestEt_EB",       "Sc deltaR",          150, 0.,5.);
   ScHisto_invMassHighestEt_EB   = new TH1F("ScHisto_invMassHighestEt_EB",      "Sc invariant mass",  150, 0.,6.);
-  ScHisto_deltaRHighestEt_EE    = new TH1F("ScHisto_deltaRHighestEt_EE",       "Sc deltaR",          100, 0.,5.);
+  ScHisto_deltaRHighestEt_EE    = new TH1F("ScHisto_deltaRHighestEt_EE",       "Sc deltaR",          150, 0.,5.);
   ScHisto_invMassHighestEt_EE   = new TH1F("ScHisto_invMassHighestEt_EE",      "Sc invariant mass",  150, 0.,6.);
-  ScHisto_deltaRHighestEt_EBEE  = new TH1F("ScHisto_deltaRHighestEt_EBEE",       "Sc deltaR",          100, 0.,5.);
+  ScHisto_deltaRHighestEt_EBEE  = new TH1F("ScHisto_deltaRHighestEt_EBEE",       "Sc deltaR",          150, 0.,5.);
   ScHisto_invMassHighestEt_EBEE = new TH1F("ScHisto_invMassHighestEt_EBEE",      "Sc invariant mass",  150, 0.,6.);
 
 
@@ -869,6 +863,7 @@ void finalJPsiAnalysisEle::saveHistos() {
   EleHisto_sigmaEta   -> Write();
   EleHisto_dr03ecal   -> Write();
   EleHisto_dr03tk     -> Write();
+  EleHisto_dr03tkcorr -> Write();
   EleHisto_dr03hcal1  -> Write();
   EleHisto_dr03hcal2  -> Write();
   EleHisto_momErr     -> Write();
