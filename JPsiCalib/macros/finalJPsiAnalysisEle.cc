@@ -477,7 +477,7 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
 	  
 	    float mee_highestEt = (highestEt_4p + highestEt_4e).M();
 	    ScHisto_invMassHighestEt->Fill(mee_highestEt);
-	    if (mee_highestEt<4. && mee_highestEt>2.5) numbersOfInvMassOk++;
+	    if (mee_highestEt<3.7 && mee_highestEt>2.5) numbersOfInvMassOk++;
 
            // to study EB/ EE depencency: both in barrel only
             if ( fabs(highestEt_3p.Eta())<1.479 && fabs(highestEt_3e.Eta())<1.479 ){
@@ -588,16 +588,17 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
   
   // normalizing to cross sections
   float filterEff_prod;
-  long crossSection;
-  if (theSample==1) { filterEff_prod = 0.00285;  crossSection =    13420000; }   // Jpsi7teV        13420000      0.00285 
-  if (theSample==2) { filterEff_prod = 0.00046;  crossSection =   235500000;}    // BCtoE20to30     0.2355 mb     0.00046
-  if (theSample==3) { filterEff_prod = 0.00234;  crossSection =    59300000; }   // BCtoE30to80     0.0593 mb     0.00234
-  if (theSample==4) { filterEff_prod = 0.0104 ;  crossSection =      906000;   } // BCtoE80to170    0.906e-3 mb   0.0104
-  if (theSample==5) { filterEff_prod = 0.0073 ;  crossSection =   235500000;}    // EMenrich20to30  0.2355 mb     0.0073
-  if (theSample==6) { filterEff_prod = 0.059  ;  crossSection =    59300000; }   // EMenrich30to80  0.0593 mb     0.059
-  if (theSample==7) { filterEff_prod = 0.148  ;  crossSection =      906000;   } // EMenrich80to170 0.906e-3 mb   0.148
-  if (theSample==8) { filterEff_prod = 2.3  ;    crossSection = 208000000;  }    // !!doubleem       20.8 mb  	  0.023  
-  if (theSample==9) { filterEff_prod = 1.;       crossSection = 1; }    /// nulla
+  long crossSection; // in picobarn
+  if (theSample==1) { filterEff_prod = 0.00285;  crossSection =    13420000; }   // Jpsi7teV          13420000      0.00285 
+  if (theSample==2) { filterEff_prod = 0.00046;  crossSection =   235500000;}    // BCtoE20to30       0.2355 mb     0.00046
+  if (theSample==3) { filterEff_prod = 0.00234;  crossSection =    59300000;}    // BCtoE30to80       0.0593 mb     0.00234
+  if (theSample==4) { filterEff_prod = 0.0104 ;  crossSection =      906000;}    // BCtoE80to170      0.906e-3 mb   0.0104
+  if (theSample==5) { filterEff_prod = 0.0073 ;  crossSection =   235500000;}    // EMenrich20to30    0.2355 mb     0.0073
+  if (theSample==6) { filterEff_prod = 0.059  ;  crossSection =    59300000;}    // EMenrich30to80    0.0593 mb     0.059
+  if (theSample==7) { filterEff_prod = 0.148  ;  crossSection =      906000;}    // EMenrich80to170   0.906e-3 mb   0.148
+  if (theSample==8) { filterEff_prod = 2.3    ;    crossSection = 208000000;}    // !!doubleem 6-20 20.8 mb 	    0.023   
+  if (theSample==9) { filterEff_prod = 0.235  ;    crossSection = 297000000;}    // doubleem >20    0.297 mb      0.235   
+  if (theSample==10) { filterEff_prod = 0.0094  ;  crossSection = 95540;    }    // DYee 1-10        95540.       0.0094         
  
   long numEvents;
   numEvents = goodGene; 
