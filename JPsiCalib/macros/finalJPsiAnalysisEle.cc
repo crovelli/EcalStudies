@@ -50,6 +50,9 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
   long okEvent_McTruth     = 0;
   long okEvent_Highest     = 0;
 
+  bool passStep[7];    
+
+
   // to choose the best pair
   int okHighest_many      = 0;
   int okBestS9S25_many    = 0;
@@ -62,6 +65,9 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
 
   for (int jentry=0; jentry<nentries; jentry++) {
 
+    for (int i=0;i<7;i++) {
+      passStep[i]= false;
+    }
     Long64_t ientry = LoadTree(jentry);
     if (ientry < 0) break;
     fChain->GetEntry(jentry);
@@ -86,7 +92,7 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
     float maxPtGen = 0.;
     float minPtGen = 0.;
     
-    HepHisto_ptHat->Fill(pthat); 
+    HepHisto_ptHatAll->Fill(pthat); 
     /// if it is signal sample
     if (signal) {
       
@@ -135,23 +141,44 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
       if (hltJpsi ) {
 	totalTrigger++;
 	
+	passStep[0] = true;
 	ScHistoEle_size -> Fill(numberOfElectrons);
 	
 	// few numbers: all electrons
-	if (numberOfElectrons>1) totalReco++;
+	if (numberOfElectrons>1) {
+	  totalReco++;
+	  passStep[1] = true;
+	}
 
 	// few numbers: all electrons, Et > 4
+	TLorentzVector this4P1e, this4P2e;	
 	for(int theEle=0; theEle<numberOfElectrons; theEle++) { 
 	  if (etRecoEle[theEle]>4) totEleGt4++;
-	  if (etRecoEle[theEle]>4 && chargeRecoEle[theEle]>0) totEleGt4plus++;
-	  if (etRecoEle[theEle]>4 && chargeRecoEle[theEle]<0) totEleGt4minus++;
+	  if (etRecoEle[theEle]>4 && chargeRecoEle[theEle]>0) {
+	    totEleGt4plus++;
+	    this4P1e.SetPxPyPzE(pxRecoEle[theEle], pyRecoEle[theEle], pzRecoEle[theEle], eneRecoEle[theEle]);
+	  }
+	  if (etRecoEle[theEle]>4 && chargeRecoEle[theEle]<0) {
+	    totEleGt4minus++;
+	    this4P2e.SetPxPyPzE(pxRecoEle[theEle], pyRecoEle[theEle], pzRecoEle[theEle], eneRecoEle[theEle]);
+	  }
 	}
 	ScHistoGt4_size -> Fill(totEleGt4);
 	if(totEleGt4plus>=1)  ScHistoGt4plus_size  -> Fill(totEleGt4plus);
 	if(totEleGt4minus>=1) ScHistoGt4minus_size -> Fill(totEleGt4minus);
-	if(totEleGt4>1) totalRecoGt4++;
-	if(totEleGt4plus>=1 && totEleGt4minus>=1) totalRecoGt4Charge++;
-	
+	if(totEleGt4>1) {
+	  totalRecoGt4++;
+	  passStep[2] = true;
+	}
+	if(totEleGt4plus>=1 && totEleGt4minus>=1) {
+	  totalRecoGt4Charge++;
+	  passStep[3] = true;
+	  float mee_highestEt = (this4P1e + this4P2e).M();
+	  ScHisto_invMassHighestEt[3]->Fill(mee_highestEt);
+	}
+
+
+
 	// --------------------------------------------------------------------------------
 	// 2) loop to decide which criteria to apply to select the electron if more than 1 is reconstructed	
 	TVector3 closerToMc3p,  highestEt_3p, bestS9S25_3p, bestSEE_3p, bestDeta_3p;
@@ -196,6 +223,8 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
 	
 	int numberOfEleOkPlus   = 0;
 	int numberOfEleOkMinus  = 0;
+
+
 	for(int theEle=0; theEle<numberOfElectrons; theEle++) { 
 	  
 	  if (totEleGt4plus>=1 && totEleGt4plus>=1) {
@@ -230,7 +259,7 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
 		  if( fabs(EoverPRecoEle[theEle] -1) > 0.4 )   isGood = false;
 		  ///if( HoverERecoEle[theEle]>0.003 )                    isGood = false;
 		  ///if( sigmaIetaIetaRecoEle[theEle]>0.022 )             isGood = false;
-		  if( dr03EcalSumEtRecoEle[theEle]>12 ) isGood = false;
+		  if( dr03EcalSumEtRecoEle[theEle]>11) isGood = false;
 		}
 		
 		if (!isBarrel){
@@ -239,7 +268,7 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
 		  if( fabs((EoverPRecoEle[theEle] -1))> 0.4 )   isGood = false;
 		  //if( HoverERecoEle[theEle]>0.003 )          isGood = false;
 		  //if( sigmaEtaEtaRecoEle[theEle]>0.06 )      isGood = false;
-		  if( dr03EcalSumEtRecoEle[theEle]>12 )       isGood = false;
+		  if( dr03EcalSumEtRecoEle[theEle]>11 )       isGood = false;
 		}
 		
 		if (!isGood) continue;
@@ -359,7 +388,10 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
 
 
 	
-	if ( numberOfEleOkPlus>0 && numberOfEleOkMinus>0 ) totalIdentified++;
+	if ( numberOfEleOkPlus>0 && numberOfEleOkMinus>0 ) {
+	  totalIdentified++;	  
+	  passStep[4] = true;
+	}
 	if ((numberOfEleOkPlus>0 && numberOfEleOkMinus>1 ) || (numberOfEleOkPlus>1 && numberOfEleOkMinus>0)) totalIdentifiedMore++;
 	
 	
@@ -428,6 +460,10 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
       
 	// to compare the distributions: use the two highest Et electrons
 	if (numberOfEleOkPlus>=1 && numberOfEleOkMinus>=1) {  
+
+	  float mee_highestEt = (highestEt_4p + highestEt_4e).M();
+	  ScHisto_invMassHighestEt[4]->Fill(mee_highestEt);
+
 	
 	  // tracker isolation added here
 	  float deltaR_highestEt = highestEt_3p.DeltaR(highestEt_3e);	
@@ -442,9 +478,10 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
 	  EleHisto_dr03tkcorr->Fill(highestEt_TIso03p);
 
 	  // BEST PAIR CUTS  it was 2.8 !!
-	  if (highestEt_TIso03p < 2 && highestEt_TIso03e < 2 ) numberOfPairsOk++;
-	
 	  if (highestEt_TIso03p < 2 && highestEt_TIso03e < 2 ) {
+	    numberOfPairsOk++;
+	    passStep[5] = true;
+	    
 	    ScHisto_etaHighestEt->Fill(highestEt_3p.Eta());
 	    ScHisto_etaHighestEt->Fill(highestEt_3e.Eta());
 	    ScHisto_phiHighestEt->Fill(highestEt_3p.Phi());
@@ -462,33 +499,36 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
 	    }
 	    ScHisto_maxEtHighestEt->Fill(maxEt_highestEt);
 	    ScHisto_minEtHighestEt->Fill(minEt_highestEt);
-	  
+	    
 	    float deltaR_highestEt = highestEt_3p.DeltaR(highestEt_3e);
 	    ScHisto_deltaRHighestEt->Fill(deltaR_highestEt);	
-	  
-	    float mee_highestEt = (highestEt_4p + highestEt_4e).M();
-	    ScHisto_invMassHighestEt->Fill(mee_highestEt);
-	    if (mee_highestEt<3.7 && mee_highestEt>2.5) numbersOfInvMassOk++;
-
-           // to study EB/ EE depencency: both in barrel only
+	    
+	    //  float mee_highestEt = (highestEt_4p + highestEt_4e).M();
+	    ScHisto_invMassHighestEt[5]->Fill(mee_highestEt);
+	    
+	    if (mee_highestEt<3.7 && mee_highestEt>2.5) {
+	      numbersOfInvMassOk++;
+	      passStep[6] = true;
+	    }
+	    // to study EB/ EE depencency: both in barrel only
             if ( fabs(highestEt_3p.Eta())<1.479 && fabs(highestEt_3e.Eta())<1.479 ){
               ScHisto_deltaRHighestEt_EB  -> Fill(deltaR_highestEt);
               ScHisto_invMassHighestEt_EB -> Fill(mee_highestEt);
             }
-
+	    
             // both in endcap only
             if ( fabs(highestEt_3p.Eta())>1.479 && fabs(highestEt_3e.Eta())>1.479 ){
               ScHisto_deltaRHighestEt_EE  -> Fill(deltaR_highestEt);
               ScHisto_invMassHighestEt_EE -> Fill(mee_highestEt);
             }
-
+	    
             // one and one
             if (  (fabs(highestEt_3p.Eta())<1.479 && fabs(highestEt_3e.Eta())>1.479) || (fabs(highestEt_3e.Eta())<1.479 && fabs(highestEt_3p.Eta())>1.479) ) {
               ScHisto_deltaRHighestEt_EBEE       -> Fill(deltaR_highestEt);
               ScHisto_invMassHighestEt_EBEE      -> Fill(mee_highestEt);
             }
-	  
-	  
+	    
+	    
 	    // study of possible biases for signal
 	    if (signal) {    
 	      float jpsi_ene = (highestEt_4p + highestEt_4e).E();	  
@@ -496,7 +536,7 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
 	      float jpsi_eta = (highestEt_4p + highestEt_4e).Eta();	  
 	      float jpsi_phi = (highestEt_4p + highestEt_4e).Phi();	  
 	      float deltaR   =  highestEt_4p.DeltaR(highestEt_4e);
-	    
+	      
 	      ScHisto_JeneVsJeta_highestEt      -> Fill(jpsi_eta, jpsi_ene);
 	      ScHisto_JetVsJeta_highestEt       -> Fill(jpsi_eta, jpsi_et);
 	      ScHisto_InvMassVsJeta_highestEt   -> Fill(jpsi_eta, mee_highestEt);                
@@ -510,7 +550,7 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
 	      if (fabs(jpsi_eta)>1.5) ScHisto_InvMassVsJetEE_highestEt  -> Fill(jpsi_et,  mee_highestEt);        
 	    }
 	  
-	  } // ok best pair
+	  } // ok best pair with Tracker isol
 	} // ok matched
       
 	// plots with all combinatorics
@@ -539,7 +579,14 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
 	  }
 	}
       } // ok HLT
-    } // ok generated    
+    } // ok generated   
+
+    /// filling Histograms per steps
+    for (int i=0;i<7;i++) {
+      if( passStep[i] ) HepHisto_ptHat[i]->Fill(pthat);
+    } 
+
+
   } // loop over entries
   
   
@@ -654,7 +701,16 @@ void finalJPsiAnalysisEle::bookHistos() {
   ScHistoGt4minus_size = new TH1F("ScHistoGt4minus_size", "Num of electrons (-) with Et>4", 10, 0,10);
 
   HepHisto_size    = new TH1F("HepHisto_size",    "Num of GenElectrons ",  10, 0,  10 );
-  HepHisto_ptHat   = new TH1F("HepHisto_ptHat",   "Pt hat distributions", 800, 0, 200.);
+  HepHisto_ptHatAll = new TH1F("HepHisto_ptHatAll",   "Pt hat distributions",  800, 0., 170.);
+
+  for (int i=0;i<7;i++) {
+    ostringstream name;
+    name << "HepHisto_ptHat" << i + 1;
+    string strname = name.str();
+    TH1F *ScHisto_ptHattmp = new TH1F( strname.c_str(),   "Pt hat distributions",  800, 0., 170.);
+    HepHisto_ptHat.push_back(ScHisto_ptHattmp);
+  }
+
   HepHisto_deltaR  = new TH1F("HepHisto_deltaR",  "GenElectrons deltaR ", 200, 0.,  2.);
   HepHisto_maxPt   = new TH1F("HepHisto_maxPt",   "GenElectrons max pt ", 200, 0., 20.);
   HepHisto_minPt   = new TH1F("HepHisto_minPt",   "GenElectrons min pt ", 200, 0., 20.);
@@ -697,7 +753,17 @@ void finalJPsiAnalysisEle::bookHistos() {
   ScHisto_maxEtHighestEt        = new TH1F("ScHisto_maxEtHighestEt",        "Sc max Et",           50, 0.,20.);
   ScHisto_minEtHighestEt        = new TH1F("ScHisto_minEtHighestEt",        "Sc min Et",           50, 0.,20.);
   ScHisto_deltaRHighestEt       = new TH1F("ScHisto_deltaRHighestEt",       "Sc deltaR",          100, 0.,5.);   
-  ScHisto_invMassHighestEt      = new TH1F("ScHisto_invMassHighestEt",      "Sc invariant mass",  150, 0.,6.);   
+
+  //  ScHisto_invMassHighestEt      = new TH1F("ScHisto_invMassHighestEt",      "Sc invariant mass",  150, 0.,6.);   
+
+  for (int i=0;i<6;i++) {
+    ostringstream name;
+    name << "ScHisto_invMassHighestEt" << i+1 ;
+    string strname = name.str();
+    TH1F *ScHistotmp = new TH1F( strname.c_str(),    "Sc invariant mass",  150, 0.,6.); 
+    ScHisto_invMassHighestEt.push_back(ScHistotmp);
+  }
+
   ScHisto_s9s25HighestEt        = new TH1F("ScHisto_s9s25HighestEt",        "S9/S25",             100, 0.,1.);   
   ScHisto_sEEHighestEt          = new TH1F("ScHisto_sEEHighestEt",          "#sigma_{#eta #eta}", 100, 0.,0.1);  
   ScHisto_hoeHighestEt          = new TH1F("ScHisto_hoeHighestEt",          "H/E",                100, -0.1, 1.);
@@ -776,7 +842,7 @@ void finalJPsiAnalysisEle::drawPlots() {
   ScHisto_maxEtHighestEt        -> Draw();  c.Print("scMaxEt.eps");
   ScHisto_minEtHighestEt        -> Draw();  c.Print("scMinEt.eps");
   ScHisto_deltaRHighestEt       -> Draw();  c.Print("scDeltaR.eps");
-  ScHisto_invMassHighestEt      -> Draw();  c.Print("scInvMass.eps");
+  //ScHisto_invMassHighestEt      -> Draw();  c.Print("scInvMass.eps");
   ScHisto_s9s25HighestEt        -> Draw();  c.Print("scS9S25.eps");
   ScHisto_sEEHighestEt          -> Draw();  c.Print("scSee.eps");
   c.SetLogy(1);
@@ -839,10 +905,14 @@ void finalJPsiAnalysisEle::saveHistos() {
   ScHistoGt4plus_size   -> Write();
   ScHistoGt4minus_size  -> Write();
 
+  HepHisto_ptHatAll   -> Write();
+  for (int i=0;i<7;i++)   {
+    HepHisto_ptHat[i] -> Write();
+  }
+
   if (signal) {
 
     HepHisto_size   -> Write();
-    HepHisto_ptHat   -> Write();
     HepHisto_deltaR   -> Write();
     HepHisto_maxPt    -> Write();
     HepHisto_minPt    -> Write();
@@ -879,7 +949,9 @@ void finalJPsiAnalysisEle::saveHistos() {
   ScHisto_maxEtHighestEt    -> Write();
   ScHisto_minEtHighestEt    -> Write();
   ScHisto_deltaRHighestEt   -> Write();
-  ScHisto_invMassHighestEt  -> Write();
+  for (int i=0;i<6;i++)   {
+    ScHisto_invMassHighestEt[i]-> Write();
+  }
   ScHisto_s9s25HighestEt    -> Write();
   ScHisto_sEEHighestEt      -> Write();
   ScHisto_hoeHighestEt      -> Write();

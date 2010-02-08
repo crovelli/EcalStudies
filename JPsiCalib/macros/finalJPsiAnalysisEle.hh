@@ -31,7 +31,8 @@ private:
   TH1F *ScHistoGt4minus_size;
 
   TH1F *HepHisto_size;
-  TH1F *HepHisto_ptHat;
+  std::vector<TH1F*> HepHisto_ptHat;
+  TH1F *HepHisto_ptHatAll;
   TH1F *HepHisto_deltaR;
   TH1F *HepHisto_maxPt;
   TH1F *HepHisto_minPt;
@@ -82,7 +83,8 @@ private:
   TH1F *ScHisto_maxEtHighestEt;        
   TH1F *ScHisto_minEtHighestEt;        
   TH1F *ScHisto_deltaRHighestEt;       
-  TH1F *ScHisto_invMassHighestEt;      
+  std::vector<TH1F*> ScHisto_invMassHighestEt;
+      
   TH1F *ScHisto_s9s25HighestEt;        
   TH1F *ScHisto_sEEHighestEt;          
   TH1F *ScHisto_hcalIsolHighestEt;     
