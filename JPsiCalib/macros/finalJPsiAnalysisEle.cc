@@ -151,18 +151,30 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
 	}
 
 	// few numbers: all electrons, Et > 4
-	TLorentzVector this4P1e, this4P2e;	
+	TLorentzVector tmp;
+	std::vector<TLorentzVector> this4Pe, this4Pp;	
 	for(int theEle=0; theEle<numberOfElectrons; theEle++) { 
 	  if (etRecoEle[theEle]>4) totEleGt4++;
 	  if (etRecoEle[theEle]>4 && chargeRecoEle[theEle]>0) {
 	    totEleGt4plus++;
-	    this4P1e.SetPxPyPzE(pxRecoEle[theEle], pyRecoEle[theEle], pzRecoEle[theEle], eneRecoEle[theEle]);
+	    tmp.SetPxPyPzE(pxRecoEle[theEle], pyRecoEle[theEle], pzRecoEle[theEle], eneRecoEle[theEle]);
+	    this4Pp.push_back(tmp);
 	  }
 	  if (etRecoEle[theEle]>4 && chargeRecoEle[theEle]<0) {
 	    totEleGt4minus++;
-	    this4P2e.SetPxPyPzE(pxRecoEle[theEle], pyRecoEle[theEle], pzRecoEle[theEle], eneRecoEle[theEle]);
+	    tmp.SetPxPyPzE(pxRecoEle[theEle], pyRecoEle[theEle], pzRecoEle[theEle], eneRecoEle[theEle]);
+	    this4Pe.push_back(tmp);
 	  }
 	}
+	/// Fill invMassplot with combinatorial mee
+	for(int l=0;l<this4Pe.size();l++) {
+	  for(int m=0;m<this4Pp.size();m++) {
+	    //cout << l << " "  << m << this4Pe.size() << " " << this4Pp.size() <<  endl;
+	    float mee_comb = (this4Pe[l] + this4Pp[m]).M();
+	    ScHisto_invMassHighestEt[3]->Fill(mee_comb);
+	  }
+	}
+
 	ScHistoGt4_size -> Fill(totEleGt4);
 	if(totEleGt4plus>=1)  ScHistoGt4plus_size  -> Fill(totEleGt4plus);
 	if(totEleGt4minus>=1) ScHistoGt4minus_size -> Fill(totEleGt4minus);
@@ -173,8 +185,6 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
 	if(totEleGt4plus>=1 && totEleGt4minus>=1) {
 	  totalRecoGt4Charge++;
 	  passStep[3] = true;
-	  float mee_highestEt = (this4P1e + this4P2e).M();
-	  ScHisto_invMassHighestEt[3]->Fill(mee_highestEt);
 	}
 
 
