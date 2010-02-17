@@ -714,10 +714,12 @@ void finalJPsiAnalysisEle::bookHistos() {
   HepHisto_ptHatAll = new TH1F("HepHisto_ptHatAll",   "Pt hat distributions",  800, 0., 170.);
 
   for (int i=0;i<7;i++) {
-    ostringstream name;
+    ostringstream name,legend;
     name << "HepHisto_ptHat" << i + 1;
+    legend << "PtHat - step" << i + 1;
     string strname = name.str();
-    TH1F *ScHisto_ptHattmp = new TH1F( strname.c_str(),   "Pt hat distributions",  800, 0., 170.);
+    string strleg = legend.str();
+    TH1F *ScHisto_ptHattmp = new TH1F( strname.c_str(),  strleg.c_str(),  800, 0., 170.);
     HepHisto_ptHat.push_back(ScHisto_ptHattmp);
   }
 
