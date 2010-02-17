@@ -15,7 +15,8 @@
 
 #include "myFunctions.cc"
 
-#define NDATA 9
+#define NDATA 4
+
 // vectors to be used in the following
 TFile *file[NDATA];
 float expected[NDATA];
@@ -35,6 +36,18 @@ TH1F *ScHisto_invMassHighestEt_EE_normL[NDATA];
 TH1F *ScHisto_invMassHighestEt_EBEE_normL[NDATA];
 TH1F *ScHisto_invMassHighestEt_normL_all;
 
+TH1F *EleHisto_detaVtx[NDATA];
+TH1F *EleHisto_dphiVtx[NDATA];
+TH1F *EleHisto_EoP[NDATA];
+TH1F *EleHisto_dr03ecal[NDATA];
+TH1F *EleHisto_dr03tkCorr[NDATA];
+TH1F *EleHisto_detaVtx_normL[NDATA];
+TH1F *EleHisto_dphiVtx_normL[NDATA];
+TH1F *EleHisto_EoP_normL[NDATA];
+TH1F *EleHisto_dr03ecal_normL[NDATA];
+TH1F *EleHisto_dr03tkCorr_normL[NDATA];
+
+
 void chargeFiles() {
   file[0] = new TFile("Outfile_Jpsi.root");
   file[1] = new TFile("Outfile_bce2030.root");
@@ -47,6 +60,13 @@ void chargeFiles() {
   file[8] = new TFile("Outfile_DYee.root");
 }
 
+void chargeFilesMB() {
+  file[0] = new TFile("Outfile_Jpsi.root");
+  file[1] = new TFile("Outfile_doubleEM6to20.root");
+  file[2] = new TFile("Outfile_doubleEMgt20.root");
+  file[3] = new TFile("Outfile_DYee.root");
+}
+
 void setExpected(int theStep) {
 
   float lumi = 1.;   // pb-1   !! number are already related to 10pb-1
@@ -55,81 +75,114 @@ void setExpected(int theStep) {
   // cout << "after HLT  : " << 10.*exp_hlt      << endl; 
   
   if (theStep==1) {     // after HLT only
-    expected[0] =  9411.04*lumi;
-    expected[1] =  160481.*lumi;
-    expected[2] =  205563.*lumi;
-    expected[3] =  36137.3*lumi;
-    expected[4] =  733553.*lumi;
-    expected[5] =  3746500.*lumi;
-    expected[6] =  381960.*lumi;
-    expected[7] =  4784730.*lumi;
-    expected[8] =  99.3*lumi;
+    expected[0] =  *lumi;
+    expected[1] =  *lumi;
+    expected[2] =  *lumi;
+    expected[3] =  *lumi;
+    expected[4] =  *lumi;
+    expected[5] =  *lumi;
+    expected[6] =  *lumi;
+    expected[7] =  *lumi;
+    expected[8] =  *lumi;
   }
   
   if (theStep==2) {     // after HLT + reco
-    expected[0] = 8192.73*lumi;
-    expected[1] = 73696.3*lumi;
-    expected[2] = 94399.1*lumi;
-    expected[3] = 20059.1*lumi;
-    expected[4] = 102448.*lumi;
-    expected[5] = 785246.*lumi;
-    expected[6] = 120682.*lumi;
-    expected[7] = 317219.*lumi;
-    expected[8] =  89.2*lumi;
+    expected[0] = *lumi;
+    expected[1] = *lumi;
+    expected[2] = *lumi;
+    expected[3] = *lumi;
+    expected[4] = *lumi;
+    expected[5] = *lumi;
+    expected[6] = *lumi;
+    expected[7] = *lumi;
+    expected[8] = *lumi;
   }
 
   if (theStep==3) {     // after HLT + reco + Et>4 
-    expected[0] = 8006.41*lumi;
-    expected[1] = 61305.3*lumi;
-    expected[2] = 78527.2*lumi;
-    expected[3] = 16578.6*lumi;
-    expected[4] = 68837.1*lumi;
-    expected[5] = 557055.*lumi;
-    expected[6] = 85397.*lumi;
-    expected[7] = 204871.*lumi;
-    expected[8] = 88.09*lumi;
+    expected[0] = *lumi;
+    expected[1] = *lumi;
+    expected[2] = *lumi;
+    expected[3] = *lumi;
+    expected[4] = *lumi;
+    expected[5] = *lumi;
+    expected[6] = *lumi;
+    expected[7] = *lumi;
+    expected[8] = *lumi;
   }
 
   if (theStep==4) {     // after HLT + reco + Et>4 + charge 
-    expected[0] = 7831.54*lumi;
-    expected[1] = 38579.5*lumi;
-    expected[2] = 49417.2*lumi;
-    expected[3] = 10395.7*lumi;
-    expected[4] = 42469*lumi;
-    expected[5] = 327059*lumi; 
-    expected[6] = 50312.9*lumi; 
-    expected[7] = 126510*lumi;
-    expected[8] = 86.6*lumi;
+    expected[0] = 7808*lumi;
+    expected[1] =  7251.*lumi;
+    expected[2] = 46979.8*lumi;
+    expected[3] =  9749.7*lumi;
+    expected[4] = 41525.*lumi;
+    expected[5] = 314940 *lumi; 
+    expected[6] =  46827.*lumi; 
+    expected[7] = 112821*lumi;
+    expected[8] = 39.8*lumi;
   }
 
   if (theStep==5) {     // after HLT + reco + Et>4 + charge + eleID 
-    expected[0] = 3769.58*lumi;
-    expected[1] = 1002.55*lumi;
-    expected[2] = 1284.1*lumi;
-    expected[3] = 58.98*lumi;
-    expected[4] = 3216.6*lumi;
-    expected[5] = 5860.14*lumi;
-    expected[6] = 295.439*lumi;
-    expected[7] = 23130.6*lumi;
-    expected[8] =  70.88*lumi;
+    expected[0] = 5048*lumi;
+    expected[1] = 2234*lumi;
+    expected[2] = 8590.*lumi;
+    expected[3] = 864.*lumi;
+    expected[4] = 4856*lumi;
+    expected[5] = 25530*lumi;
+    expected[6] =  2517*lumi;
+    expected[7] = 38236*lumi;
+    expected[8] = 29*lumi;
   }
 
-  if (theStep==6) {     // after HLT + reco + Et>4 + charge + eleID + isol 
-    expected[0] = 2350.*lumi;
-    expected[1] =  55.9*lumi;
-    expected[2] =  71.6*lumi;
-    expected[3] =  2.73*lumi;
-    expected[4] = 547.0*lumi;
-    expected[5] = 582.28*lumi;
-    expected[6] = 25.97*lumi;
-    expected[7] = 5192.9*lumi; 
-    expected[8] =  57.97*lumi;
+  if (theStep==6) {     // after HLT + reco + Et>4 + charge + eleID + tk isol 
+    expected[0] = 4431.76*lumi;
+    expected[1] = 585.8*lumi;
+    expected[2] = 835  *lumi;
+    expected[3] = 29.1 *lumi;
+    expected[4] = 1508.*lumi;
+    expected[5] = 3077 *lumi;
+    expected[6] = 155.8*lumi;
+    expected[7] = 15105*lumi; 
+    expected[8] = 26.6 *lumi;
   }
 }
 
-void readHistos() {
+void setExpectedMB(int theStep) {
+
+  float lumi = 1.;   // pb-1   !! number are already related to 10pb-1
+  
+  // float exp_         =           kineEff  * filterEff_prod*crossSection;
+  // cout << "after HLT  : " << 10.*exp_hlt      << endl; 
+  
+
+  if (theStep==4) {     // after HLT + reco + Et>4 + charge 
+    expected[0] = 7808*lumi;
+    expected[1] = 112821*lumi;
+    expected[2] = 1363340*lumi; 
+    expected[3] = 39.8*lumi;
+  }
+
+  if (theStep==5) {     // after HLT + reco + Et>4 + charge + eleID 
+    expected[0] = 5048*lumi;
+    expected[1] = 38236*lumi;
+    expected[2] = 174937 *lumi; 
+    expected[3] = 29*lumi;
+  }
+
+  if (theStep==6) {     // after HLT + reco + Et>4 + charge + eleID + isol 
+    expected[0] = 4431.76*lumi;
+    expected[1] = 15105*lumi; 
+    expected[2] = 24926 *lumi; 
+    expected[3] = 26.6 *lumi;
+  }
+}
+
+void readHistos(int theStep) {
   for(int ifile=0; ifile<NDATA; ifile++){
-    ScHisto_invMassHighestEt[ifile]      = (TH1F*)file[ifile]->Get("ScHisto_invMassHighestEt");
+    ostringstream name;
+    name << "ScHisto_invMassHighestEt" << theStep ;
+    string strname = name.str();
+    ScHisto_invMassHighestEt[ifile]      = (TH1F*)file[ifile]->Get(strname.c_str());
     ScHisto_invMassHighestEt_EB[ifile]   = (TH1F*)file[ifile]->Get("ScHisto_invMassHighestEt_EB");
     ScHisto_invMassHighestEt_EE[ifile]   = (TH1F*)file[ifile]->Get("ScHisto_invMassHighestEt_EE");
     ScHisto_invMassHighestEt_EBEE[ifile] = (TH1F*)file[ifile]->Get("ScHisto_invMassHighestEt_EBEE");
@@ -193,13 +246,9 @@ void normalizeToL() {
 void addStoB() {
 
   ScHisto_invMassHighestEt_normL_all = (TH1F*)ScHisto_invMassHighestEt_normL[0]->Clone("ScHisto_invMassHighestEt_normL_all");
-  ScHisto_invMassHighestEt_normL_all -> Add(ScHisto_invMassHighestEt_normL[1]);
-  ScHisto_invMassHighestEt_normL_all -> Add(ScHisto_invMassHighestEt_normL[2]);
-  ScHisto_invMassHighestEt_normL_all -> Add(ScHisto_invMassHighestEt_normL[3]);
-  ScHisto_invMassHighestEt_normL_all -> Add(ScHisto_invMassHighestEt_normL[4]);
-  ScHisto_invMassHighestEt_normL_all -> Add(ScHisto_invMassHighestEt_normL[5]);
-  ScHisto_invMassHighestEt_normL_all -> Add(ScHisto_invMassHighestEt_normL[6]);
-  ScHisto_invMassHighestEt_normL_all -> Add(ScHisto_invMassHighestEt_normL[7]);
+  for(int ifile=1; ifile<NDATA; ifile++){
+    ScHisto_invMassHighestEt_normL_all -> Add(ScHisto_invMassHighestEt_normL[ifile]);
+  }
 }
 
 void cosmeticsSvsB() {
@@ -236,7 +285,7 @@ void drawSvsB(int theStep) {
 
   chargeFiles();
   setExpected(theStep);
-  readHistos();
+  readHistos(theStep);
   normalizeTo1();
   normalizeToL();
   addStoB();
@@ -254,7 +303,7 @@ void drawSvsB(int theStep) {
   tesiStyle->SetFrameBorderMode(0);
   tesiStyle->cd();
 
-  TLegend leg(0.7,0.8,0.85,0.92);
+  TLegend leg(0.7,0.8,0.89,0.99);
   leg.AddEntry(ScHisto_invMassHighestEt_normL[0], "Jpsi prompt signal",  "f");
   leg.AddEntry(ScHisto_invMassHighestEt_normL[1], "bc->e, 20-30"      ,  "f");
   leg.AddEntry(ScHisto_invMassHighestEt_normL[2], "bc->e, 30-80"      ,  "f");
@@ -266,6 +315,8 @@ void drawSvsB(int theStep) {
   leg.AddEntry(ScHisto_invMassHighestEt_normL[8], "DYee  1-10 GeV     ", "f");
   leg.SetFillColor(0);
   leg.SetBorderSize(0.4);
+  leg.SetTextSize(0.03);
+  leg.SetMargin(0.35);
 
   TCanvas c1("c1","all",1);  
   ScHisto_invMassHighestEt_normL[0]->Draw();
@@ -315,12 +366,172 @@ void drawSvsB(int theStep) {
 
 }
 
+// analysis: S vs B for MinBias samples
+void drawSvsB_MB(int theStep) {
+
+  chargeFilesMB();
+  setExpectedMB(theStep);
+  readHistos(theStep);
+  normalizeTo1();
+  normalizeToL();
+  addStoB();
+  cosmeticsSvsB();
+
+  TStyle *tesiStyle = new TStyle("tesiStyle","");
+  tesiStyle->SetCanvasColor(0);
+  tesiStyle->SetFrameFillColor(0);
+  tesiStyle->SetStatColor(0);
+  tesiStyle->SetOptStat(000);
+  tesiStyle->SetOptFit(0011);
+  tesiStyle->SetTitleFillColor(0);
+  tesiStyle->SetCanvasBorderMode(0);
+  tesiStyle->SetPadBorderMode(0);
+  tesiStyle->SetFrameBorderMode(0);
+  tesiStyle->cd();
+
+  TLegend leg(0.7,0.8,0.85,0.92);
+  leg.AddEntry(ScHisto_invMassHighestEt_normL[0], "Jpsi prompt signal",  "f");
+  leg.AddEntry(ScHisto_invMassHighestEt_normL[1], "double em.enr  6-20", "f");
+  leg.AddEntry(ScHisto_invMassHighestEt_normL[2], "double em.enr  > 20", "f");
+  leg.AddEntry(ScHisto_invMassHighestEt_normL[3], "DYee  1-10 GeV     ", "f");
+  leg.SetFillColor(0);
+  leg.SetBorderSize(0.4);
+  
+
+  // summing up backgrounds and signals
+  THStack staB_invMassHighestEt("staB_invMassHighestEt","staB_invMassHighestEt");
+  for (int ii=1; ii<4; ii++) {
+    staB_invMassHighestEt.Add(ScHisto_invMassHighestEt_normL[ii]);
+  }
+  THStack staS_invMassHighestEt("staS_invMassHighestEt","staS_invMassHighestEt");
+  for (int ii=0; ii<1; ii++) {
+    staS_invMassHighestEt.Add(ScHisto_invMassHighestEt_normL[ii]);
+  }
+  TCanvas c31("c31","all",1);  
+  staB_invMassHighestEt.Draw();
+  staS_invMassHighestEt.Draw("same");
+  leg.Draw();
+  c31.SaveAs("stackMB.eps");
+  c31.SaveAs("stackMB.root");
+
+  THStack staA_invMassHighestEt("staA_invMassHighestEt","staA_invMassHighestEt");
+  //staA_invMassHighestEt.Add(ScHisto_invMassHighestEt_normL[3]);
+  for (int ii=0; ii<4; ii++) {
+    staA_invMassHighestEt.Add(ScHisto_invMassHighestEt_normL[ii]);
+  }
+  TCanvas c32("c32","all",1);  
+  staA_invMassHighestEt.Draw();
+  leg.Draw();
+  c32.SaveAs("SandBMB.root");
+
+}
+
+// analysis: S vs B for MinBias samples
+void drawCuts() {
+
+  chargeFiles();
+  setExpected(4);
+
+  TH1F *EleHisto_detaVtx_normL[NDATA];
+  TH1F *EleHisto_dphiVtx_normL[NDATA];
+  TH1F *EleHisto_EoP_normL[NDATA];
+  TH1F *EleHisto_dr03ecal_normL[NDATA];
+  TH1F *EleHisto_dr03tkCorr_normL[NDATA];
+
+  for(int ifile=0; ifile<NDATA; ifile++){
+    EleHisto_detaVtx[ifile]      = (TH1F*)file[ifile]->Get("EleHisto_detaVtx");
+    EleHisto_dphiVtx[ifile]      = (TH1F*)file[ifile]->Get("EleHisto_dphiVtx");
+    EleHisto_EoP[ifile]          = (TH1F*)file[ifile]->Get("EleHisto_EoP");
+    EleHisto_dr03ecal[ifile]     = (TH1F*)file[ifile]->Get("EleHisto_dr03ecal");
+    EleHisto_dr03tkCorr[ifile]    = (TH1F*)file[ifile]->Get("EleHisto_dr03tkCorr");
+  }
+  char title[500];
+  for(int ifile=0; ifile<NDATA; ifile++){
+    sprintf(title,"EleHisto_detaVtx_normL[%d]", ifile);
+    EleHisto_detaVtx_normL[ifile] = (TH1F*)EleHisto_detaVtx[ifile] -> Clone(title);
+    sprintf(title,"EleHisto_dphiVtx_normL[%d]", ifile);
+    EleHisto_dphiVtx_normL[ifile] = (TH1F*)EleHisto_dphiVtx[ifile] -> Clone(title);
+    sprintf(title,"EleHisto_EoP_normL[%d]", ifile);
+    EleHisto_EoP_normL[ifile] = (TH1F*)EleHisto_EoP[ifile] -> Clone(title);
+    sprintf(title,"EleHisto_dr03ecal_normL[%d]", ifile);
+    EleHisto_dr03ecal_normL[ifile] = (TH1F*)EleHisto_dr03ecal[ifile] -> Clone(title);
+    sprintf(title,"EleHisto_dr03tkCorr_normL[%d]", ifile);
+    EleHisto_dr03tkCorr_normL[ifile] = (TH1F*)EleHisto_dr03tkCorr[ifile] -> Clone(title);
+  }
+
+  for(int ifile=0; ifile<NDATA; ifile++){
+    if (EleHisto_detaVtx_normL[ifile]   -> GetEntries()>0) 
+      EleHisto_detaVtx_normL[ifile]     -> Scale(expected[ifile]/(EleHisto_detaVtx_normL[ifile] -> GetEntries()));
+    if (EleHisto_dphiVtx_normL[ifile]   -> GetEntries()>0) 
+      EleHisto_dphiVtx_normL[ifile]     -> Scale(expected[ifile]/(EleHisto_dphiVtx_normL[ifile] -> GetEntries()));
+    if (EleHisto_EoP_normL[ifile]   -> GetEntries()>0) 
+      EleHisto_EoP_normL[ifile]     -> Scale(expected[ifile]/(EleHisto_EoP_normL[ifile] -> GetEntries()));
+    if (EleHisto_dr03ecal_normL[ifile]   -> GetEntries()>0) 
+      EleHisto_dr03ecal_normL[ifile]     -> Scale(expected[ifile]/(EleHisto_dr03ecal_normL[ifile] -> GetEntries()));
+    if (EleHisto_detaVtx_normL[ifile]   -> GetEntries()>0) 
+      EleHisto_dr03tkCorr_normL[ifile]     -> Scale(expected[ifile]/(EleHisto_dr03tkCorr_normL[ifile] -> GetEntries()));
+ 
+    color = 2;
+    if (ifile > 0 ) {color = 4;}
+    
+    EleHisto_detaVtx_normL[ifile]     -> SetLineColor(color);
+    EleHisto_dphiVtx_normL[ifile]     -> SetLineColor(color);
+    EleHisto_EoP_normL[ifile]         -> SetLineColor(color);
+    EleHisto_dr03ecal_normL[ifile]    -> SetLineColor(color);
+    EleHisto_dr03tkCorr_normL[ifile]  -> SetLineColor(color);
+    
+    EleHisto_detaVtx_normL[ifile]     -> SetLineWidth(2);
+    EleHisto_dphiVtx_normL[ifile]     -> SetLineWidth(2);
+    EleHisto_EoP_normL[ifile]         -> SetLineWidth(2);
+    EleHisto_dr03ecal_normL[ifile]    -> SetLineWidth(2);
+    EleHisto_dr03tkCorr_normL[ifile]  -> SetLineWidth(2);
+  }
+
+
+
+  TStyle *tesiStyle = new TStyle("tesiStyle","");
+  tesiStyle->SetCanvasColor(0);
+  tesiStyle->SetFrameFillColor(0);
+  tesiStyle->SetStatColor(0);
+  tesiStyle->SetOptStat(000);
+  tesiStyle->SetOptFit(0011);
+  tesiStyle->SetTitleFillColor(0);
+  tesiStyle->SetCanvasBorderMode(0);
+  tesiStyle->SetPadBorderMode(0);
+  tesiStyle->SetFrameBorderMode(0);
+  tesiStyle->cd();
+
+  TLegend leg(0.7,0.8,0.85,0.92);
+  leg.AddEntry( EleHisto_detaVtx_normL[0], "Jpsi prompt signal",  "f");
+  leg.AddEntry( EleHisto_detaVtx_normL[1], "background", "f");
+  leg.SetFillColor(0);
+  leg.SetBorderSize(0.4);
+  
+
+  // summing up backgrounds and signals
+  TH1F  *staB_deta = (TH1F*) EleHisto_detaVtx_normL[1]->Clone( "BEleHisto_detaVtx");
+  for (int ii=1; ii<NDATA; ii++) {
+    staB_deta->Add(EleHisto_detaVtx_normL[ii]);
+  }
+  TH1F  *staS_deta = (TH1F*) EleHisto_detaVtx_normL[0]->Clone( "SEleHisto_detaVtx");
+  for (int ii=0; ii<1; ii++) {
+    staS_deta->Add(EleHisto_detaVtx_normL[ii]);
+  }
+  TCanvas c31("c31","all",1);  
+  staB_deta->Draw();
+  staS_deta->Draw("same");
+  leg.Draw();
+
+  c31.SaveAs("detacut.root");
+
+}
+
 
 // analisi signal: EB vs EE vs EBEB vs all
 void drawRegions() {
 
   chargeFiles();
-  readHistos();
+  readHistos(theStep);
   // cosmeticsSignal();
   normalizeTo1();
 
