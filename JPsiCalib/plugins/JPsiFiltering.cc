@@ -82,9 +82,10 @@ void JPsiFiltering::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
   // ---------------------------------------------------------------------
   // filters infos:
   Handle<edm::TriggerResults> FILTERR;  
-  try { iEvent.getByLabel(triggerResults_, FILTERR); }
-  catch(cms::Exception& ex){ edm::LogError("ProblemTriggserResults") << "Trigger results: " << triggerResults_ << " not found"; }
-  if (!FILTERR.isValid()) throw cms::Exception("ProductNotValid") << "TriggerResults product not valid";
+  iEvent.getByLabel(triggerResults_, FILTERR);
+  cout << "EEE triggerresults valid " << FILTERR.isValid() << endl;
+  cout << "EEE triggerresults failedtoget " << FILTERR.failedToGet() << endl;
+  //  if (!FILTERR.isValid()) throw cms::Exception("ProductNotValid") << "TriggerResults product not valid";
   
   int filter1 = 0;
   int filter2 = 0;
@@ -94,9 +95,11 @@ void JPsiFiltering::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
   int filter6 = 0;
   int filter7 = 0;
   int filter8 = 0;
-  if (FILTERR.isValid()){
-    triggerNames_.init(*FILTERR);
-    for ( unsigned int iFilter=0; iFilter < FILTERR->size(); iFilter++ ) {
+  // if (FILTERR.isValid()){
+    bool res = triggerNames_.init(*FILTERR);
+    cout << "tirgger names is " << res << " " << FILTERR->size() << endl;
+      for ( unsigned int iFilter=0; iFilter < FILTERR->size(); iFilter++ ) {
+      cout<<" &&&& filter " << triggerNames_.triggerName(iFilter) << " " <<  FILTERR->accept(iFilter) << endl;
       if (triggerNames_.triggerName(iFilter)=="p1" && FILTERR->accept(iFilter)==1) filter1 = 1;
       if (triggerNames_.triggerName(iFilter)=="p2" && FILTERR->accept(iFilter)==1) filter2 = 1;
       if (triggerNames_.triggerName(iFilter)=="p3" && FILTERR->accept(iFilter)==1) filter3 = 1;
@@ -106,7 +109,7 @@ void JPsiFiltering::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
       if (triggerNames_.triggerName(iFilter)=="p7" && FILTERR->accept(iFilter)==1) filter7 = 1;
       if (triggerNames_.triggerName(iFilter)=="p8" && FILTERR->accept(iFilter)==1) filter8 = 1;
     }
-  }
+    //  }
 
   // ---------------------------------------------------------------------
   // run infos:
