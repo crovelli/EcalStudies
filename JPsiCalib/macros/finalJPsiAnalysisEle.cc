@@ -16,6 +16,9 @@
 
 #include "finalJPsiAnalysisEle.hh"
 
+//#define HLTCUT 
+#define PTcut 3
+
 using namespace std;
 
 finalJPsiAnalysisEle::finalJPsiAnalysisEle(TTree *tree) 
@@ -72,7 +75,7 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
     if (ientry < 0) break;
     fChain->GetEntry(jentry);
     if (jentry ==1) std::cout << ">>> Signal is " << signal << std::endl;
-    if (jentry%50000 == 0) std::cout << ">>> Processing event # " << jentry << std::endl;
+    if (jentry%100000 == 0) std::cout << ">>> Processing event # " << jentry << std::endl;
 
     AllIncluded++;
 
@@ -137,8 +140,10 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
     if(!signal || numberOfGenerated==2) {
       goodGene++;
       
-      // selecting HLTbit 
+#ifdef HLTCUT      // selecting HLTbit 
       if (hltJpsi ) {
+#endif
+
 	totalTrigger++;
 	
 	passStep[0] = true;
@@ -150,17 +155,17 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
 	  passStep[1] = true;
 	}
 
-	// few numbers: all electrons, Et > 4
+	// few numbers: all electrons, Et > PTcut
 	TLorentzVector tmp;
 	std::vector<TLorentzVector> this4Pe, this4Pp;	
 	for(int theEle=0; theEle<numberOfElectrons; theEle++) { 
-	  if (etRecoEle[theEle]>4) totEleGt4++;
-	  if (etRecoEle[theEle]>4 && chargeRecoEle[theEle]>0) {
+	  if (etRecoEle[theEle]> PTcut) totEleGt4++;
+	  if (etRecoEle[theEle]> PTcut && chargeRecoEle[theEle]>0) {
 	    totEleGt4plus++;
 	    tmp.SetPxPyPzE(pxRecoEle[theEle], pyRecoEle[theEle], pzRecoEle[theEle], eneRecoEle[theEle]);
 	    this4Pp.push_back(tmp);
 	  }
-	  if (etRecoEle[theEle]>4 && chargeRecoEle[theEle]<0) {
+	  if (etRecoEle[theEle]> PTcut && chargeRecoEle[theEle]<0) {
 	    totEleGt4minus++;
 	    tmp.SetPxPyPzE(pxRecoEle[theEle], pyRecoEle[theEle], pzRecoEle[theEle], eneRecoEle[theEle]);
 	    this4Pe.push_back(tmp);
@@ -243,7 +248,7 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
 	    if (pxRecoEle[theEle]>-700) {
 	      
 	      // skipping electrons below threshold
-	      if (etRecoEle[theEle]>4) {
+	      if (etRecoEle[theEle]> PTcut) {
 
 		// searching for some criteria to select the two 'best' electrons (among those with Et>=4) ( analysis carried on using ECAL )	      
 		TVector3 this3P; 
@@ -588,7 +593,9 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
 	    }
 	  }
 	}
+#ifdef HLTCUT      // selecting HLTbit 
       } // ok HLT
+#endif
     } // ok generated   
 
     /// filling Histograms per steps
@@ -624,11 +631,11 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
   cout << "good number of gene MC = "              << goodGene        << endl;
   cout << "total number of events passing HLT = "  << totalTrigger    << ";  eff-> " << effHLT <<"+-" << erreffHLT << endl;
   cout << "total number of reco = "                << totalReco       << endl;
-  cout << "total number of reco & Et>4= "          << totalRecoGt4    << endl;
-  cout << "total number of reco & Et>4 & charge requirement = " << totalRecoGt4Charge << endl;
-  cout << "total number of reco & Et>4 & id & isol = " << totalIdentified <<  ";  eff-> " << effSelected <<"+-" << erreffSelected << endl;
-  cout << "total number of reco & ET>4 & id & full isol (tracker also) = " << numberOfPairsOk << ";  eff-> " << effSelIsol <<"+-" << erreffSelIsol << endl;
-  cout << "total number of reco & ET>4 & id & full isol (tracker also) + invMass in 2.5 - 3.7 = " << numbersOfInvMassOk << endl;
+  cout << "total number of reco & Et>" << PTcut << "= "          << totalRecoGt4    << endl;
+  cout << "total number of reco & Et>" << PTcut << " & charge requirement = " << totalRecoGt4Charge << endl;
+  cout << "total number of reco & Et>" << PTcut << " & id & isol = " << totalIdentified <<  ";  eff-> " << effSelected <<"+-" << erreffSelected << endl;
+  cout << "total number of reco & ET>" << PTcut << " & id & full isol (tracker also) = " << numberOfPairsOk << ";  eff-> " << effSelIsol <<"+-" << erreffSelIsol << endl;
+  cout << "total number of reco & ET>" << PTcut << " & id & full isol (tracker also) + invMass in 2.5 - 3.7 = " << numbersOfInvMassOk << endl;
   cout << endl;
   cout << "total number of reco & matched & id, more than 2 = " << totalIdentifiedMore << endl;
   cout << endl;
@@ -647,8 +654,10 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
   if (theSample==6) { filterEff_prod = 0.059  ;  crossSection =    59300000;}    // EMenrich30to80    0.0593 mb     0.059
   if (theSample==7) { filterEff_prod = 0.148  ;  crossSection =      906000;}    // EMenrich80to170   0.906e-3 mb   0.148
   if (theSample==8) { filterEff_prod = 2.3    ;    crossSection = 208000000;}    // !!doubleem 6-20 20.8 mb 	    0.023   
-  if (theSample==9) { filterEff_prod = 0.235  ;    crossSection = 297000000;}    // doubleem >20    0.297 mb      0.235   
+  if (theSample==9) { filterEff_prod = 0.235  ;    crossSection = 297000000;}    // doubleem >20    0.297 mb       
   if (theSample==10) { filterEff_prod = 0.0094  ;  crossSection = 95540;    }    // DYee 1-10        95540.       0.0094         
+  if (theSample==11) { filterEff_prod =0.074   ;  crossSection = 484400000;    }    // ppEleX   2409996 events 2417242 raw 48.44 mb  0.00074
+  
  
   long numEvents;
   numEvents = goodGene; 
