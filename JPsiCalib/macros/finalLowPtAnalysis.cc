@@ -16,6 +16,8 @@
 
 #include "finalLowPtAnalysis.hh"
 
+#define PTFiltcut 2
+
 using namespace std;
 
 finalLowPtAnalysis::finalLowPtAnalysis(TTree *tree) 
@@ -47,6 +49,7 @@ void finalLowPtAnalysis::Loop() {
   float totEleRobTight[8];
   float tot2eReco[8];
   float tot2eRecoGt4[8];
+  float tot2eRecoGt4dR[8];
   float tot2eIdent[8];
   float tot2eEleLoose[8];
   float tot2eEleRobLoose[8];
@@ -62,6 +65,7 @@ void finalLowPtAnalysis::Loop() {
     totEleRobTight[i] = 0.;
     tot2eReco[i]      = 0.;
     tot2eRecoGt4[i]     = 0.;
+    tot2eRecoGt4dR[i]     = 0.;
     tot2eIdent[i]       = 0.;
     tot2eEleLoose[i]    = 0.;
     tot2eEleRobLoose[i] = 0.;
@@ -77,6 +81,7 @@ void finalLowPtAnalysis::Loop() {
   float totalEleRobTight    = 0.;
   float total2eReco         = 0.;
   float total2eRecoGt4      = 0.;
+  float total2eRecoGt4dR      = 0.;
   float total2eIdentified   = 0.;
   float total2eEleLoose     = 0.;
   float total2eEleRobLoose  = 0.;
@@ -168,8 +173,15 @@ void finalLowPtAnalysis::Loop() {
 	
     ScHistoEle_size -> Fill(numberOfElectrons);
 
+    std::vector<TVector3> EledR_3P;
+    TVector3 this3PdR; 
+  
     for(int theEle=0; theEle<numberOfElectrons; theEle++) {
-      if (etRecoEle[theEle]>4) totEleGt4++;
+      if (etRecoEle[theEle]> PTFiltcut) {
+	totEleGt4++;
+	this3PdR.SetXYZ(xRecoEle[theEle], yRecoEle[theEle], zRecoEle[theEle]);
+	EledR_3P.push_back(this3PdR);
+      }
     }
     ScHistoGt4_size -> Fill(totEleGt4);
 
@@ -199,8 +211,29 @@ void finalLowPtAnalysis::Loop() {
 
     if(totEleGt4>1) {
       total2eRecoGt4++;
+      HepHisto_ptHatReco->Fill(ptHat);  /// 
       for (int i = 0;i < 8 ; i++) { 
-	if ( bitFilter[i] ) tot2eRecoGt4[i]++;
+	if ( bitFilter[i] ) {
+	  tot2eRecoGt4[i]++;
+	  HepHisto_ptHatRecoFilt[i]->Fill(ptHat); 
+	}
+      }
+      ///  computing dR
+      float deltaRtmp;
+      float ele_deltaRmin=999.;
+      float ele_deltaRmax=0.;
+      for (unsigned int ii=0;ii<EledR_3P.size();ii++) {
+	for (unsigned int jj=ii+1;jj<EledR_3P.size();jj++) {
+	  deltaRtmp = EledR_3P[ii].DeltaR(EledR_3P[jj]);
+	  if (deltaRtmp > ele_deltaRmax ) ele_deltaRmax = deltaRtmp;
+	  if (deltaRtmp < ele_deltaRmin ) ele_deltaRmin = deltaRtmp;
+	}
+      }
+      if(ele_deltaRmax > 0.1 && ele_deltaRmin < 1.1) {
+	total2eRecoGt4dR++;
+	for (int i = 0;i < 8 ; i++) { 
+	  if ( bitFilter[i] ) tot2eRecoGt4dR[i]++; 
+	}
       }
     }
     
@@ -254,7 +287,7 @@ void finalLowPtAnalysis::Loop() {
 	Ele_3P.push_back(this3P);
 	Ele_4P.push_back(this4P);
 
-	if (etRecoEle[theEle]>4) {
+	if (etRecoEle[theEle]>PTFiltcut) {
 
 	
 	// making a loose eleID (among those with Et>=4) ( analysis carried on using ECAL )	  
@@ -333,8 +366,9 @@ void finalLowPtAnalysis::Loop() {
       float ele_mee = (Ele_4P[0] + Ele_4P[1]).M();
       
       ScHisto_deltaR->Fill(ele_deltaR);
+      
       for (int i = 0;i < 8 ; i++) { 
-	if ( bitFilter[i] ) ScHisto_deltaRFilt[i]->Fill(ele_deltaR); 
+	if ( bitFilter[i] )  ScHisto_deltaRFilt[i]->Fill(ele_deltaR); 
       }
       ScHisto_invMass->Fill(ele_mee);
     }  
@@ -349,12 +383,10 @@ void finalLowPtAnalysis::Loop() {
     }
 
     if(numberOfgoodEle >1) {
-      HepHisto_ptHatReco->Fill(ptHat);  /// 
       total2eIdentified++;
       for (int i = 0;i < 8 ; i++) { 
 	if ( bitFilter[i] ) {
 	  tot2eIdent[i]++;
-	  HepHisto_ptHatRecoFilt[i]->Fill(ptHat); 
 	}
       }
     }
@@ -365,7 +397,7 @@ void finalLowPtAnalysis::Loop() {
 
       // skipping problematic electrons
       if (xRecoEle[theEle]>-700) {
-	if (etRecoEle[theEle]>4) {
+	if (etRecoEle[theEle]> PTFiltcut) {
 	  
 	  if(eleIdLoose[theEle]) {
 	    numIdLoose++;
@@ -455,9 +487,9 @@ void finalLowPtAnalysis::Loop() {
 //   cout << "noFilt " << setw(9) << totalEleLoose << setw(10) << totalEleRobLoose << setw(14) <<  totalIdentified << setw(12) << totalRecoGt4  << setw(11) << total2eEleLoose << setw(11) << total2eEleRobLoose << setw(14) <<  total2eIdentified << setw(12) << total2eRecoGt4 <<  endl;
 //   for (int i=0; i<8; i++)  cout << "Filt" << i +1 << "  "  << setw(9) << totEleLoose[i] << setw(10) << totEleRobLoose[i] <<  setw(14) <<  totIdent[i] << setw(12) << totRecoGt4[i] << setw(11) << tot2eEleLoose[i] << setw(11) << tot2eEleRobLoose[i] << setw(14) <<  tot2eIdent[i] << setw(12) << tot2eRecoGt4[i] << endl;
   
-  cout << "           2EleLoose  2EleRobLoose  2RoughEleID  2RecoGt4    2Reco  " << endl;
-  cout << "noFilt " << setw(11) << total2eEleLoose << setw(11) << total2eEleRobLoose << setw(14) <<  total2eIdentified << setw(12) << total2eRecoGt4 << setw(12) << total2eReco << endl;
-  for (int i=0; i<8; i++)  cout << "Filt" << i +1 << "  "  << setw(11) << tot2eEleLoose[i] << setw(11) << tot2eEleRobLoose[i] << setw(14) <<  tot2eIdent[i] << setw(12) << tot2eRecoGt4[i] << setw(12) << tot2eReco[i] << endl;
+  cout << "           2EleIDdR  2EleRobLoose  2RoughEleID  2RecoGt4    2Reco  " << endl;
+  cout << "noFilt " << setw(11) << total2eRecoGt4dR << setw(11) << total2eEleRobLoose << setw(14) <<  total2eIdentified << setw(12) << total2eRecoGt4 << setw(12) << total2eReco << endl;
+  for (int i=0; i<8; i++)  cout << "Filt" << i +1 << "  "  << setw(11) << tot2eRecoGt4dR[i] << setw(11) << tot2eEleRobLoose[i] << setw(14) <<  tot2eIdent[i] << setw(12) << tot2eRecoGt4[i] << setw(12) << tot2eReco[i] << endl;
   
   
 //   // Efficiencies and Pass rates
@@ -468,17 +500,16 @@ void finalLowPtAnalysis::Loop() {
   float filtRobLooseEff[8];
   float filtEff2e[8];
   float filtEffeleId2e[8];
-  float filtLooseEff2e[8];
+  float filtdREff2e[8];
   float filtRobLooseEff2e[8];
   float filtPassRate[8];
   float errfiltEff2e[8];
   float errfiltEffeleId2e[8];
-  float errfiltLooseEff2e[8];
+  float errfiltdREff2e[8];
   float errfiltRobLooseEff2e[8];
   float errPassRate[8];
 
-  //  cout << "EFF:      EleLoose  EleRobLoose  RoughEleID    RecoGt4    2EleLoose  2EleRobLoose  2RoughEleID  2RecoGt4" << endl;
-  cout << "EFF:          2EleLoose      2EleRobLoose      2RoughEleID        2RecoGt4         PassRate" << endl;
+  cout << "EFF:          2EleLoose      2EleRobLoose      2RoughEleID        2RecoGt"<< PTFiltcut << "         PassRate" << endl;
   for (int i=0; i<8; i++) {    
     filtEff[i]        = totRecoGt4[i]/totalRecoGt4 ;
     filtEffeleId[i]   = totIdent[i]/totalIdentified ;
@@ -486,18 +517,18 @@ void finalLowPtAnalysis::Loop() {
     filtRobLooseEff[i]= totEleRobLoose[i]/totalEleRobLoose ;
     filtEff2e[i]        = tot2eRecoGt4[i]/total2eRecoGt4 ;
     filtEffeleId2e[i]   = tot2eIdent[i]/total2eIdentified ;
-    filtLooseEff2e[i]   = tot2eEleLoose[i]/total2eEleLoose ;
+    filtdREff2e[i]   = tot2eRecoGt4dR[i]/total2eRecoGt4dR ;
     filtRobLooseEff2e[i]= tot2eEleRobLoose[i]/total2eEleRobLoose ;
     errfiltEff2e[i]     = sqrt(filtEff2e[i]*(1-filtEff2e[i])/total2eRecoGt4);
     errfiltEffeleId2e[i]= sqrt(filtEffeleId2e[i]*(1-filtEffeleId2e[i])/total2eIdentified);
-    errfiltLooseEff2e[i]= sqrt(filtLooseEff2e[i]*(1-filtLooseEff2e[i])/total2eEleLoose);
+    errfiltdREff2e[i]= sqrt(filtdREff2e[i]*(1-filtdREff2e[i])/total2eRecoGt4dR);
     errfiltRobLooseEff2e[i]= sqrt(filtRobLooseEff2e[i]*(1-filtRobLooseEff2e[i])/total2eEleRobLoose);
     
     filtPassRate[i]   = totFilter[i]/totalEvents ;
     errPassRate[i]    = sqrt(filtPassRate[i] * (1-filtPassRate[i]) / totalEvents) ;
    //    cout << "Filt" << i +1 << "  "  << setw(11) << filtLooseEff[i] << setw(12) << filtRobLooseEff[i]  << setw(13) << filtEffeleId[i] << setw(12) << filtEff[i] << setw(11) << filtLooseEff2e[i] << setw(13) << filtRobLooseEff2e[i]  << setw(14) << filtEffeleId2e[i] << setw(12) << filtEff2e[i] << endl;
     cout << "Filt" << i +1 << "  "  ;
-    cout << setw(10) << setprecision(4) << fixed << filtLooseEff2e[i] *100    << "+-" << setw(4) << errfiltLooseEff2e[i] *100 ;
+    cout << setw(10) << setprecision(4) <<  fixed << filtdREff2e[i] *100       << "+-" << setw(4) << errfiltdREff2e[i] *100 ;
     cout << setw(10) << setprecision(4) <<  fixed << filtRobLooseEff2e[i]*100  << "+-" << setw(4) << errfiltRobLooseEff2e[i] *100;
     cout << setw(10) << setprecision(4) <<  fixed << filtEffeleId2e[i] *100    << "+-" << setw(4) << errfiltEffeleId2e[i] *100;
     cout << setw(10) << setprecision(4) <<  fixed << filtEff2e[i] *100         << "+-" << setw(4) << errfiltEff2e[i] *100;
