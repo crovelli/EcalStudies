@@ -13,7 +13,7 @@
 <use name=RecoEgamma/EgammaMCTools>
 <use name=RecoEcal/EgammaCoreTools>
 <use name=RecoEgamma/Examples>
-<use name=PhysicsTools/UtilAlgos>
+<use name=CommonTools/UtilAlgos>
 <use name=FWCore/ServiceRegistry>
 <use name=hepmc> 
 <use name=clhep>

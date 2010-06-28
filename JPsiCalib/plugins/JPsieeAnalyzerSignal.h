@@ -11,7 +11,7 @@
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "FWCore/Framework/interface/TriggerNames.h"
 #include "DataFormats/Common/interface/EDProduct.h"
-#include "PhysicsTools/UtilAlgos/interface/TFileService.h"
+#include "CommonTools/UtilAlgos/interface/TFileService.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include "DataFormats/Common/interface/ValueMap.h"
 
@@ -43,7 +43,7 @@ class JPsieeAnalyzerSignal : public edm::EDAnalyzer
    
  explicit JPsieeAnalyzerSignal(const edm::ParameterSet& conf);
    
- virtual void beginJob(edm::EventSetup const& iSetup);
+ virtual void beginJob();
  virtual void endJob();
  virtual void analyze(const edm::Event& e, const edm::EventSetup& c);
 

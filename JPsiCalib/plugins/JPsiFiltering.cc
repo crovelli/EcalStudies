@@ -95,7 +95,8 @@ void JPsiFiltering::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
   int filter7 = 0;
   int filter8 = 0;
   if (FILTERR.isValid()){
-    bool res = triggerNames_.init(*FILTERR);
+    triggerNames_.init(*FILTERR);
+    //bool res = triggerNames_.init(*FILTERR);
     //   cout << "tirgger names is " << res << " " << FILTERR->size() << endl;
     for ( unsigned int iFilter=0; iFilter < FILTERR->size(); iFilter++ ) {
 	//cout<<" &&&& filter " << triggerNames_.triggerName(iFilter) << " " <<  FILTERR->accept(iFilter) << endl;

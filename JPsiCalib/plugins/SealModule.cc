@@ -8,7 +8,7 @@
 
 DEFINE_SEAL_MODULE();
 
-#include "PhysicsTools/UtilAlgos/interface/Merger.h"
+#include "CommonTools/UtilAlgos/interface/Merger.h"
 #include "DataFormats/EgammaReco/interface/SuperCluster.h"
 #include "DataFormats/EgammaReco/interface/SuperClusterFwd.h"
 DEFINE_FWK_MODULE(JPsieeAnalyzerSignal);

@@ -54,7 +54,7 @@ JPsieeAnalyzerSignal::JPsieeAnalyzerSignal(const edm::ParameterSet& iConfig) {
 }
 
 
-void JPsieeAnalyzerSignal::beginJob(const EventSetup&) { 
+void JPsieeAnalyzerSignal::beginJob() { 
 
   OutputTree = new JPsiTree(fOutFileTreeName_.c_str()); 
 } 
@@ -300,8 +300,8 @@ void JPsieeAnalyzerSignal::analyze(const edm::Event& iEvent, const edm::EventSet
     if (!isMomentumCorrected)    intIsMomentumCorrected = 0;
     
     // particle flow or standard electron
-    bool isEcalDriven   = eleIter->isEcalDriven();
-    bool isParticleFlow = eleIter->isTrackerDriven();
+    bool isEcalDriven   = eleIter->ecalDrivenSeed();
+    bool isParticleFlow = eleIter->trackerDrivenSeed();
     int intIsEcalDriven, intIsParticleFlow;
     if ( isEcalDriven )   intIsEcalDriven = 1;
     if (!isEcalDriven )   intIsEcalDriven = 0;
