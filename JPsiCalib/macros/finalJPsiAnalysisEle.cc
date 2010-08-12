@@ -572,11 +572,11 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
 	if ( numberOfEleOkPlus>=1 && numberOfEleOkMinus>=1 && numberOfPairsOk>=1 ){ 
 	  for(int theEle1=0; theEle1<numberOfElectrons; theEle1++) { 
 	    if (pxRecoEle[theEle1]<-700) continue;
-	    if (etRecoEle[theEle1]<4)     continue;
+	    if (etRecoEle[theEle1]< PTcut)     continue;
 	  
 	    for(int theEle2=(theEle1+1); theEle2<numberOfElectrons; theEle2++) { 
 	      if (pxRecoEle[theEle2]<-700) continue;
-	      if (etRecoEle[theEle2]<4)     continue;
+	      if (etRecoEle[theEle2]< PTPut)     continue;
 	    
 	      TLorentzVector tlvTheEle1, tlvTheEle2;
 	      TVector3 tv3TheEle1, tv3TheEle2;
