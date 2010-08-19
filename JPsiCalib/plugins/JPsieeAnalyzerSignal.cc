@@ -7,7 +7,7 @@
 #include "FWCore/Framework/interface/EDAnalyzer.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
-#include "FWCore/Framework/interface/TriggerNames.h"
+#include "FWCore/Common/interface/TriggerNames.h"
 #include "DataFormats/Common/interface/Handle.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include "DataFormats/EgammaCandidates/interface/GsfElectron.h"
@@ -68,6 +68,7 @@ void JPsieeAnalyzerSignal::analyze(const edm::Event& iEvent, const edm::EventSet
   
   // 1) HLT
   Handle<edm::TriggerResults> HLTR;  
+
   try { iEvent.getByLabel(triggerResults_, HLTR); }
   catch(cms::Exception& ex){ edm::LogError("ProblemHltTriggserResults") << "Trigger results: " << triggerResults_ << " not found"; }
   if (!HLTR.isValid()) throw cms::Exception("ProductNotValid") << "TriggerResults product not valid";
@@ -77,11 +78,12 @@ void JPsieeAnalyzerSignal::analyze(const edm::Event& iEvent, const edm::EventSet
   bool hltBoth    = false;
   // considering the two possible HLTmenu  1e31 or 8e29 
   if (HLTR.isValid()){
-    triggerNames_.init(*HLTR);
+    // get trigger names
+    const edm::TriggerNames & triggerNames = iEvent.triggerNames(*HLTR);
     for ( unsigned int iHlt=0; iHlt < HLTR->size(); iHlt++ ) {
-      if (( triggerNames_.triggerName(iHlt)=="HLT_DoubleEle5_SW_Jpsi_L1R"    || triggerNames_.triggerName(iHlt)=="HLT_DoublePhoton5_Jpsi_L1R" )    && HLTR->accept(iHlt)==1) hltJPsi = true;
-      if (( triggerNames_.triggerName(iHlt)=="HLT_DoubleEle5_SW_Upsilon_L1R" || triggerNames_.triggerName(iHlt)=="HLT_DoublePhoton5_Upsilon_L1R" ) && HLTR->accept(iHlt)==1) hltUpsilon = true;
-      if (( triggerNames_.triggerName(iHlt)=="HLT_DoubleEle10_SW_L1R"        || triggerNames_.triggerName(iHlt)=="HLT_DoublePhoton5_eeRes_L1R" )   && HLTR->accept(iHlt)==1) hltBoth = true;
+      if (( triggerNames.triggerName(iHlt)=="HLT_DoublePhoton4_eeRes_L1R"   )    && HLTR->accept(iHlt)==1) hltJPsi = true;
+      if (( triggerNames.triggerName(iHlt)=="HLT_DoublePhoton4_Upsilon_L1R")  && HLTR->accept(iHlt)==1) hltUpsilon = true;
+      if (( triggerNames.triggerName(iHlt)=="HLT_DoublePhoton4_Jpsi_L1R" )   && HLTR->accept(iHlt)==1) hltBoth = true;
     }
   }
   if ( hltJPsi) intHltJPsi = 1;

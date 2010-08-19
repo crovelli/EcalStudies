@@ -11,7 +11,7 @@
 #include "FWCore/ServiceRegistry/interface/Service.h"
 #include "DataFormats/Common/interface/EDProduct.h"
 #include "AnalysisDataFormats/Egamma/interface/ElectronID.h"
-#include "FWCore/Framework/interface/TriggerNames.h"
+#include "FWCore/Common/interface/TriggerNames.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
 #include "DataFormats/Common/interface/ValueMap.h"
 
@@ -55,8 +55,6 @@ class JPsiFiltering : public edm::EDAnalyzer
   typedef std::vector< edm::Handle<eleIdMap> > eleIdContainer;
   eleIdContainer *eleIdResults_;
 
-  edm::TriggerNames triggerNames_;
-  
   // tree
   std::string fOutFileTreeName_;
   FilteringTree* OutputTree;

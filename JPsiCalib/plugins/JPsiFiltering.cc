@@ -15,7 +15,7 @@
 #include "DataFormats/GsfTrackReco/interface/GsfTrackFwd.h"
 #include "SimDataFormats/GeneratorProducts/interface/HepMCProduct.h"
 #include "SimDataFormats/GeneratorProducts/interface/GenEventInfoProduct.h"
-#include "FWCore/Framework/interface/TriggerNames.h"
+#include "FWCore/Common/interface/TriggerNames.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
 
 // root & others
@@ -95,19 +95,19 @@ void JPsiFiltering::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
   int filter7 = 0;
   int filter8 = 0;
   if (FILTERR.isValid()){
-    triggerNames_.init(*FILTERR);
-    //bool res = triggerNames_.init(*FILTERR);
-    //   cout << "tirgger names is " << res << " " << FILTERR->size() << endl;
+    // get trigger names
+    const edm::TriggerNames & triggerNames = iEvent.triggerNames(*FILTERR);
+
     for ( unsigned int iFilter=0; iFilter < FILTERR->size(); iFilter++ ) {
-	//cout<<" &&&& filter " << triggerNames_.triggerName(iFilter) << " " <<  FILTERR->accept(iFilter) << endl;
-      if (triggerNames_.triggerName(iFilter)=="p1" && FILTERR->accept(iFilter)==1) filter1 = 1;
-      if (triggerNames_.triggerName(iFilter)=="p2" && FILTERR->accept(iFilter)==1) filter2 = 1;
-      if (triggerNames_.triggerName(iFilter)=="p3" && FILTERR->accept(iFilter)==1) filter3 = 1;
-      if (triggerNames_.triggerName(iFilter)=="p4" && FILTERR->accept(iFilter)==1) filter4 = 1;
-      if (triggerNames_.triggerName(iFilter)=="p5" && FILTERR->accept(iFilter)==1) filter5 = 1;
-      if (triggerNames_.triggerName(iFilter)=="p6" && FILTERR->accept(iFilter)==1) filter6 = 1;
-      if (triggerNames_.triggerName(iFilter)=="p7" && FILTERR->accept(iFilter)==1) filter7 = 1;
-      if (triggerNames_.triggerName(iFilter)=="p8" && FILTERR->accept(iFilter)==1) filter8 = 1;
+
+      if (triggerNames.triggerName(iFilter)=="p1" && FILTERR->accept(iFilter)==1) filter1 = 1;
+      if (triggerNames.triggerName(iFilter)=="p2" && FILTERR->accept(iFilter)==1) filter2 = 1;
+      if (triggerNames.triggerName(iFilter)=="p3" && FILTERR->accept(iFilter)==1) filter3 = 1;
+      if (triggerNames.triggerName(iFilter)=="p4" && FILTERR->accept(iFilter)==1) filter4 = 1;
+      if (triggerNames.triggerName(iFilter)=="p5" && FILTERR->accept(iFilter)==1) filter5 = 1;
+      if (triggerNames.triggerName(iFilter)=="p6" && FILTERR->accept(iFilter)==1) filter6 = 1;
+      if (triggerNames.triggerName(iFilter)=="p7" && FILTERR->accept(iFilter)==1) filter7 = 1;
+      if (triggerNames.triggerName(iFilter)=="p8" && FILTERR->accept(iFilter)==1) filter8 = 1;
     }
   }
 

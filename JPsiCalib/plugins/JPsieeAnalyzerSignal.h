@@ -9,7 +9,7 @@
 #include "FWCore/ParameterSet/interface/InputTag.h"
 #include "FWCore/Framework/interface/ESHandle.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
-#include "FWCore/Framework/interface/TriggerNames.h"
+#include "FWCore/Common/interface/TriggerNames.h"
 #include "DataFormats/Common/interface/EDProduct.h"
 #include "CommonTools/UtilAlgos/interface/TFileService.h"
 #include "DataFormats/Common/interface/TriggerResults.h"
@@ -58,7 +58,6 @@ class JPsieeAnalyzerSignal : public edm::EDAnalyzer
  bool isSignal_;  
  bool isUpsiAnalysis_;  
  
- edm::TriggerNames triggerNames_;
  int intHltJPsi, intHltUpsilon, intHltBoth;
  
  typedef edm::ValueMap<float> eleIdMap;
