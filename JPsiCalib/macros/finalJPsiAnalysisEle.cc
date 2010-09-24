@@ -576,7 +576,7 @@ void finalJPsiAnalysisEle::Loop(int theSample) {
 	  
 	    for(int theEle2=(theEle1+1); theEle2<numberOfElectrons; theEle2++) { 
 	      if (pxRecoEle[theEle2]<-700) continue;
-	      if (etRecoEle[theEle2]< PTPut)     continue;
+	      if (etRecoEle[theEle2]< PTcut)     continue;
 	    
 	      TLorentzVector tlvTheEle1, tlvTheEle2;
 	      TVector3 tv3TheEle1, tv3TheEle2;
