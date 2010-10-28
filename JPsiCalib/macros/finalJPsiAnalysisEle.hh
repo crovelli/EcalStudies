@@ -83,6 +83,18 @@ private:
   TH1F *ScHisto_maxEtHighestEt;        
   TH1F *ScHisto_minEtHighestEt;        
   TH1F *ScHisto_deltaRHighestEt;       
+
+  TH1F *ScHisto_maxEtBG;  
+  TH1F *ScHisto_minEtBG;   
+  TH1F *ScHisto_deltaRBG; 
+  TH1F *ScHisto_etaBG;     
+  TH1F *ScHisto_phiBG;      
+  TH1F *ScHisto_maxEtBG2;  
+  TH1F *ScHisto_minEtBG2;   
+  TH1F *ScHisto_deltaRBG2; 
+  TH1F *ScHisto_etaBG2;     
+  TH1F *ScHisto_phiBG2;      
+
   std::vector<TH1F*> ScHisto_invMassHighestEt;
       
   TH1F *ScHisto_s9s25HighestEt;        
