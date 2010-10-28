@@ -51,6 +51,7 @@ JPsieeAnalyzerSignal::JPsieeAnalyzerSignal(const edm::ParameterSet& iConfig) {
   ecalRechitsCollectionEE_ = iConfig.getParameter<InputTag>("ecalrechitsCollectionEE");  
   triggerResults_	   = iConfig.getParameter<InputTag>("triggerResults");
   isSignal_                = iConfig.getUntrackedParameter<bool>("isSignal");
+  isData_                  = iConfig.getUntrackedParameter<bool>("isData");
 }
 
 
@@ -81,9 +82,15 @@ void JPsieeAnalyzerSignal::analyze(const edm::Event& iEvent, const edm::EventSet
     // get trigger names
     const edm::TriggerNames & triggerNames = iEvent.triggerNames(*HLTR);
     for ( unsigned int iHlt=0; iHlt < HLTR->size(); iHlt++ ) {
-      if (( triggerNames.triggerName(iHlt)=="HLT_DoublePhoton4_eeRes_L1R"   )    && HLTR->accept(iHlt)==1) hltJPsi = true;
-      if (( triggerNames.triggerName(iHlt)=="HLT_DoublePhoton4_Upsilon_L1R")  && HLTR->accept(iHlt)==1) hltUpsilon = true;
-      if (( triggerNames.triggerName(iHlt)=="HLT_DoublePhoton4_Jpsi_L1R" )   && HLTR->accept(iHlt)==1) hltBoth = true;
+      //#  menu August 2010
+      if (( triggerNames.triggerName(iHlt)=="HLT_DoubleEle4_SW_eeRes_L1R"   )    && HLTR->accept(iHlt)==1) {
+	hltJPsi = true;
+	hltUpsilon = true;
+      }
+      //#  menu June/July
+      //#      if (( triggerNames.triggerName(iHlt)=="HLT_DoublePhoton4_eeRes_L1R"   )    && HLTR->accept(iHlt)==1) hltJPsi = true;
+      //#      if (( triggerNames.triggerName(iHlt)=="HLT_DoublePhoton4_Upsilon_L1R")  && HLTR->accept(iHlt)==1) hltUpsilon = true;
+      //#      if (( triggerNames.triggerName(iHlt)=="HLT_DoublePhoton4_Jpsi_L1R" )   && HLTR->accept(iHlt)==1) hltBoth = true;
     }
   }
   if ( hltJPsi) intHltJPsi = 1;
@@ -100,16 +107,18 @@ void JPsieeAnalyzerSignal::analyze(const edm::Event& iEvent, const edm::EventSet
   iSetup.get<CaloTopologyRecord>().get(topology);
   if (topology.isValid()) theTopology = topology.product();
   
-  // 3) generated electrons
   const HepMC::GenEvent *myGenEvent;
-  Handle<edm::HepMCProduct> hepMC;
-  iEvent.getByLabel("generator", hepMC);
-  myGenEvent = hepMC->GetEvent();
+  if ( !isData_) {
+    // 3) generated electrons
+    Handle<edm::HepMCProduct> hepMC;
+    iEvent.getByLabel("generator", hepMC);
+    myGenEvent = hepMC->GetEvent();
+  }
 
   // 4) reconstructed electrons  
   Handle<GsfElectronCollection> gsfElectrons;
   iEvent.getByLabel(electronCollection_,gsfElectrons); 
-
+  
   // 5) ECAL rechits to build cluster shapes
   const EcalRecHitCollection *rechitsEB;
   const EcalRecHitCollection *rechitsEE;
@@ -127,39 +136,42 @@ void JPsieeAnalyzerSignal::analyze(const edm::Event& iEvent, const edm::EventSet
   iEvent.getByLabel( "eidRobustTight", (*eleIdResults_)[2] );
   iEvent.getByLabel( "eidTight",       (*eleIdResults_)[3] );
   
-  // 7) pt hat
-  Handle<GenEventInfoProduct> genEventInfo;
-  iEvent.getByLabel("generator", genEventInfo);
-  float ptHat = genEventInfo->qScale();
-  
+  float ptHat = -1.;
+  if (!isData_) {
+    // 7) pt hat
+    Handle<GenEventInfoProduct> genEventInfo;
+    iEvent.getByLabel("generator", genEventInfo);
+    ptHat = genEventInfo->qScale();
+  }
 
   // ---------------------------------------------------------------------
   // generator level informations
   
+
   // if running on background samples we skip events with true j/psi 
   //  bool isASignal = false;
   int isJPsi = 0;
   int isUpsi = 0;
 
-  if( !isSignal_ ) {
-    HepMC::GenEvent::particle_const_iterator mcIter;
-    for ( mcIter=myGenEvent->particles_begin(); mcIter != myGenEvent->particles_end(); mcIter++ ) {
-      if ( fabs((*mcIter)->pdg_id())==11) {
-	HepMC::GenParticle* mother=0;
-	if ( (*mcIter)->production_vertex() ) {
-	  if ((*mcIter)->production_vertex()->particles_begin(HepMC::parents) != (*mcIter)->production_vertex()->particles_end(HepMC::parents)) { 
-	    mother = *((*mcIter)->production_vertex()->particles_begin(HepMC::parents));
+  if ( ! isData_) {
+    if( !isSignal_ ) {
+      HepMC::GenEvent::particle_const_iterator mcIter;
+      for ( mcIter=myGenEvent->particles_begin(); mcIter != myGenEvent->particles_end(); mcIter++ ) {
+	if ( fabs((*mcIter)->pdg_id())==11) {
+	  HepMC::GenParticle* mother=0;
+	  if ( (*mcIter)->production_vertex() ) {
+	    if ((*mcIter)->production_vertex()->particles_begin(HepMC::parents) != (*mcIter)->production_vertex()->particles_end(HepMC::parents)) { 
+	      mother = *((*mcIter)->production_vertex()->particles_begin(HepMC::parents));
+	    }
 	  }
-	}
-	if (mother != 0 && ((mother->pdg_id() == 553) || (mother->pdg_id() == 100553) || (mother->pdg_id() == 200553) )) isUpsi = 1; 
-	if ((mother != 0) && ((mother->pdg_id() == 443) ) ) isJPsi = 1; 
-      } // if electron
-    }
-  } // if signal
-  
-  // if background sample and a j/psi is found, skip the event
-  //  if( isSignal_ ||  !isASignal ) {
-  
+	  if (mother != 0 && ((mother->pdg_id() == 553) || (mother->pdg_id() == 100553) || (mother->pdg_id() == 200553) )) isUpsi = 1; 
+	  if ((mother != 0) && ((mother->pdg_id() == 443) ) ) isJPsi = 1; 
+	} // if electron
+      }
+    } // if signal
+    
+  }
+   
   // ------------------------------------------------
   // run infos:
   int theRun         = iEvent.id().run();
@@ -175,7 +187,7 @@ void JPsieeAnalyzerSignal::analyze(const edm::Event& iEvent, const edm::EventSet
   
   // for signal only, MC info: electrons from j/psi
   int theMcPc = 0;
-  if( isSignal_ ) {
+  if( isSignal_ && ! isData_ ) {
     
     float pxGenEle[2];
     float pyGenEle[2];

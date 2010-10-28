@@ -56,6 +56,7 @@ class JPsieeAnalyzerSignal : public edm::EDAnalyzer
  edm::InputTag triggerResults_;
 
  bool isSignal_;  
+ bool isData_;  
  bool isUpsiAnalysis_;  
  
  int intHltJPsi, intHltUpsilon, intHltBoth;
